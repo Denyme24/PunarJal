@@ -1,16 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import {
   Filter,
   Droplets,
   Sparkles,
-  CheckCircle2,
-  AlertCircle,
   Activity,
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -83,18 +79,39 @@ const Dashboard = () => {
     flowRate: 1200,
   });
 
+  const moveToNextStage = useCallback(() => {
+    setCurrentStageIndex((i) => Math.min(i + 1, stages.length - 1));
+  }, [stages.length]);
+
+  const resetSimulation = useCallback(() => {
+    setCurrentStageIndex(0);
+    setStages((prev) =>
+      prev.map((stage, index) => ({
+        ...stage,
+        status: index === 0 ? "active" : "pending",
+        progress: 0,
+      }))
+    );
+    setRealTimeData({
+      turbidity: 500,
+      pH: 7.2,
+      cod: 300,
+      flowRate: 1200,
+    });
+  }, []);
+
   // Simulate treatment progress
   useEffect(() => {
     const interval = setInterval(() => {
       setStages((prev) =>
         prev.map((stage, index) => {
           if (index === currentStageIndex && stage.status === "active") {
-            const newProgress = Math.min(stage.progress + 2, 100);
+            const newProgress = Math.min(stage.progress + 1, 100);
 
             if (newProgress === 100) {
               // Move to next stage
               setTimeout(() => {
-                setCurrentStageIndex((i) => Math.min(i + 1, stages.length - 1));
+                moveToNextStage();
               }, 1000);
 
               return { ...stage, progress: newProgress, status: "completed" };
@@ -109,21 +126,21 @@ const Dashboard = () => {
           return stage;
         })
       );
-    }, 100);
+    }, 200); // Reduced frequency to prevent flickering
 
     return () => clearInterval(interval);
-  }, [currentStageIndex]);
+  }, [currentStageIndex, moveToNextStage]);
 
   // Simulate real-time sensor data
   useEffect(() => {
     const interval = setInterval(() => {
       setRealTimeData((prev) => ({
-        turbidity: Math.max(2, prev.turbidity - Math.random() * 10),
-        pH: 7.0 + Math.random() * 0.4 - 0.2,
-        cod: Math.max(5, prev.cod - Math.random() * 5),
-        flowRate: 1200 + Math.random() * 100 - 50,
+        turbidity: Math.max(2, prev.turbidity - Math.random() * 5),
+        pH: Math.max(6.8, Math.min(7.4, 7.0 + Math.random() * 0.4 - 0.2)),
+        cod: Math.max(5, prev.cod - Math.random() * 3),
+        flowRate: Math.max(1000, Math.min(1400, 1200 + Math.random() * 100 - 50)),
       }));
-    }, 2000);
+    }, 3000); // Reduced frequency to prevent flickering
 
     return () => clearInterval(interval);
   }, []);
@@ -141,18 +158,6 @@ const Dashboard = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge className="bg-blue-500">In Progress</Badge>;
-      case "completed":
-        return <Badge className="bg-green-500">Completed</Badge>;
-      case "skipped":
-        return <Badge className="bg-gray-500">Skipped</Badge>;
-      default:
-        return <Badge className="bg-gray-600">Pending</Badge>;
-    }
-  };
 
   return (
     <ProtectedRoute>
@@ -264,45 +269,30 @@ const Dashboard = () => {
                           </p>
                         </div>
                       </div>
-                      {getStatusBadge(stage.status)}
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-white/80 text-sm">Progress</span>
-                          <span className="text-white font-semibold">
-                            {stage.progress}%
-                          </span>
-                        </div>
-                        <Progress value={stage.progress} className="h-2" />
-                      </div>
-
-                      {stage.status !== "pending" && (
-                        <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-white/10">
-                          {Object.entries(stage.parameters).map(
-                            ([key, value]) => (
-                              <div key={key} className="space-y-1">
-                                <span className="text-xs text-white/60 uppercase">
-                                  {key}
-                                </span>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-white/50 line-through">
-                                    {value.before}
-                                  </span>
-                                  <span className="text-white">→</span>
-                                  <span className="text-cyan-400 font-semibold">
-                                    {value.after}
-                                  </span>
-                                  <span className="text-xs text-white/60">
-                                    {value.unit}
-                                  </span>
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {Object.entries(stage.parameters).map(
+                        ([key, value]) => (
+                          <div key={key} className="space-y-1">
+                            <span className="text-xs text-white/60 uppercase">
+                              {key}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-white/50 line-through">
+                                {value.before}
+                              </span>
+                              <span className="text-white">→</span>
+                              <span className="text-cyan-400 font-semibold">
+                                {value.after}
+                              </span>
+                              <span className="text-xs text-white/60">
+                                {value.unit}
+                              </span>
+                            </div>
+                          </div>
+                        )
                       )}
                     </div>
                   </CardContent>
@@ -321,14 +311,14 @@ const Dashboard = () => {
             <Button
               onClick={() => (window.location.href = "/reuse")}
               disabled={stages[stages.length - 1].status !== "completed"}
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-6 text-lg"
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               View Reuse Recommendations
             </Button>
             <Button
               variant="outline"
-              onClick={() => (window.location.href = "/simulation")}
-              className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg"
+              onClick={resetSimulation}
+              className="border-2 border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 hover:border-cyan-400 px-8 py-6 text-lg font-semibold"
             >
               Start New Simulation
             </Button>
