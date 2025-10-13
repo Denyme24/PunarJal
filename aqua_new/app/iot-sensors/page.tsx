@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Activity,
   Wifi,
@@ -18,6 +20,7 @@ import {
   TrendingDown,
   MapPin,
   Droplets,
+  Play,
 } from "lucide-react";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -33,6 +36,7 @@ interface SensorData {
   trend: "up" | "down" | "stable";
   history: number[];
   location: string;
+  paramKey: "turbidity" | "pH" | "cod" | "tds" | "nitrogen" | "phosphorus";
 }
 
 interface LocationData {
@@ -44,9 +48,10 @@ interface LocationData {
 
 const IoTSensors = () => {
   const { user } = useAuth();
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const router = useRouter();
+  const [selectedLocation, setSelectedLocation] = useState<string>("Hebbal");
   const [allSensors, setAllSensors] = useState<SensorData[]>([
-    // Location 1 - Hebbal Lake
+    // Location 1 - Hebbal Lake (all 6 sensors matching simulation page)
     {
       id: "turbidity-hebbal",
       name: "Turbidity Sensor",
@@ -57,6 +62,7 @@ const IoTSensors = () => {
       trend: "down",
       history: [50, 48, 47, 46, 45.2],
       location: "Hebbal",
+      paramKey: "turbidity",
     },
     {
       id: "ph-hebbal",
@@ -68,6 +74,7 @@ const IoTSensors = () => {
       trend: "stable",
       history: [7.2, 7.3, 7.2, 7.3, 7.3],
       location: "Hebbal",
+      paramKey: "pH",
     },
     {
       id: "cod-hebbal",
@@ -79,6 +86,7 @@ const IoTSensors = () => {
       trend: "down",
       history: [180, 165, 155, 148, 142],
       location: "Hebbal",
+      paramKey: "cod",
     },
     {
       id: "tds-hebbal",
@@ -86,12 +94,37 @@ const IoTSensors = () => {
       value: 456,
       unit: "mg/L",
       status: "online",
-      threshold: { min: 0, max: 1000 },
+      threshold: { min: 0, max: 2000 },
       trend: "stable",
       history: [450, 455, 458, 454, 456],
       location: "Hebbal",
+      paramKey: "tds",
     },
-    // Location 2 - Bellandur Lake
+    {
+      id: "nitrogen-hebbal",
+      name: "Nitrogen Sensor",
+      value: 18,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 100 },
+      trend: "stable",
+      history: [19, 18.5, 18, 18.2, 18],
+      location: "Hebbal",
+      paramKey: "nitrogen",
+    },
+    {
+      id: "phosphorus-hebbal",
+      name: "Phosphorus Analyzer",
+      value: 4.2,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 50 },
+      trend: "down",
+      history: [5.0, 4.8, 4.5, 4.3, 4.2],
+      location: "Hebbal",
+      paramKey: "phosphorus",
+    },
+    // Location 2 - Bellandur Lake (all 6 sensors)
     {
       id: "turbidity-bellandur",
       name: "Turbidity Sensor",
@@ -102,6 +135,7 @@ const IoTSensors = () => {
       trend: "up",
       history: [62, 64, 66, 67, 68.5],
       location: "Bellandur",
+      paramKey: "turbidity",
     },
     {
       id: "ph-bellandur",
@@ -113,30 +147,57 @@ const IoTSensors = () => {
       trend: "up",
       history: [7.8, 7.9, 8.0, 8.0, 8.1],
       location: "Bellandur",
+      paramKey: "pH",
     },
     {
-      id: "ammonia-bellandur",
-      name: "Ammonia Sensor",
-      value: 12.4,
+      id: "cod-bellandur",
+      name: "COD Analyzer",
+      value: 285,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 500 },
+      trend: "up",
+      history: [260, 270, 275, 280, 285],
+      location: "Bellandur",
+      paramKey: "cod",
+    },
+    {
+      id: "tds-bellandur",
+      name: "TDS Meter",
+      value: 890,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 2000 },
+      trend: "stable",
+      history: [880, 885, 890, 888, 890],
+      location: "Bellandur",
+      paramKey: "tds",
+    },
+    {
+      id: "nitrogen-bellandur",
+      name: "Nitrogen Sensor",
+      value: 32,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 100 },
+      trend: "up",
+      history: [28, 29, 30, 31, 32],
+      location: "Bellandur",
+      paramKey: "nitrogen",
+    },
+    {
+      id: "phosphorus-bellandur",
+      name: "Phosphorus Analyzer",
+      value: 8.5,
       unit: "mg/L",
       status: "online",
       threshold: { min: 0, max: 50 },
       trend: "up",
-      history: [10, 10.5, 11, 11.8, 12.4],
+      history: [7.5, 7.8, 8.0, 8.2, 8.5],
       location: "Bellandur",
+      paramKey: "phosphorus",
     },
-    {
-      id: "nitrate-bellandur",
-      name: "Nitrate Sensor",
-      value: 5.8,
-      unit: "mg/L",
-      status: "online",
-      threshold: { min: 0, max: 20 },
-      trend: "up",
-      history: [5.2, 5.4, 5.5, 5.6, 5.8],
-      location: "Bellandur",
-    },
-    // Location 3 - Ulsoor Lake
+    // Location 3 - Ulsoor Lake (all 6 sensors)
     {
       id: "turbidity-ulsoor",
       name: "Turbidity Sensor",
@@ -147,6 +208,7 @@ const IoTSensors = () => {
       trend: "stable",
       history: [32, 32.5, 31.8, 32.2, 32.1],
       location: "Ulsoor",
+      paramKey: "turbidity",
     },
     {
       id: "ph-ulsoor",
@@ -158,54 +220,141 @@ const IoTSensors = () => {
       trend: "stable",
       history: [6.9, 7.0, 6.8, 6.9, 6.9],
       location: "Ulsoor",
+      paramKey: "pH",
+    },
+    {
+      id: "cod-ulsoor",
+      name: "COD Analyzer",
+      value: 165,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 500 },
+      trend: "down",
+      history: [180, 175, 170, 168, 165],
+      location: "Ulsoor",
+      paramKey: "cod",
+    },
+    {
+      id: "tds-ulsoor",
+      name: "TDS Meter",
+      value: 620,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 2000 },
+      trend: "stable",
+      history: [615, 618, 622, 619, 620],
+      location: "Ulsoor",
+      paramKey: "tds",
+    },
+    {
+      id: "nitrogen-ulsoor",
+      name: "Nitrogen Sensor",
+      value: 15,
+      unit: "mg/L",
+      status: "online",
+      threshold: { min: 0, max: 100 },
+      trend: "down",
+      history: [17, 16.5, 16, 15.5, 15],
+      location: "Ulsoor",
+      paramKey: "nitrogen",
     },
     {
       id: "phosphorus-ulsoor",
       name: "Phosphorus Analyzer",
-      value: 0.8,
+      value: 3.8,
       unit: "mg/L",
       status: "online",
-      threshold: { min: 0, max: 10 },
+      threshold: { min: 0, max: 50 },
       trend: "down",
-      history: [1.2, 1.0, 0.9, 0.8, 0.8],
+      history: [4.5, 4.2, 4.0, 3.9, 3.8],
       location: "Ulsoor",
-    },
-    {
-      id: "flow-ulsoor",
-      name: "Flow Meter",
-      value: 890,
-      unit: "L/min",
-      status: "online",
-      threshold: { min: 800, max: 1500 },
-      trend: "stable",
-      history: [885, 888, 892, 889, 890],
-      location: "Ulsoor",
+      paramKey: "phosphorus",
     },
   ]);
 
   // Get nearby locations based on user's location
   const getNearbyLocations = (userLocation: string): LocationData[] => {
     const locationMap: { [key: string]: LocationData[] } = {
-      "Hebbal": [
-        { name: "Hebbal", lakeName: "Hebbal Lake", sensorCount: 4, status: "active" },
-        { name: "Bellandur", lakeName: "Bellandur Lake", sensorCount: 4, status: "active" },
-        { name: "Ulsoor", lakeName: "Ulsoor Lake", sensorCount: 4, status: "active" },
+      Hebbal: [
+        {
+          name: "Hebbal",
+          lakeName: "Hebbal Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Bellandur",
+          lakeName: "Bellandur Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Ulsoor",
+          lakeName: "Ulsoor Lake",
+          sensorCount: 6,
+          status: "active",
+        },
       ],
-      "Bellandur": [
-        { name: "Bellandur", lakeName: "Bellandur Lake", sensorCount: 4, status: "active" },
-        { name: "Hebbal", lakeName: "Hebbal Lake", sensorCount: 4, status: "active" },
-        { name: "Ulsoor", lakeName: "Ulsoor Lake", sensorCount: 4, status: "active" },
+      Bellandur: [
+        {
+          name: "Bellandur",
+          lakeName: "Bellandur Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Hebbal",
+          lakeName: "Hebbal Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Ulsoor",
+          lakeName: "Ulsoor Lake",
+          sensorCount: 6,
+          status: "active",
+        },
       ],
-      "Ulsoor": [
-        { name: "Ulsoor", lakeName: "Ulsoor Lake", sensorCount: 4, status: "active" },
-        { name: "Hebbal", lakeName: "Hebbal Lake", sensorCount: 4, status: "active" },
-        { name: "Bellandur", lakeName: "Bellandur Lake", sensorCount: 4, status: "active" },
+      Ulsoor: [
+        {
+          name: "Ulsoor",
+          lakeName: "Ulsoor Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Hebbal",
+          lakeName: "Hebbal Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Bellandur",
+          lakeName: "Bellandur Lake",
+          sensorCount: 6,
+          status: "active",
+        },
       ],
       // Default for other locations
-      "default": [
-        { name: "Hebbal", lakeName: "Hebbal Lake", sensorCount: 4, status: "active" },
-        { name: "Bellandur", lakeName: "Bellandur Lake", sensorCount: 4, status: "active" },
-        { name: "Ulsoor", lakeName: "Ulsoor Lake", sensorCount: 4, status: "active" },
+      default: [
+        {
+          name: "Hebbal",
+          lakeName: "Hebbal Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Bellandur",
+          lakeName: "Bellandur Lake",
+          sensorCount: 6,
+          status: "active",
+        },
+        {
+          name: "Ulsoor",
+          lakeName: "Ulsoor Lake",
+          sensorCount: 6,
+          status: "active",
+        },
       ],
     };
 
@@ -217,11 +366,9 @@ const IoTSensors = () => {
 
   // Filter sensors based on selected location
   useEffect(() => {
-    if (selectedLocation) {
-      setSensors(allSensors.filter(sensor => sensor.location === selectedLocation));
-    } else {
-      setSensors(allSensors);
-    }
+    setSensors(
+      allSensors.filter((sensor) => sensor.location === selectedLocation)
+    );
   }, [selectedLocation, allSensors]);
 
   // Simulate live sensor updates
@@ -264,6 +411,28 @@ const IoTSensors = () => {
     if (percentage < 50) return { color: "blue", status: "Good" };
     if (percentage < 80) return { color: "yellow", status: "Warning" };
     return { color: "red", status: "Critical" };
+  };
+
+  const handleInitiateSimulation = () => {
+    const locationSensors = allSensors.filter(
+      (s) => s.location === selectedLocation
+    );
+
+    // Build parameters object from sensors
+    const params: any = {};
+    locationSensors.forEach((sensor) => {
+      params[sensor.paramKey] = sensor.value;
+    });
+
+    // Build URL query string
+    const queryParams = new URLSearchParams({
+      ...params,
+      sourceName:
+        nearbyLocations.find((l) => l.name === selectedLocation)?.lakeName ||
+        selectedLocation,
+    });
+
+    router.push(`/simulation?${queryParams.toString()}`);
   };
 
   const MiniChart = ({ history }: { history: number[] }) => {
@@ -349,9 +518,11 @@ const IoTSensors = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Card 
+                  <Card
                     className={`bg-white/5 backdrop-blur-lg border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer group ${
-                      selectedLocation === location.name ? 'ring-2 ring-cyan-400 bg-cyan-500/10' : ''
+                      selectedLocation === location.name
+                        ? "ring-2 ring-cyan-400 bg-cyan-500/10"
+                        : ""
                     }`}
                     onClick={() => setSelectedLocation(location.name)}
                   >
@@ -361,13 +532,13 @@ const IoTSensors = () => {
                           <Droplets className="h-5 w-5 text-cyan-400" />
                           <MapPin className="h-4 w-4 text-white/60" />
                         </div>
-                        <Badge 
+                        <Badge
                           className={`${
-                            location.status === 'active' 
-                              ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-                              : location.status === 'maintenance'
-                              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                              : 'bg-red-500/20 text-red-400 border-red-500/30'
+                            location.status === "active"
+                              ? "bg-green-500/20 text-green-400 border-green-500/30"
+                              : location.status === "maintenance"
+                              ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                              : "bg-red-500/20 text-red-400 border-red-500/30"
                           }`}
                         >
                           {location.status}
@@ -384,15 +555,23 @@ const IoTSensors = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-white/60">Sensors:</span>
-                          <span className="text-cyan-400 font-medium">{location.sensorCount}</span>
+                          <span className="text-cyan-400 font-medium">
+                            {location.sensorCount}
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-white/60">Status:</span>
-                          <span className={`font-medium ${
-                            location.status === 'active' ? 'text-green-400' : 
-                            location.status === 'maintenance' ? 'text-yellow-400' : 'text-red-400'
-                          }`}>
-                            {location.status.charAt(0).toUpperCase() + location.status.slice(1)}
+                          <span
+                            className={`font-medium ${
+                              location.status === "active"
+                                ? "text-green-400"
+                                : location.status === "maintenance"
+                                ? "text-yellow-400"
+                                : "text-red-400"
+                            }`}
+                          >
+                            {location.status.charAt(0).toUpperCase() +
+                              location.status.slice(1)}
                           </span>
                         </div>
                       </div>
@@ -406,41 +585,45 @@ const IoTSensors = () => {
                 </motion.div>
               ))}
             </div>
-            
-            {selectedLocation && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6"
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 flex items-center justify-between flex-wrap gap-4"
+            >
+              <div className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full">
+                <Droplets className="h-4 w-4 text-cyan-400" />
+                <span className="text-cyan-400 text-sm font-medium">
+                  Showing sensors for:{" "}
+                  {
+                    nearbyLocations.find((l) => l.name === selectedLocation)
+                      ?.lakeName
+                  }
+                </span>
+              </div>
+
+              <Button
+                onClick={handleInitiateSimulation}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold shadow-lg shadow-cyan-500/30"
               >
-                <div className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full w-fit">
-                  <Droplets className="h-4 w-4 text-cyan-400" />
-                  <span className="text-cyan-400 text-sm font-medium">
-                    Showing sensors for: {nearbyLocations.find(l => l.name === selectedLocation)?.lakeName}
-                  </span>
-                  <button
-                    onClick={() => setSelectedLocation(null)}
-                    className="ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
-                  >
-                    View All
-                  </button>
-                </div>
-              </motion.div>
-            )}
+                <Play className="h-4 w-4 mr-2" />
+                Initiate Simulation
+              </Button>
+            </motion.div>
           </motion.div>
 
           {/* System Overview */}
           <div className="grid md:grid-cols-4 gap-4 mb-8">
             {[
               {
-                label: selectedLocation ? `Active Sensors (${selectedLocation})` : "Active Sensors",
+                label: `Active Sensors (${selectedLocation})`,
                 value: sensors.filter((s) => s.status === "online").length,
                 icon: Activity,
               },
-              { 
-                label: selectedLocation ? `Readings (${selectedLocation})` : "Total Readings", 
-                value: selectedLocation ? `${(sensors.length * 2.5).toFixed(1)}k` : "24.8k", 
-                icon: TrendingUp 
+              {
+                label: `Readings (${selectedLocation})`,
+                value: `${(sensors.length * 2.5).toFixed(1)}k`,
+                icon: TrendingUp,
               },
               { label: "Uptime", value: "99.9%", icon: Wifi },
               { label: "Last Update", value: "2s ago", icon: Activity },
@@ -455,7 +638,9 @@ const IoTSensors = () => {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <stat.icon className="h-5 w-5 text-cyan-400" />
-                      <span className="text-xs text-white/60">{stat.label}</span>
+                      <span className="text-xs text-white/60">
+                        {stat.label}
+                      </span>
                     </div>
                     <div className="text-2xl font-bold text-white">
                       {stat.value}
@@ -474,12 +659,13 @@ const IoTSensors = () => {
           >
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Activity className="h-5 w-5 text-cyan-400" />
-              {selectedLocation 
-                ? `Sensor Data - ${nearbyLocations.find(l => l.name === selectedLocation)?.lakeName}`
-                : 'All Sensor Data'
+              Sensor Data -{" "}
+              {
+                nearbyLocations.find((l) => l.name === selectedLocation)
+                  ?.lakeName
               }
             </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sensors.map((sensor, index) => {
                 const status = getSensorStatus(sensor);
                 return (
@@ -532,8 +718,8 @@ const IoTSensors = () => {
                               </span>
                             </div>
                             <div className="text-xs text-white/50">
-                              Range: {sensor.threshold.min} - {sensor.threshold.max}{" "}
-                              {sensor.unit}
+                              Range: {sensor.threshold.min} -{" "}
+                              {sensor.threshold.max} {sensor.unit}
                             </div>
                           </div>
 
@@ -551,55 +737,6 @@ const IoTSensors = () => {
                 );
               })}
             </div>
-          </motion.div>
-
-          {/* Integration Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="mt-12"
-          >
-            <Card className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 backdrop-blur-lg border-cyan-500/20">
-              <CardHeader>
-                <CardTitle className="text-white text-2xl">
-                  Smart Decision Engine Integration
-                </CardTitle>
-                <CardDescription className="text-white/70">
-                  Sensor data is automatically processed by our intelligent
-                  treatment system
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <div className="text-cyan-400 font-semibold">
-                      Automatic Stage Activation
-                    </div>
-                    <p className="text-white/70 text-sm">
-                      Treatment stages activate based on real-time sensor
-                      thresholds
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-cyan-400 font-semibold">
-                      Predictive Alerts
-                    </div>
-                    <p className="text-white/70 text-sm">
-                      AI predicts issues before they occur based on sensor trends
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-cyan-400 font-semibold">
-                      Energy Optimization
-                    </div>
-                    <p className="text-white/70 text-sm">
-                      Unnecessary stages skipped automatically to save energy
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </motion.div>
         </div>
       </div>
