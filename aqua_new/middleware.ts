@@ -1,44 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyToken } from "./lib/auth";
 
-// Paths that require authentication
-const protectedPaths = [
-  "/simulation",
-  "/dashboard",
-  "/iot-sensors",
-  "/reuse",
-  "/analytics",
-];
+// Note: Authentication is primarily handled client-side by ProtectedRoute component
+// This middleware is kept minimal to allow for better UX with client-side protection
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Check if path requires authentication
-  const isProtectedPath = protectedPaths.some((path) =>
-    pathname.startsWith(path)
-  );
-
-  if (isProtectedPath) {
-    // Get token from cookie or Authorization header
-    const token =
-      request.cookies.get("token")?.value ||
-      request.headers.get("authorization")?.replace("Bearer ", "");
-
-    if (!token) {
-      // Redirect to home if no token
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    // Verify token
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      // Redirect to home if token is invalid
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
-
+  // Let all requests through - client-side ProtectedRoute handles auth UX
   return NextResponse.next();
 }
 
