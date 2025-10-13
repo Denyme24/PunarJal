@@ -15,8 +15,7 @@ export async function POST(request: Request) {
 
     const apiKey =
       process.env.GEMINI_API_KEY ||
-      process.env.GOOGLE_GENAI_API_KEY ||
-      "AIzaSyBwF6TdGYv9cUG2FNsnqvLzJsTdb5U-DBM";
+      process.env.GOOGLE_GENAI_API_KEY
 
     const prompt = `Generate wastewater treatment analytics JSON based on:
 Parameters: ${JSON.stringify(parameters)}
