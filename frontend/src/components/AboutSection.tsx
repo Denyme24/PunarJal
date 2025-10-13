@@ -43,7 +43,7 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="about" className="relative py-32 bg-gradient-to-b from-background to-muted">
+    <section id="about" className="relative py-32" style={{ backgroundColor: '#1A1C24' }}>
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <motion.div
@@ -53,10 +53,10 @@ const AboutSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl md:text-6xl font-bold text-primary mb-6">
-            About <span className="font-serif italic">AquaRenew</span>
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            About <span className="font-serif italic text-cyan-400">AquaRenew</span>
           </h2>
-          <p className="text-xl text-primary/80 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Revolutionizing wastewater treatment through intelligent technology and sustainable practices
           </p>
         </motion.div>
@@ -72,15 +72,15 @@ const AboutSection = () => {
             className="space-y-8"
           >
             <div className="space-y-6">
-              <h3 className="text-3xl md:text-4xl font-bold text-primary">
+              <h3 className="text-3xl md:text-4xl font-bold text-white">
                 Our Mission
               </h3>
-              <p className="text-lg text-primary/80 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed">
                 At AquaRenew, we believe that every drop of water has value. Our mission is to transform 
                 wastewater treatment from a costly necessity into a sustainable resource recovery system 
                 that benefits both industry and environment.
               </p>
-              <p className="text-lg text-primary/80 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed">
                 Through cutting-edge IoT sensors, AI-driven analytics, and automated treatment processes, 
                 we're making water reuse not just possible, but profitable and environmentally responsible.
               </p>
@@ -95,10 +95,10 @@ const AboutSection = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   viewport={{ once: true }}
-                  className="text-center p-6 bg-white/50 backdrop-blur-sm rounded-xl border border-border/50"
+                  className="text-center p-6 bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50"
                 >
-                  <div className="text-3xl font-bold text-accent mb-2">{stat.value}</div>
-                  <div className="text-sm text-primary/70 font-medium">{stat.label}</div>
+                  <div className="text-3xl font-bold text-cyan-400 mb-2">{stat.value}</div>
+                  <div className="text-sm text-gray-300 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -112,13 +112,13 @@ const AboutSection = () => {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl p-8 border border-border/50">
+            <div className="bg-gradient-to-br from-gray-800/30 to-gray-700/30 rounded-3xl p-8 border border-gray-600/50">
               <div className="text-center space-y-6">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-accent to-secondary rounded-full mb-6">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-6">
                   <Droplet className="h-10 w-10 text-white" />
                 </div>
-                <h4 className="text-2xl font-bold text-primary">Smart Water Future</h4>
-                <p className="text-primary/70">
+                <h4 className="text-2xl font-bold text-white">Smart Water Future</h4>
+                <p className="text-gray-300">
                   Join us in creating a world where wastewater becomes a valuable resource, 
                   not a waste product.
                 </p>
@@ -135,7 +135,7 @@ const AboutSection = () => {
           viewport={{ once: true }}
           className="mb-20"
         >
-          <h3 className="text-3xl md:text-4xl font-bold text-primary text-center mb-16">
+          <h3 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
             Why Choose AquaRenew?
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -146,15 +146,15 @@ const AboutSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-border/50 hover:bg-white/70 transition-all duration-300 group"
+                className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:bg-gray-700/60 transition-all duration-300 group"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-gradient-to-r from-accent/20 to-secondary/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="h-6 w-6 text-accent" />
+                  <div className="p-3 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                    <feature.icon className="h-6 w-6 text-cyan-400" />
                   </div>
-                  <h4 className="text-xl font-semibold text-primary">{feature.title}</h4>
+                  <h4 className="text-xl font-semibold text-white">{feature.title}</h4>
                 </div>
-                <p className="text-primary/70 leading-relaxed">{feature.description}</p>
+                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -166,19 +166,19 @@ const AboutSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center bg-gradient-to-r from-primary/10 to-secondary/10 rounded-3xl p-12 border border-border/50"
+          className="text-center bg-gradient-to-r from-gray-800/30 to-gray-700/30 rounded-3xl p-12 border border-gray-600/50"
         >
-          <h3 className="text-3xl md:text-4xl font-bold text-primary mb-6">
+          <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Transform Your Water Management?
           </h3>
-          <p className="text-xl text-primary/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Discover how AquaRenew can revolutionize your wastewater treatment and unlock 
             the potential of water reuse for your organization.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.a
               href="/simulation"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-accent to-secondary text-white rounded-lg font-semibold text-lg hover:shadow-2xl hover:shadow-accent/40 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-semibold text-lg hover:shadow-2xl hover:shadow-cyan-500/40 transition-all duration-300"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -199,7 +199,7 @@ const AboutSection = () => {
             </motion.a>
             <motion.a
               href="/dashboard"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-primary rounded-lg font-semibold text-lg hover:bg-white/20 hover:border-white/40 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-700/50 backdrop-blur-md border border-gray-600/50 text-white rounded-lg font-semibold text-lg hover:bg-gray-600/60 hover:border-gray-500/60 transition-all duration-300"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
