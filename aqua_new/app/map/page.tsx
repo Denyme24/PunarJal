@@ -26,8 +26,9 @@ export default function MapPage() {
   const [selectedSource, setSelectedSource] = useState<WaterSource | null>(
     null
   );
+  // Default to Bangalore coordinates
   const [mapCenter, setMapCenter] = useState<[number, number]>([
-    37.7749, -122.4194,
+    12.9716, 77.5946,
   ]);
   const [filter, setFilter] = useState<"all" | "safe" | "attention">("all");
 
@@ -37,8 +38,10 @@ export default function MapPage() {
       const sources = getWaterSourcesByLocation(user.location);
       setWaterSources(sources);
 
-      // Set map center to user's location
-      const center = locationCoordinates[user.location];
+      // Set map center to user's specific location (e.g., Whitefield, Koramangala)
+      // Fall back to general Bangalore if specific neighborhood not found
+      const center =
+        locationCoordinates[user.location] || locationCoordinates["Bangalore"];
       if (center) {
         setMapCenter(center);
       }
@@ -132,16 +135,16 @@ export default function MapPage() {
               </div>
 
               {/* Legend */}
-              <div className="flex gap-4 bg-white/5 backdrop-blur-lg rounded-lg p-3 border border-white/10">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 bg-white/5 backdrop-blur-lg rounded-lg p-3 border border-white/10">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                  <span className="text-sm text-white">
+                  <div className="w-4 h-4 flex-shrink-0 rounded-full bg-green-500"></div>
+                  <span className="text-xs sm:text-sm text-white">
                     Green pins indicate suitable quality
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-amber-500"></div>
-                  <span className="text-sm text-white">
+                  <div className="w-4 h-4 flex-shrink-0 rounded-full bg-amber-500"></div>
+                  <span className="text-xs sm:text-sm text-white">
                     Amber pins indicate thresholds near limits
                   </span>
                 </div>
@@ -149,19 +152,15 @@ export default function MapPage() {
             </div>
           </motion.div>
 
-          {/* Map Container */}
+          {/* Map and Card Container */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-400px)] min-h-[600px]"
+            className="relative"
           >
-            {/* Map */}
-            <div
-              className={`${
-                selectedSource ? "lg:col-span-2" : "lg:col-span-3"
-              } rounded-xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-300`}
-            >
+            {/* Map - Always Full Width on Mobile, Responsive on Desktop */}
+            <div className="w-full h-[calc(100vh-400px)] min-h-[600px] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
               <WaterSourcesMap
                 waterSources={filteredSources}
                 center={mapCenter}
@@ -170,21 +169,36 @@ export default function MapPage() {
               />
             </div>
 
-            {/* Detail Card */}
-            <AnimatePresence>
+            {/* Detail Card - Slides Over Map on Mobile, Side Panel on Desktop */}
+            <AnimatePresence mode="wait">
               {selectedSource && (
-                <motion.div
-                  initial={{ opacity: 0, x: 300 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 300 }}
-                  transition={{ duration: 0.3 }}
-                  className="lg:col-span-1"
-                >
-                  <WaterSourceCard
-                    source={selectedSource}
-                    onClose={handleCloseCard}
+                <>
+                  {/* Backdrop for Mobile */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+                    onClick={handleCloseCard}
                   />
-                </motion.div>
+
+                  {/* Card */}
+                  <motion.div
+                    initial={{ opacity: 0, x: "100%" }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="fixed lg:absolute top-0 right-0 h-full lg:h-[calc(100vh-400px)] lg:min-h-[600px] w-full sm:w-[400px] lg:w-[380px] z-50 lg:z-10"
+                  >
+                    <div className="h-full overflow-y-auto">
+                      <WaterSourceCard
+                        source={selectedSource}
+                        onClose={handleCloseCard}
+                      />
+                    </div>
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
           </motion.div>

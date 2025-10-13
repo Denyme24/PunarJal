@@ -83,7 +83,7 @@ export default function WaterSourcesMap({
   return (
     <MapContainer
       center={center}
-      zoom={12}
+      zoom={13}
       style={{ height: "100%", width: "100%", borderRadius: "0.5rem" }}
       className="z-0"
     >
