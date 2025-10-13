@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useRef } from "react";
-import murkyWaterBg from "@/assets/murky-water-bg.jpg";
+import heroBg from "@/assets/bg.jpeg";
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,7 +23,7 @@ const HeroSection = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={murkyWaterBg}
+          src={heroBg}
           alt="Contaminated wastewater"
           className="w-full h-full object-cover"
         />
