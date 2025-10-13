@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-// Removed other sections for a clean slate
+import AboutSection from "@/components/AboutSection";
 
 const Index = () => {
   return (
@@ -8,6 +8,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <AboutSection />
       </main>
     </div>
   );

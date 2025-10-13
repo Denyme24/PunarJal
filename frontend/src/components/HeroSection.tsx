@@ -153,7 +153,7 @@ const HeroSection = () => {
             </svg>
           </motion.a>
           <motion.a
-            href="/about"
+            href="#about"
             className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-lg font-semibold text-sm hover:bg-white/15 hover:border-white/40 transition-all duration-300"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}

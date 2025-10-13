@@ -9,7 +9,6 @@ import Dashboard from "./pages/Dashboard";
 import IoTSensors from "./pages/IoTSensors";
 import Reuse from "./pages/Reuse";
 import Analytics from "./pages/Analytics";
-import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +26,6 @@ const App = () => (
           <Route path="/iot-sensors" element={<IoTSensors />} />
           <Route path="/reuse" element={<Reuse />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/about" element={<About />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
