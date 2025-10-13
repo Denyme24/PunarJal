@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -16,41 +17,197 @@ import {
   Leaf,
   BarChart3,
   PieChart,
+  Download,
+  FileText,
+  Loader2,
 } from "lucide-react";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { Button } from "@/components/ui/button";
+
+type AnalyticsData = {
+  simulationHistory: Array<{
+    date: string;
+    waterSaved: number;
+    energySaved: number;
+    efficiency: number;
+  }>;
+  treatmentEfficiency: {
+    primary: { removal: number; avgTime: number; energyUsed: number };
+    secondary: { removal: number; avgTime: number; energyUsed: number };
+    tertiary: { removal: number; avgTime: number; energyUsed: number };
+  };
+  reuseBreakdown: Array<{
+    type: string;
+    percentage: number;
+    volume: number;
+  }>;
+  sustainabilityMetrics: {
+    totalWaterRecycled: number;
+    freshwaterSaved: number;
+    co2Emissions: number;
+    energyEfficiency: number;
+    costSavings: number;
+    treesEquivalent: number;
+    waterFootprintReduction?: number;
+  };
+  environmentalImpact: {
+    freshwaterConservation: string;
+    co2EmissionsAvoided: string;
+    treesPlanted: string;
+    waterFootprintReduction: string;
+  };
+  economicBenefits: {
+    totalCostSavings: string;
+    waterBillReduction: string;
+    energyCostSavings: string;
+    paybackPeriod: string;
+  };
+};
 
 const Analytics = () => {
-  const simulationHistory = [
-    { date: "2025-10-13", waterSaved: 1200, energySaved: 180, efficiency: 94 },
-    { date: "2025-10-12", waterSaved: 1150, energySaved: 175, efficiency: 92 },
-    { date: "2025-10-11", waterSaved: 1300, energySaved: 195, efficiency: 95 },
-    { date: "2025-10-10", waterSaved: 1100, energySaved: 165, efficiency: 90 },
-    { date: "2025-10-09", waterSaved: 1250, energySaved: 185, efficiency: 93 },
-  ];
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const treatmentEfficiency = {
-    primary: { removal: 65, avgTime: 45, energyUsed: 25 },
-    secondary: { removal: 85, avgTime: 120, energyUsed: 55 },
-    tertiary: { removal: 95, avgTime: 90, energyUsed: 70 },
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get last simulation context from localStorage
+        const contextRaw = localStorage.getItem("lastSimulationContext");
+        if (!contextRaw) {
+          setError(
+            "No simulation data found. Please run a simulation first from the Simulation page."
+          );
+          setLoading(false);
+          return;
+        }
+
+        const context = JSON.parse(contextRaw);
+
+        // Call AI generation API
+        const res = await fetch("/api/analytics/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(context),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result?.error || "Failed to generate analytics");
+        }
+
+        setAnalyticsData(result.data);
+      } catch (e: any) {
+        setError(e?.message || "Failed to load analytics");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  const exportAsPdf = () => {
+    window.print();
   };
 
-  const reuseBreakdown = [
-    { type: "Agricultural Irrigation", percentage: 35, volume: 420 },
-    { type: "Industrial Process", percentage: 28, volume: 336 },
-    { type: "Landscape Irrigation", percentage: 20, volume: 240 },
-    { type: "Toilet Flushing", percentage: 12, volume: 144 },
-    { type: "Cooling Systems", percentage: 5, volume: 60 },
-  ];
+  const exportAsCsv = () => {
+    if (!analyticsData) return;
 
-  const sustainabilityMetrics = {
-    totalWaterRecycled: 432000,
-    freshwaterSaved: 389000,
-    co2Emissions: 2.5,
-    energyEfficiency: 88,
-    costSavings: 125000,
-    treesEquivalent: 115,
+    const rows = analyticsData.simulationHistory;
+    const header = Object.keys(rows[0] || {}).join(",");
+    const lines = rows.map((r) => Object.values(r).join(","));
+    const csv = [header, ...lines].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `analytics-report-${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
+
+  const generateReport = () => {
+    if (!analyticsData) return;
+
+    const report = {
+      generatedAt: new Date().toISOString(),
+      ...analyticsData,
+    };
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `treatment-report-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (loading) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
+          <Header />
+          <div className="container mx-auto px-6 pt-32 pb-20 flex flex-col items-center justify-center min-h-[60vh]">
+            <Loader2 className="h-12 w-12 text-cyan-400 animate-spin mb-4" />
+            <p className="text-white text-xl">
+              Generating AI-powered analytics...
+            </p>
+            <p className="text-white/60 text-sm mt-2">
+              This may take a few moments
+            </p>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (error) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
+          <Header />
+          <div className="container mx-auto px-6 pt-32 pb-20">
+            <Card className="bg-red-500/10 border-red-500/30 max-w-2xl mx-auto">
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Error Loading Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-white/80 mb-4">{error}</p>
+                <Button
+                  onClick={() => (window.location.href = "/simulation")}
+                  className="bg-cyan-500 hover:bg-cyan-600"
+                >
+                  Go to Simulation
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (!analyticsData) return null;
+
+  const { sustainabilityMetrics } = analyticsData;
 
   return (
     <ProtectedRoute>
@@ -71,7 +228,7 @@ const Analytics = () => {
               </span>
             </h1>
             <p className="text-xl text-white/70">
-              Comprehensive sustainability and performance insights
+              AI-generated insights based on your simulation
             </p>
           </motion.div>
 
@@ -88,9 +245,9 @@ const Analytics = () => {
               },
               {
                 label: "Freshwater Saved",
-                value: `${(sustainabilityMetrics.freshwaterSaved / 1000).toFixed(
-                  0
-                )}kL`,
+                value: `${(
+                  sustainabilityMetrics.freshwaterSaved / 1000
+                ).toFixed(0)}kL`,
                 icon: Droplets,
                 color: "blue",
               },
@@ -187,12 +344,12 @@ const Analytics = () => {
                       Recent Simulation History
                     </CardTitle>
                     <CardDescription className="text-white/60">
-                      Performance data from the last 5 simulations
+                      Performance data from recent simulations
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {simulationHistory.map((sim, index) => (
+                      {analyticsData.simulationHistory.map((sim, index) => (
                         <div
                           key={sim.date}
                           className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
@@ -231,55 +388,57 @@ const Analytics = () => {
               {/* Treatment Efficiency Tab */}
               <TabsContent value="efficiency">
                 <div className="grid md:grid-cols-3 gap-6">
-                  {Object.entries(treatmentEfficiency).map(([stage, data]) => (
-                    <Card
-                      key={stage}
-                      className="bg-white/5 backdrop-blur-lg border-white/10"
-                    >
-                      <CardHeader>
-                        <CardTitle className="text-white text-xl capitalize">
-                          {stage} Treatment
-                        </CardTitle>
-                        <CardDescription className="text-white/60">
-                          Stage performance metrics
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
+                  {Object.entries(analyticsData.treatmentEfficiency).map(
+                    ([stage, data]) => (
+                      <Card
+                        key={stage}
+                        className="bg-white/5 backdrop-blur-lg border-white/10"
+                      >
+                        <CardHeader>
+                          <CardTitle className="text-white text-xl capitalize">
+                            {stage} Treatment
+                          </CardTitle>
+                          <CardDescription className="text-white/60">
+                            Stage performance metrics
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-white/70 text-sm">
+                                Contaminant Removal
+                              </span>
+                              <span className="text-cyan-400 font-bold">
+                                {data.removal}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-white/10 rounded-full h-2">
+                              <div
+                                className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full"
+                                style={{ width: `${data.removal}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
                             <span className="text-white/70 text-sm">
-                              Contaminant Removal
+                              Avg. Processing Time
                             </span>
-                            <span className="text-cyan-400 font-bold">
-                              {data.removal}%
+                            <span className="text-white font-semibold">
+                              {data.avgTime} min
                             </span>
                           </div>
-                          <div className="w-full bg-white/10 rounded-full h-2">
-                            <div
-                              className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full"
-                              style={{ width: `${data.removal}%` }}
-                            />
+                          <div className="flex items-center justify-between">
+                            <span className="text-white/70 text-sm">
+                              Energy Consumption
+                            </span>
+                            <span className="text-amber-400 font-semibold">
+                              {data.energyUsed} kWh
+                            </span>
                           </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/70 text-sm">
-                            Avg. Processing Time
-                          </span>
-                          <span className="text-white font-semibold">
-                            {data.avgTime} min
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/70 text-sm">
-                            Energy Consumption
-                          </span>
-                          <span className="text-amber-400 font-semibold">
-                            {data.energyUsed} kWh
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    )
+                  )}
                 </div>
               </TabsContent>
 
@@ -298,7 +457,7 @@ const Analytics = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {reuseBreakdown.map((item, index) => (
+                      {analyticsData.reuseBreakdown.map((item, index) => (
                         <div key={item.type} className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="text-white font-medium">
@@ -355,7 +514,10 @@ const Analytics = () => {
                             Freshwater Conservation
                           </span>
                           <span className="text-green-400 font-bold text-xl">
-                            389,000L
+                            {
+                              analyticsData.environmentalImpact
+                                .freshwaterConservation
+                            }
                           </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
@@ -363,7 +525,10 @@ const Analytics = () => {
                             CO₂ Emissions Avoided
                           </span>
                           <span className="text-green-400 font-bold text-xl">
-                            2.5 Tonnes
+                            {
+                              analyticsData.environmentalImpact
+                                .co2EmissionsAvoided
+                            }
                           </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
@@ -371,14 +536,19 @@ const Analytics = () => {
                             Equivalent Trees Planted
                           </span>
                           <span className="text-green-400 font-bold text-xl">
-                            115 Trees
+                            {analyticsData.environmentalImpact.treesPlanted}
                           </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
                           <span className="text-white font-semibold text-base">
                             Reduction in Water Footprint
                           </span>
-                          <span className="text-green-400 font-bold text-xl">47%</span>
+                          <span className="text-green-400 font-bold text-xl">
+                            {
+                              analyticsData.environmentalImpact
+                                .waterFootprintReduction
+                            }
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -400,25 +570,31 @@ const Analytics = () => {
                             Total Cost Savings
                           </span>
                           <span className="text-cyan-400 font-bold text-xl">
-                            $125,000
+                            {analyticsData.economicBenefits.totalCostSavings}
                           </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
                           <span className="text-white font-semibold text-base">
                             Water Bill Reduction
                           </span>
-                          <span className="text-cyan-400 font-bold text-xl">$89,000</span>
+                          <span className="text-cyan-400 font-bold text-xl">
+                            {analyticsData.economicBenefits.waterBillReduction}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
                           <span className="text-white font-semibold text-base">
                             Energy Cost Savings
                           </span>
-                          <span className="text-cyan-400 font-bold text-xl">$36,000</span>
+                          <span className="text-cyan-400 font-bold text-xl">
+                            {analyticsData.economicBenefits.energyCostSavings}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
-                          <span className="text-white font-semibold text-base">Payback Period</span>
+                          <span className="text-white font-semibold text-base">
+                            Payback Period
+                          </span>
                           <span className="text-cyan-400 font-bold text-xl">
-                            2.3 Years
+                            {analyticsData.economicBenefits.paybackPeriod}
                           </span>
                         </div>
                       </div>
@@ -440,15 +616,27 @@ const Analytics = () => {
               Export detailed reports for stakeholder presentations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-colors">
+              <Button
+                onClick={exportAsPdf}
+                className="px-6 py-3 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+              >
+                <Download className="h-4 w-4 mr-2" />
                 Export as PDF
-              </button>
-              <button className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-colors">
+              </Button>
+              <Button
+                onClick={exportAsCsv}
+                className="px-6 py-3 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+              >
+                <Download className="h-4 w-4 mr-2" />
                 Export as CSV
-              </button>
-              <button className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-colors">
+              </Button>
+              <Button
+                onClick={generateReport}
+                className="px-6 py-3 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+              >
+                <FileText className="h-4 w-4 mr-2" />
                 Generate Report
-              </button>
+              </Button>
             </div>
           </motion.div>
         </div>

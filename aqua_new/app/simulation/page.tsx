@@ -90,9 +90,9 @@ const Simulation = () => {
   };
 
   const handleStartSimulation = () => {
-    // Navigate to dashboard with parameters
+    // Navigate to treatment dashboard with parameters
     const params = new URLSearchParams(parameters as any).toString();
-    window.location.href = `/dashboard?${params}`;
+    window.location.href = `/treatment-dashboard?${params}`;
   };
 
   const parameterCards = [
