@@ -51,7 +51,7 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="about" className="relative py-32 bg-gradient-to-b from-background to-muted">
+    <section id="about" className="relative py-32" style={{ backgroundColor: '#1a2332' }}>
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <motion.div
@@ -64,7 +64,7 @@ const AboutSection = () => {
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
             About <span className="font-serif italic text-cyan-400">AquaRenew</span>
           </h2>
-          <p className="text-xl text-primary/80 max-w-3xl mx-auto">
+          <p className="text-xl text-white/80 max-w-3xl mx-auto">
             Revolutionizing wastewater treatment through intelligent technology and sustainable practices
           </p>
         </motion.div>
@@ -83,12 +83,12 @@ const AboutSection = () => {
               <h3 className="text-3xl md:text-4xl font-bold text-white">
                 Our Mission
               </h3>
-              <p className="text-lg text-primary/80 leading-relaxed">
+              <p className="text-lg text-white/80 leading-relaxed">
                 At AquaRenew, we believe that every drop of water has value. Our mission is to transform 
                 wastewater treatment from a costly necessity into a sustainable resource recovery system 
                 that benefits both industry and environment.
               </p>
-              <p className="text-lg text-primary/80 leading-relaxed">
+              <p className="text-lg text-white/80 leading-relaxed">
                 Through cutting-edge IoT sensors, AI-driven analytics, and automated treatment processes, 
                 we're making water reuse not just possible, but profitable and environmentally responsible.
               </p>
@@ -106,7 +106,7 @@ const AboutSection = () => {
                   className="text-center p-6 bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50"
                 >
                   <div className="text-3xl font-bold text-accent mb-2">{stat.value}</div>
-                  <div className="text-sm text-primary/70 font-medium">{stat.label}</div>
+                  <div className="text-sm text-white/70 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -125,8 +125,8 @@ const AboutSection = () => {
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-6">
                   <Droplet className="h-10 w-10 text-white" />
                 </div>
-                <h4 className="text-2xl font-bold text-primary">Smart Water Future</h4>
-                <p className="text-primary/70">
+                <h4 className="text-2xl font-bold text-white">Smart Water Future</h4>
+                <p className="text-white/70">
                   Join us in creating a world where wastewater becomes a valuable resource, 
                   not a waste product.
                 </p>
@@ -160,9 +160,9 @@ const AboutSection = () => {
                   <div className="p-3 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <feature.icon className="h-6 w-6 text-cyan-400" />
                   </div>
-                  <h4 className="text-xl font-semibold text-primary">{feature.title}</h4>
+                  <h4 className="text-xl font-semibold text-white">{feature.title}</h4>
                 </div>
-                <p className="text-primary/70 leading-relaxed">{feature.description}</p>
+                <p className="text-white/70 leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -179,7 +179,7 @@ const AboutSection = () => {
           <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Transform Your Water Management?
           </h3>
-          <p className="text-xl text-primary/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             Discover how AquaRenew can revolutionize your wastewater treatment and unlock 
             the potential of water reuse for your organization.
           </p>
