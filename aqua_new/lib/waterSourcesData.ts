@@ -18,6 +18,7 @@ export interface WaterSource {
 
 // Location coordinates for different cities/regions
 export const locationCoordinates: Record<string, [number, number]> = {
+  // Major Cities
   "San Francisco": [37.7749, -122.4194],
   "New York": [40.7128, -74.0060],
   "Los Angeles": [34.0522, -118.2437],
@@ -30,6 +31,33 @@ export const locationCoordinates: Record<string, [number, number]> = {
   "Tokyo": [35.6762, 139.6503],
   "Sydney": [-33.8688, 151.2093],
   "Toronto": [43.6532, -79.3832],
+  
+  // Bangalore Neighborhoods
+  "Whitefield": [12.9698, 77.7499],
+  "Electronic City": [12.8395, 77.6770],
+  "Koramangala": [12.9352, 77.6245],
+  "Indiranagar": [12.9784, 77.6408],
+  "JP Nagar": [12.9082, 77.5855],
+  "Jayanagar": [12.9250, 77.5838],
+  "BTM Layout": [12.9165, 77.6101],
+  "HSR Layout": [12.9121, 77.6446],
+  "Marathahalli": [12.9591, 77.7012],
+  "Sarjapur Road": [12.9010, 77.6874],
+  "Hebbal": [13.0358, 77.5970],
+  "Yelahanka": [13.1007, 77.5963],
+  "Banashankari": [12.9250, 77.5482],
+  "Rajajinagar": [12.9916, 77.5522],
+  "Malleshwaram": [13.0033, 77.5703],
+  "Yeshwanthpur": [13.0280, 77.5380],
+  "Peenya": [13.0297, 77.5154],
+  "Bommanahalli": [12.9100, 77.6300],
+  "Mahadevapura": [12.9930, 77.6976],
+  "Dasarahalli": [13.0418, 77.5152],
+  "RR Nagar": [12.9200, 77.5200],
+  "Kengeri": [12.9077, 77.4854],
+  "Hennur": [13.0366, 77.6412],
+  "Bellandur": [12.9250, 77.6761],
+  "MG Road": [12.9750, 77.6068],
 };
 
 // Generate water sources for a given location
@@ -300,13 +328,212 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
+  // Bangalore Neighborhoods
+  "Whitefield": [
+    {
+      id: "wf-001",
+      name: "Whitefield Lake",
+      location: "Whitefield",
+      coordinates: [12.9698, 77.7499],
+      quality: "safe",
+      metrics: {
+        turbidity: 58,
+        pH: 7.3,
+        cod: 170,
+        tds: 685,
+        nitrogen: 17,
+        phosphorus: 4.4,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+    {
+      id: "wf-002",
+      name: "ITPL Water Treatment Plant",
+      location: "Whitefield",
+      coordinates: [12.9850, 77.7370],
+      quality: "attention",
+      metrics: {
+        turbidity: 110,
+        pH: 6.9,
+        cod: 320,
+        tds: 890,
+        nitrogen: 25,
+        phosphorus: 6.8,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "Electronic City": [
+    {
+      id: "ec-001",
+      name: "Electronic City Lake",
+      location: "Electronic City",
+      coordinates: [12.8395, 77.6770],
+      quality: "safe",
+      metrics: {
+        turbidity: 65,
+        pH: 7.2,
+        cod: 185,
+        tds: 710,
+        nitrogen: 19,
+        phosphorus: 4.7,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "Koramangala": [
+    {
+      id: "kr-001",
+      name: "Koramangala Valley",
+      location: "Koramangala",
+      coordinates: [12.9352, 77.6245],
+      quality: "attention",
+      metrics: {
+        turbidity: 125,
+        pH: 6.8,
+        cod: 355,
+        tds: 925,
+        nitrogen: 29,
+        phosphorus: 7.2,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "HSR Layout": [
+    {
+      id: "hsr-001",
+      name: "HSR Lake",
+      location: "HSR Layout",
+      coordinates: [12.9121, 77.6446],
+      quality: "safe",
+      metrics: {
+        turbidity: 52,
+        pH: 7.5,
+        cod: 160,
+        tds: 665,
+        nitrogen: 16,
+        phosphorus: 4.2,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "Bellandur": [
+    {
+      id: "bel-001",
+      name: "Bellandur Lake",
+      location: "Bellandur",
+      coordinates: [12.9250, 77.6761],
+      quality: "attention",
+      metrics: {
+        turbidity: 195,
+        pH: 6.6,
+        cod: 480,
+        tds: 1100,
+        nitrogen: 42,
+        phosphorus: 10.5,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+    {
+      id: "bel-002",
+      name: "Kaikondrahalli Lake",
+      location: "Bellandur",
+      coordinates: [12.9300, 77.6600],
+      quality: "safe",
+      metrics: {
+        turbidity: 70,
+        pH: 7.1,
+        cod: 190,
+        tds: 720,
+        nitrogen: 20,
+        phosphorus: 5.0,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "Marathahalli": [
+    {
+      id: "mar-001",
+      name: "Marathahalli Water Source",
+      location: "Marathahalli",
+      coordinates: [12.9591, 77.7012],
+      quality: "safe",
+      metrics: {
+        turbidity: 62,
+        pH: 7.4,
+        cod: 175,
+        tds: 695,
+        nitrogen: 18,
+        phosphorus: 4.6,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "Indiranagar": [
+    {
+      id: "ind-001",
+      name: "Indiranagar Tank",
+      location: "Indiranagar",
+      coordinates: [12.9784, 77.6408],
+      quality: "safe",
+      metrics: {
+        turbidity: 48,
+        pH: 7.6,
+        cod: 155,
+        tds: 650,
+        nitrogen: 15,
+        phosphorus: 4.0,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
+  "Hebbal": [
+    {
+      id: "heb-001",
+      name: "Hebbal Lake",
+      location: "Hebbal",
+      coordinates: [13.0358, 77.5970],
+      quality: "attention",
+      metrics: {
+        turbidity: 135,
+        pH: 6.7,
+        cod: 385,
+        tds: 950,
+        nitrogen: 31,
+        phosphorus: 8.0,
+      },
+      lastUpdated: new Date().toISOString(),
+    },
+  ],
 };
 
 // Helper function to get water sources by location
 export const getWaterSourcesByLocation = (
   location: string
 ): WaterSource[] => {
-  return waterSourcesByLocation[location] || [];
+  // If exact location has water sources, return them
+  if (waterSourcesByLocation[location]) {
+    return waterSourcesByLocation[location];
+  }
+  
+  // Fallback: If it's a Bangalore neighborhood without specific data,
+  // return all Bangalore water sources
+  const bangaloreNeighborhoods = [
+    "Whitefield", "Electronic City", "Koramangala", "Indiranagar", 
+    "JP Nagar", "Jayanagar", "BTM Layout", "HSR Layout", "Marathahalli",
+    "Sarjapur Road", "Hebbal", "Yelahanka", "Banashankari", "Rajajinagar",
+    "Malleshwaram", "Yeshwanthpur", "Peenya", "Bommanahalli", "Mahadevapura",
+    "Dasarahalli", "RR Nagar", "Kengeri", "Hennur", "Bellandur", "MG Road"
+  ];
+  
+  if (bangaloreNeighborhoods.includes(location)) {
+    // Return all Bangalore area water sources
+    return Object.entries(waterSourcesByLocation)
+      .filter(([key]) => bangaloreNeighborhoods.includes(key) || key === "Bangalore")
+      .flatMap(([_, sources]) => sources);
+  }
+  
+  return [];
 };
 
 // Helper function to get all water sources
