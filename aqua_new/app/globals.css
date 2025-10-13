@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet map styles */
+@import "leaflet/dist/leaflet.css";
+
+/* Custom map marker styles */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Fix leaflet z-index issues with modals */
+.leaflet-pane {
+  z-index: 400;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

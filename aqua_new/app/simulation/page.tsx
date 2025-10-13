@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -20,9 +21,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Droplets, Beaker, Waves, TrendingDown, Sparkles } from "lucide-react";
+import {
+  Droplets,
+  Beaker,
+  Waves,
+  TrendingDown,
+  Sparkles,
+  MapPin,
+} from "lucide-react";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface WaterParameters {
   turbidity: number;
@@ -37,6 +46,8 @@ interface WaterParameters {
 type NumericParameters = Exclude<keyof WaterParameters, "reuseType">;
 
 const Simulation = () => {
+  const searchParams = useSearchParams();
+  const [sourceName, setSourceName] = useState<string | null>(null);
   const [parameters, setParameters] = useState<WaterParameters>({
     turbidity: 50,
     pH: 7.0,
@@ -46,6 +57,33 @@ const Simulation = () => {
     phosphorus: 5,
     reuseType: "",
   });
+
+  // Load parameters from URL if coming from map
+  useEffect(() => {
+    const turbidity = searchParams.get("turbidity");
+    const pH = searchParams.get("pH");
+    const cod = searchParams.get("cod");
+    const tds = searchParams.get("tds");
+    const nitrogen = searchParams.get("nitrogen");
+    const phosphorus = searchParams.get("phosphorus");
+    const name = searchParams.get("sourceName");
+
+    if (turbidity || pH || cod || tds) {
+      setParameters({
+        turbidity: turbidity ? parseFloat(turbidity) : 50,
+        pH: pH ? parseFloat(pH) : 7.0,
+        cod: cod ? parseFloat(cod) : 300,
+        tds: tds ? parseFloat(tds) : 500,
+        nitrogen: nitrogen ? parseFloat(nitrogen) : 20,
+        phosphorus: phosphorus ? parseFloat(phosphorus) : 5,
+        reuseType: "",
+      });
+
+      if (name) {
+        setSourceName(name);
+      }
+    }
+  }, [searchParams]);
 
   const handleSliderChange = (field: NumericParameters, value: number[]) => {
     setParameters({ ...parameters, [field]: value[0] });
@@ -142,6 +180,26 @@ const Simulation = () => {
               Enter wastewater parameters to simulate the intelligent treatment
               process
             </p>
+
+            {/* Show alert if data is loaded from map */}
+            {sourceName && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mt-6 max-w-2xl mx-auto"
+              >
+                <Alert className="bg-cyan-500/10 border-cyan-500/30">
+                  <MapPin className="h-4 w-4 text-cyan-400" />
+                  <AlertDescription className="text-white ml-2">
+                    Parameters loaded from{" "}
+                    <span className="font-semibold text-cyan-400">
+                      {sourceName}
+                    </span>
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

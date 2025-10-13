@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/map/:path*",
     "/simulation/:path*",
     "/dashboard/:path*",
     "/iot-sensors/:path*",

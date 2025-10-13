@@ -28,6 +28,7 @@ const Header = () => {
 
   const navLinks = [
     { href: "/", label: "HOME" },
+    { href: "/map", label: "MAP VIEW" },
     { href: "/simulation", label: "SIMULATION" },
     { href: "/dashboard", label: "DASHBOARD" },
     { href: "/iot-sensors", label: "IOT SENSORS" },
