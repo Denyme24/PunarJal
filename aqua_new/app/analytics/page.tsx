@@ -339,85 +339,85 @@ const Analytics = () => {
               {/* Sustainability Tab */}
               <TabsContent value="sustainability">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-lg border-green-500/20">
+                  <Card className="bg-gradient-to-br from-gray-800 to-gray-900 backdrop-blur-lg border-gray-700">
                     <CardHeader>
                       <CardTitle className="text-white text-2xl">
                         Environmental Impact
                       </CardTitle>
-                      <CardDescription className="text-white/70">
+                      <CardDescription className="text-white">
                         Positive environmental contributions
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             Freshwater Conservation
                           </span>
-                          <span className="text-green-400 font-bold">
+                          <span className="text-green-400 font-bold text-xl">
                             389,000L
                           </span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             CO₂ Emissions Avoided
                           </span>
-                          <span className="text-green-400 font-bold">
+                          <span className="text-green-400 font-bold text-xl">
                             2.5 Tonnes
                           </span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             Equivalent Trees Planted
                           </span>
-                          <span className="text-green-400 font-bold">
+                          <span className="text-green-400 font-bold text-xl">
                             115 Trees
                           </span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             Reduction in Water Footprint
                           </span>
-                          <span className="text-green-400 font-bold">47%</span>
+                          <span className="text-green-400 font-bold text-xl">47%</span>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-lg border-blue-500/20">
+                  <Card className="bg-gradient-to-br from-gray-800 to-gray-900 backdrop-blur-lg border-gray-700">
                     <CardHeader>
                       <CardTitle className="text-white text-2xl">
                         Economic Benefits
                       </CardTitle>
-                      <CardDescription className="text-white/70">
+                      <CardDescription className="text-white">
                         Financial savings and ROI
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             Total Cost Savings
                           </span>
-                          <span className="text-cyan-400 font-bold">
+                          <span className="text-cyan-400 font-bold text-xl">
                             $125,000
                           </span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             Water Bill Reduction
                           </span>
-                          <span className="text-cyan-400 font-bold">$89,000</span>
+                          <span className="text-cyan-400 font-bold text-xl">$89,000</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">
                             Energy Cost Savings
                           </span>
-                          <span className="text-cyan-400 font-bold">$36,000</span>
+                          <span className="text-cyan-400 font-bold text-xl">$36,000</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                          <span className="text-white/80">Payback Period</span>
-                          <span className="text-cyan-400 font-bold">
+                        <div className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-gray-600 shadow-lg">
+                          <span className="text-white font-semibold text-base">Payback Period</span>
+                          <span className="text-cyan-400 font-bold text-xl">
                             2.3 Years
                           </span>
                         </div>
