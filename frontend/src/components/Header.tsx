@@ -12,7 +12,6 @@ const Header = () => {
     { href: "/iot-sensors", label: "IOT SENSORS" },
     { href: "/reuse", label: "REUSE OPTIONS" },
     { href: "/analytics", label: "ANALYTICS" },
-    { href: "/about", label: "ABOUT" },
   ];
 
   return (
