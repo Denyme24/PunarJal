@@ -19,7 +19,7 @@ export default function WaterSourceCard({
   if (!source) return null;
 
   const handleInitiateSimulation = () => {
-    // Navigate to simulation page with pre-filled parameters
+    // Navigate to treatment dashboard with pre-filled parameters
     const params = new URLSearchParams({
       turbidity: source.metrics.turbidity.toString(),
       pH: source.metrics.pH.toString(),
@@ -29,7 +29,7 @@ export default function WaterSourceCard({
       phosphorus: source.metrics.phosphorus.toString(),
       sourceName: source.name,
     });
-    router.push(`/simulation?${params.toString()}`);
+    router.push(`/treatment-dashboard?${params.toString()}`);
   };
 
   const getQualityColor = (quality: string) => {
