@@ -4,7 +4,7 @@ export interface WaterSource {
   name: string;
   location: string;
   coordinates: [number, number]; // [latitude, longitude]
-  quality: "safe" | "attention" | "critical";
+  quality: 'safe' | 'attention' | 'critical';
   metrics: {
     turbidity: number; // NTU
     pH: number;
@@ -19,56 +19,56 @@ export interface WaterSource {
 // Location coordinates for different cities/regions
 export const locationCoordinates: Record<string, [number, number]> = {
   // Major Cities
-  "San Francisco": [37.7749, -122.4194],
-  "New York": [40.7128, -74.0060],
-  "Los Angeles": [34.0522, -118.2437],
-  "Chicago": [41.8781, -87.6298],
-  "Houston": [29.7604, -95.3698],
-  "Mumbai": [19.0760, 72.8777],
-  "Delhi": [28.7041, 77.1025],
-  "Bangalore": [12.9716, 77.5946],
-  "London": [51.5074, -0.1278],
-  "Tokyo": [35.6762, 139.6503],
-  "Sydney": [-33.8688, 151.2093],
-  "Toronto": [43.6532, -79.3832],
-  
+  'San Francisco': [37.7749, -122.4194],
+  'New York': [40.7128, -74.006],
+  'Los Angeles': [34.0522, -118.2437],
+  Chicago: [41.8781, -87.6298],
+  Houston: [29.7604, -95.3698],
+  Mumbai: [19.076, 72.8777],
+  Delhi: [28.7041, 77.1025],
+  Bangalore: [12.9716, 77.5946],
+  London: [51.5074, -0.1278],
+  Tokyo: [35.6762, 139.6503],
+  Sydney: [-33.8688, 151.2093],
+  Toronto: [43.6532, -79.3832],
+
   // Bangalore Neighborhoods
-  "Whitefield": [12.9698, 77.7499],
-  "Electronic City": [12.8395, 77.6770],
-  "Koramangala": [12.9352, 77.6245],
-  "Indiranagar": [12.9784, 77.6408],
-  "JP Nagar": [12.9082, 77.5855],
-  "Jayanagar": [12.9250, 77.5838],
-  "BTM Layout": [12.9165, 77.6101],
-  "HSR Layout": [12.9121, 77.6446],
-  "Marathahalli": [12.9591, 77.7012],
-  "Sarjapur Road": [12.9010, 77.6874],
-  "Hebbal": [13.0358, 77.5970],
-  "Yelahanka": [13.1007, 77.5963],
-  "Banashankari": [12.9250, 77.5482],
-  "Rajajinagar": [12.9916, 77.5522],
-  "Malleshwaram": [13.0033, 77.5703],
-  "Yeshwanthpur": [13.0280, 77.5380],
-  "Peenya": [13.0297, 77.5154],
-  "Bommanahalli": [12.9100, 77.6300],
-  "Mahadevapura": [12.9930, 77.6976],
-  "Dasarahalli": [13.0418, 77.5152],
-  "RR Nagar": [12.9200, 77.5200],
-  "Kengeri": [12.9077, 77.4854],
-  "Hennur": [13.0366, 77.6412],
-  "Bellandur": [12.9250, 77.6761],
-  "MG Road": [12.9750, 77.6068],
+  Whitefield: [12.9698, 77.7499],
+  'Electronic City': [12.8395, 77.677],
+  Koramangala: [12.9352, 77.6245],
+  Indiranagar: [12.9784, 77.6408],
+  'JP Nagar': [12.9082, 77.5855],
+  Jayanagar: [12.925, 77.5838],
+  'BTM Layout': [12.9165, 77.6101],
+  'HSR Layout': [12.9121, 77.6446],
+  Marathahalli: [12.9591, 77.7012],
+  'Sarjapur Road': [12.901, 77.6874],
+  Hebbal: [13.0358, 77.597],
+  Yelahanka: [13.1007, 77.5963],
+  Banashankari: [12.925, 77.5482],
+  Rajajinagar: [12.9916, 77.5522],
+  Malleshwaram: [13.0033, 77.5703],
+  Yeshwanthpur: [13.028, 77.538],
+  Peenya: [13.0297, 77.5154],
+  Bommanahalli: [12.91, 77.63],
+  Mahadevapura: [12.993, 77.6976],
+  Dasarahalli: [13.0418, 77.5152],
+  'RR Nagar': [12.92, 77.52],
+  Kengeri: [12.9077, 77.4854],
+  Hennur: [13.0366, 77.6412],
+  Bellandur: [12.925, 77.6761],
+  'MG Road': [12.975, 77.6068],
 };
 
 // Generate water sources for a given location
 export const waterSourcesByLocation: Record<string, WaterSource[]> = {
-  "San Francisco": [
+  'San Francisco': [
     {
-      id: "sf-001",
-      name: "Harbor Lake",
-      location: "San Francisco",
+      id: 'sf-001',
+      name: 'Harbor Lake',
+      location: 'San Francisco',
       coordinates: [37.7749, -122.4194],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 64,
         pH: 7.2,
@@ -80,11 +80,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "sf-002",
-      name: "Mission Bay Reservoir",
-      location: "San Francisco",
+      id: 'sf-002',
+      name: 'Mission Bay Reservoir',
+      location: 'San Francisco',
       coordinates: [37.7699, -122.3922],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 45,
         pH: 7.5,
@@ -96,11 +96,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "sf-003",
-      name: "Golden Gate Park Lake",
-      location: "San Francisco",
+      id: 'sf-003',
+      name: 'Golden Gate Park Lake',
+      location: 'San Francisco',
       coordinates: [37.7694, -122.4862],
-      quality: "attention",
+      quality: 'attention',
       metrics: {
         turbidity: 120,
         pH: 6.8,
@@ -112,11 +112,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "sf-004",
-      name: "Lake Merced",
-      location: "San Francisco",
-      coordinates: [37.7280, -122.4850],
-      quality: "safe",
+      id: 'sf-004',
+      name: 'Lake Merced',
+      location: 'San Francisco',
+      coordinates: [37.728, -122.485],
+      quality: 'safe',
       metrics: {
         turbidity: 38,
         pH: 7.3,
@@ -128,11 +128,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "sf-005",
-      name: "Sutro Baths Water Source",
-      location: "San Francisco",
+      id: 'sf-005',
+      name: 'Sutro Baths Water Source',
+      location: 'San Francisco',
       coordinates: [37.7804, -122.5138],
-      quality: "attention",
+      quality: 'attention',
       metrics: {
         turbidity: 95,
         pH: 7.0,
@@ -144,13 +144,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "New York": [
+  'New York': [
     {
-      id: "ny-001",
-      name: "Central Park Reservoir",
-      location: "New York",
+      id: 'ny-001',
+      name: 'Central Park Reservoir',
+      location: 'New York',
       coordinates: [40.7829, -73.9654],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 52,
         pH: 7.4,
@@ -162,11 +162,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "ny-002",
-      name: "Jamaica Bay",
-      location: "New York",
+      id: 'ny-002',
+      name: 'Jamaica Bay',
+      location: 'New York',
       coordinates: [40.6195, -73.8234],
-      quality: "attention",
+      quality: 'attention',
       metrics: {
         turbidity: 140,
         pH: 6.9,
@@ -178,11 +178,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "ny-003",
-      name: "Hudson River Point",
-      location: "New York",
-      coordinates: [40.7489, -73.9680],
-      quality: "safe",
+      id: 'ny-003',
+      name: 'Hudson River Point',
+      location: 'New York',
+      coordinates: [40.7489, -73.968],
+      quality: 'safe',
       metrics: {
         turbidity: 48,
         pH: 7.6,
@@ -194,13 +194,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Mumbai": [
+  Mumbai: [
     {
-      id: "mum-001",
-      name: "Powai Lake",
-      location: "Mumbai",
+      id: 'mum-001',
+      name: 'Powai Lake',
+      location: 'Mumbai',
       coordinates: [19.1197, 72.9059],
-      quality: "attention",
+      quality: 'attention',
       metrics: {
         turbidity: 180,
         pH: 6.7,
@@ -212,11 +212,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "mum-002",
-      name: "Vihar Lake",
-      location: "Mumbai",
+      id: 'mum-002',
+      name: 'Vihar Lake',
+      location: 'Mumbai',
       coordinates: [19.1136, 72.9153],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 68,
         pH: 7.1,
@@ -228,11 +228,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "mum-003",
-      name: "Tulsi Lake",
-      location: "Mumbai",
-      coordinates: [19.1580, 72.8814],
-      quality: "safe",
+      id: 'mum-003',
+      name: 'Tulsi Lake',
+      location: 'Mumbai',
+      coordinates: [19.158, 72.8814],
+      quality: 'safe',
       metrics: {
         turbidity: 55,
         pH: 7.3,
@@ -246,11 +246,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
   ],
   Delhi: [
     {
-      id: "del-001",
-      name: "Yamuna River Point",
-      location: "Delhi",
-      coordinates: [28.6139, 77.2090],
-      quality: "attention",
+      id: 'del-001',
+      name: 'Yamuna River Point',
+      location: 'Delhi',
+      coordinates: [28.6139, 77.209],
+      quality: 'attention',
       metrics: {
         turbidity: 220,
         pH: 6.5,
@@ -262,11 +262,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "del-002",
-      name: "Hauz Khas Lake",
-      location: "Delhi",
+      id: 'del-002',
+      name: 'Hauz Khas Lake',
+      location: 'Delhi',
       coordinates: [28.5494, 77.1925],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 72,
         pH: 7.2,
@@ -280,11 +280,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
   ],
   Bangalore: [
     {
-      id: "blr-001",
-      name: "Bellandur Lake",
-      location: "Bangalore",
-      coordinates: [12.9250, 77.6761],
-      quality: "attention",
+      id: 'blr-001',
+      name: 'Bellandur Lake',
+      location: 'Bangalore',
+      coordinates: [12.925, 77.6761],
+      quality: 'attention',
       metrics: {
         turbidity: 195,
         pH: 6.6,
@@ -296,11 +296,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "blr-002",
-      name: "Ulsoor Lake",
-      location: "Bangalore",
-      coordinates: [12.9810, 77.6220],
-      quality: "safe",
+      id: 'blr-002',
+      name: 'Ulsoor Lake',
+      location: 'Bangalore',
+      coordinates: [12.981, 77.622],
+      quality: 'safe',
       metrics: {
         turbidity: 60,
         pH: 7.4,
@@ -312,11 +312,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "blr-003",
-      name: "Sankey Tank",
-      location: "Bangalore",
+      id: 'blr-003',
+      name: 'Sankey Tank',
+      location: 'Bangalore',
       coordinates: [12.9988, 77.5632],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 42,
         pH: 7.6,
@@ -329,13 +329,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
     },
   ],
   // Bangalore Neighborhoods
-  "Whitefield": [
+  Whitefield: [
     {
-      id: "wf-001",
-      name: "Whitefield Lake",
-      location: "Whitefield",
+      id: 'wf-001',
+      name: 'Whitefield Lake',
+      location: 'Whitefield',
       coordinates: [12.9698, 77.7499],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 58,
         pH: 7.3,
@@ -347,11 +347,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "wf-002",
-      name: "ITPL Water Treatment Plant",
-      location: "Whitefield",
-      coordinates: [12.9850, 77.7370],
-      quality: "attention",
+      id: 'wf-002',
+      name: 'ITPL Water Treatment Plant',
+      location: 'Whitefield',
+      coordinates: [12.985, 77.737],
+      quality: 'attention',
       metrics: {
         turbidity: 110,
         pH: 6.9,
@@ -363,13 +363,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Electronic City": [
+  'Electronic City': [
     {
-      id: "ec-001",
-      name: "Electronic City Lake",
-      location: "Electronic City",
-      coordinates: [12.8395, 77.6770],
-      quality: "safe",
+      id: 'ec-001',
+      name: 'Electronic City Lake',
+      location: 'Electronic City',
+      coordinates: [12.8395, 77.677],
+      quality: 'safe',
       metrics: {
         turbidity: 65,
         pH: 7.2,
@@ -381,13 +381,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Koramangala": [
+  Koramangala: [
     {
-      id: "kr-001",
-      name: "Koramangala Valley",
-      location: "Koramangala",
+      id: 'kr-001',
+      name: 'Koramangala Valley',
+      location: 'Koramangala',
       coordinates: [12.9352, 77.6245],
-      quality: "attention",
+      quality: 'attention',
       metrics: {
         turbidity: 125,
         pH: 6.8,
@@ -399,13 +399,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "HSR Layout": [
+  'HSR Layout': [
     {
-      id: "hsr-001",
-      name: "HSR Lake",
-      location: "HSR Layout",
+      id: 'hsr-001',
+      name: 'HSR Lake',
+      location: 'HSR Layout',
       coordinates: [12.9121, 77.6446],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 52,
         pH: 7.5,
@@ -417,13 +417,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Bellandur": [
+  Bellandur: [
     {
-      id: "bel-001",
-      name: "Bellandur Lake",
-      location: "Bellandur",
-      coordinates: [12.9250, 77.6761],
-      quality: "attention",
+      id: 'bel-001',
+      name: 'Bellandur Lake',
+      location: 'Bellandur',
+      coordinates: [12.925, 77.6761],
+      quality: 'attention',
       metrics: {
         turbidity: 195,
         pH: 6.6,
@@ -435,11 +435,11 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
     {
-      id: "bel-002",
-      name: "Kaikondrahalli Lake",
-      location: "Bellandur",
-      coordinates: [12.9300, 77.6600],
-      quality: "safe",
+      id: 'bel-002',
+      name: 'Kaikondrahalli Lake',
+      location: 'Bellandur',
+      coordinates: [12.93, 77.66],
+      quality: 'safe',
       metrics: {
         turbidity: 70,
         pH: 7.1,
@@ -451,13 +451,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Marathahalli": [
+  Marathahalli: [
     {
-      id: "mar-001",
-      name: "Marathahalli Water Source",
-      location: "Marathahalli",
+      id: 'mar-001',
+      name: 'Marathahalli Water Source',
+      location: 'Marathahalli',
       coordinates: [12.9591, 77.7012],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 62,
         pH: 7.4,
@@ -469,13 +469,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Indiranagar": [
+  Indiranagar: [
     {
-      id: "ind-001",
-      name: "Indiranagar Tank",
-      location: "Indiranagar",
+      id: 'ind-001',
+      name: 'Indiranagar Tank',
+      location: 'Indiranagar',
       coordinates: [12.9784, 77.6408],
-      quality: "safe",
+      quality: 'safe',
       metrics: {
         turbidity: 48,
         pH: 7.6,
@@ -487,13 +487,13 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
       lastUpdated: new Date().toISOString(),
     },
   ],
-  "Hebbal": [
+  Hebbal: [
     {
-      id: "heb-001",
-      name: "Hebbal Lake",
-      location: "Hebbal",
-      coordinates: [13.0358, 77.5970],
-      quality: "attention",
+      id: 'heb-001',
+      name: 'Hebbal Lake',
+      location: 'Hebbal',
+      coordinates: [13.0358, 77.597],
+      quality: 'attention',
       metrics: {
         turbidity: 135,
         pH: 6.7,
@@ -508,31 +508,51 @@ export const waterSourcesByLocation: Record<string, WaterSource[]> = {
 };
 
 // Helper function to get water sources by location
-export const getWaterSourcesByLocation = (
-  location: string
-): WaterSource[] => {
+export const getWaterSourcesByLocation = (location: string): WaterSource[] => {
   // If exact location has water sources, return them
   if (waterSourcesByLocation[location]) {
     return waterSourcesByLocation[location];
   }
-  
+
   // Fallback: If it's a Bangalore neighborhood without specific data,
   // return all Bangalore water sources
   const bangaloreNeighborhoods = [
-    "Whitefield", "Electronic City", "Koramangala", "Indiranagar", 
-    "JP Nagar", "Jayanagar", "BTM Layout", "HSR Layout", "Marathahalli",
-    "Sarjapur Road", "Hebbal", "Yelahanka", "Banashankari", "Rajajinagar",
-    "Malleshwaram", "Yeshwanthpur", "Peenya", "Bommanahalli", "Mahadevapura",
-    "Dasarahalli", "RR Nagar", "Kengeri", "Hennur", "Bellandur", "MG Road"
+    'Whitefield',
+    'Electronic City',
+    'Koramangala',
+    'Indiranagar',
+    'JP Nagar',
+    'Jayanagar',
+    'BTM Layout',
+    'HSR Layout',
+    'Marathahalli',
+    'Sarjapur Road',
+    'Hebbal',
+    'Yelahanka',
+    'Banashankari',
+    'Rajajinagar',
+    'Malleshwaram',
+    'Yeshwanthpur',
+    'Peenya',
+    'Bommanahalli',
+    'Mahadevapura',
+    'Dasarahalli',
+    'RR Nagar',
+    'Kengeri',
+    'Hennur',
+    'Bellandur',
+    'MG Road',
   ];
-  
+
   if (bangaloreNeighborhoods.includes(location)) {
     // Return all Bangalore area water sources
     return Object.entries(waterSourcesByLocation)
-      .filter(([key]) => bangaloreNeighborhoods.includes(key) || key === "Bangalore")
+      .filter(
+        ([key]) => bangaloreNeighborhoods.includes(key) || key === 'Bangalore'
+      )
       .flatMap(([_, sources]) => sources);
   }
-  
+
   return [];
 };
 
@@ -540,4 +560,3 @@ export const getWaterSourcesByLocation = (
 export const getAllWaterSources = (): WaterSource[] => {
   return Object.values(waterSourcesByLocation).flat();
 };
-

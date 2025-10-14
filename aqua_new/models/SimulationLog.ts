@@ -1,14 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export interface ISimulationLog extends mongoose.Document {
   userId: mongoose.Types.ObjectId;
   userEmail: string;
   userLocation?: string;
-  
+
   // Source of simulation
-  source: "simulation_page" | "iot_sensors" | "map_view";
+  source: 'simulation_page' | 'iot_sensors' | 'map_view';
   sourceName?: string; // e.g., "Hebbal Lake" for map/IoT sources
-  
+
   // Input parameters
   inputParameters: {
     turbidity: number;
@@ -19,7 +19,7 @@ export interface ISimulationLog extends mongoose.Document {
     phosphorus: number;
     reuseType?: string;
   };
-  
+
   // Simulation result
   simulationResult: {
     primaryTreatment: {
@@ -58,12 +58,12 @@ export interface ISimulationLog extends mongoose.Document {
         exceedsThreshold: boolean;
       }>;
     };
-    overallStatus: "safe" | "needs-treatment" | "critical";
+    overallStatus: 'safe' | 'needs-treatment' | 'critical';
     totalStagesRequired: number;
     estimatedTreatmentTime: number;
     estimatedEfficiency: number;
   };
-  
+
   // Metadata
   timestamp: Date;
   sessionId?: string;
@@ -73,7 +73,7 @@ const SimulationLogSchema = new mongoose.Schema<ISimulationLog>(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       index: true,
     },
@@ -86,7 +86,7 @@ const SimulationLogSchema = new mongoose.Schema<ISimulationLog>(
     },
     source: {
       type: String,
-      enum: ["simulation_page", "iot_sensors", "map_view"],
+      enum: ['simulation_page', 'iot_sensors', 'map_view'],
       required: true,
       index: true,
     },
@@ -147,7 +147,7 @@ const SimulationLogSchema = new mongoose.Schema<ISimulationLog>(
       },
       overallStatus: {
         type: String,
-        enum: ["safe", "needs-treatment", "critical"],
+        enum: ['safe', 'needs-treatment', 'critical'],
       },
       totalStagesRequired: Number,
       estimatedTreatmentTime: Number,
@@ -172,5 +172,4 @@ SimulationLogSchema.index({ userId: 1, timestamp: -1 });
 SimulationLogSchema.index({ userLocation: 1, timestamp: -1 });
 
 export default mongoose.models.SimulationLog ||
-  mongoose.model<ISimulationLog>("SimulationLog", SimulationLogSchema);
-
+  mongoose.model<ISimulationLog>('SimulationLog', SimulationLogSchema);

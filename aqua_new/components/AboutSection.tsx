@@ -1,60 +1,60 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Droplet, Cpu, BarChart3, Leaf, Shield, Zap } from "lucide-react";
+import { motion } from 'framer-motion';
+import { Droplet, Cpu, BarChart3, Leaf, Shield, Zap } from 'lucide-react';
 
 const AboutSection = () => {
   const features = [
     {
       icon: Cpu,
-      title: "AI-Powered Intelligence",
+      title: 'AI-Powered Intelligence',
       description:
-        "Advanced machine learning algorithms optimize treatment processes in real-time",
+        'Advanced machine learning algorithms optimize treatment processes in real-time',
     },
     {
       icon: BarChart3,
-      title: "Data-Driven Insights",
+      title: 'Data-Driven Insights',
       description:
-        "Comprehensive analytics provide actionable insights for water management",
+        'Comprehensive analytics provide actionable insights for water management',
     },
     {
       icon: Shield,
-      title: "Quality Assurance",
+      title: 'Quality Assurance',
       description:
-        "Multi-stage filtration ensures water meets the highest safety standards",
+        'Multi-stage filtration ensures water meets the highest safety standards',
     },
     {
       icon: Leaf,
-      title: "Environmental Impact",
+      title: 'Environmental Impact',
       description:
-        "Sustainable processes reduce carbon footprint and promote circular economy",
+        'Sustainable processes reduce carbon footprint and promote circular economy',
     },
     {
       icon: Zap,
-      title: "Automated Operations",
+      title: 'Automated Operations',
       description:
-        "Smart automation reduces manual intervention and operational costs",
+        'Smart automation reduces manual intervention and operational costs',
     },
     {
       icon: Droplet,
-      title: "Water Conservation",
+      title: 'Water Conservation',
       description:
-        "Maximizes water reuse potential, reducing dependency on freshwater sources",
+        'Maximizes water reuse potential, reducing dependency on freshwater sources',
     },
   ];
 
   const stats = [
-    { value: "95%", label: "Water Recovery Rate" },
-    { value: "60%", label: "Energy Savings" },
-    { value: "24/7", label: "Monitoring" },
-    { value: "99.9%", label: "System Uptime" },
+    { value: '95%', label: 'Water Recovery Rate' },
+    { value: '60%', label: 'Energy Savings' },
+    { value: '24/7', label: 'Monitoring' },
+    { value: '99.9%', label: 'System Uptime' },
   ];
 
   return (
     <section
       id="about"
       className="relative py-32"
-      style={{ backgroundColor: "#1a2332" }}
+      style={{ backgroundColor: '#1a2332' }}
     >
       <div className="container mx-auto px-6">
         {/* Section Header */}
@@ -66,7 +66,7 @@ const AboutSection = () => {
           className="text-center mb-20"
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            About{" "}
+            About{' '}
             <span className="font-serif italic text-cyan-400">PunarJal</span>
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
@@ -97,8 +97,8 @@ const AboutSection = () => {
               </p>
               <p className="text-lg text-white/80 leading-relaxed">
                 Through cutting-edge IoT sensors, AI-driven analytics, and
-                automated treatment processes, we're making water reuse not just
-                possible, but profitable and environmentally responsible.
+                automated treatment processes, we&apos;re making water reuse not
+                just possible, but profitable and environmentally responsible.
               </p>
             </div>
 

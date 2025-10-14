@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 // Note: Authentication is primarily handled client-side by ProtectedRoute component
 // This middleware is kept minimal to allow for better UX with client-side protection
@@ -11,12 +11,11 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/map/:path*",
-    "/simulation/:path*",
-    "/treatment-dashboard/:path*",
-    "/iot-sensors/:path*",
-    "/reuse/:path*",
-    "/analytics/:path*",
+    '/map/:path*',
+    '/simulation/:path*',
+    '/treatment-dashboard/:path*',
+    '/iot-sensors/:path*',
+    '/reuse/:path*',
+    '/analytics/:path*',
   ],
 };
-

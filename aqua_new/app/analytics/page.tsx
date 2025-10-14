@@ -1,20 +1,19 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Dialog,
   DialogContent,
@@ -22,10 +21,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   TrendingUp,
-  TrendingDown,
   Droplets,
   Zap,
   Leaf,
@@ -35,18 +33,14 @@ import {
   FileText,
   Loader2,
   AlertTriangle,
-  Eye,
   MessageSquare,
   Building2,
-  Clock,
   CheckCircle,
-  XCircle,
-  Filter,
   Activity,
-} from "lucide-react";
-import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { useAuth } from "@/contexts/AuthContext";
+} from 'lucide-react';
+import Header from '@/components/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 type AnalyticsData = {
   simulationHistory: Array<{
@@ -94,7 +88,7 @@ type PlantData = {
   name: string;
   location: string;
   operator: string;
-  status: "operational" | "maintenance" | "alert";
+  status: 'operational' | 'maintenance' | 'alert';
   lastUpdated: string;
   currentMetrics: {
     turbidity: number;
@@ -111,7 +105,7 @@ type PlantData = {
   };
   alerts: Array<{
     id: string;
-    type: "warning" | "critical";
+    type: 'warning' | 'critical';
     parameter: string;
     message: string;
     timestamp: string;
@@ -128,7 +122,7 @@ type PlantData = {
     message: string;
     timestamp: string;
     officer: string;
-    status: "sent" | "acknowledged" | "resolved";
+    status: 'sent' | 'acknowledged' | 'resolved';
   }>;
 };
 
@@ -154,24 +148,26 @@ const Analytics = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Environmental Officer dashboard state
   const [plants, setPlants] = useState<PlantData[]>([]);
   const [selectedPlant, setSelectedPlant] = useState<PlantData | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [activeTab, setActiveTab] = useState('overview');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
-  const [complianceReports, setComplianceReports] = useState<ComplianceReport[]>([]);
+  const [complianceReports, setComplianceReports] = useState<
+    ComplianceReport[]
+  >([]);
 
   // Sample plant data for Environmental Officer dashboard
   const initializePlantData = () => {
     const samplePlants: PlantData[] = [
       {
-        id: "plant-001",
-        name: "Central Treatment Plant",
-        location: "Bangalore Central",
-        operator: "John Smith",
-        status: "alert",
+        id: 'plant-001',
+        name: 'Central Treatment Plant',
+        location: 'Bangalore Central',
+        operator: 'John Smith',
+        status: 'alert',
         lastUpdated: new Date().toISOString(),
         currentMetrics: {
           turbidity: 8.5,
@@ -183,36 +179,36 @@ const Analytics = () => {
         },
         trends: {
           tds: [
-            { date: "2024-01-01", value: 650 },
-            { date: "2024-01-02", value: 680 },
-            { date: "2024-01-03", value: 720 },
-            { date: "2024-01-04", value: 780 },
-            { date: "2024-01-05", value: 820 },
-            { date: "2024-01-06", value: 850 },
+            { date: '2024-01-01', value: 650 },
+            { date: '2024-01-02', value: 680 },
+            { date: '2024-01-03', value: 720 },
+            { date: '2024-01-04', value: 780 },
+            { date: '2024-01-05', value: 820 },
+            { date: '2024-01-06', value: 850 },
           ],
           turbidity: [
-            { date: "2024-01-01", value: 12.5 },
-            { date: "2024-01-02", value: 11.8 },
-            { date: "2024-01-03", value: 10.2 },
-            { date: "2024-01-04", value: 9.5 },
-            { date: "2024-01-05", value: 8.8 },
-            { date: "2024-01-06", value: 8.5 },
+            { date: '2024-01-01', value: 12.5 },
+            { date: '2024-01-02', value: 11.8 },
+            { date: '2024-01-03', value: 10.2 },
+            { date: '2024-01-04', value: 9.5 },
+            { date: '2024-01-05', value: 8.8 },
+            { date: '2024-01-06', value: 8.5 },
           ],
           efficiency: [
-            { date: "2024-01-01", value: 85 },
-            { date: "2024-01-02", value: 87 },
-            { date: "2024-01-03", value: 89 },
-            { date: "2024-01-04", value: 91 },
-            { date: "2024-01-05", value: 88 },
-            { date: "2024-01-06", value: 86 },
+            { date: '2024-01-01', value: 85 },
+            { date: '2024-01-02', value: 87 },
+            { date: '2024-01-03', value: 89 },
+            { date: '2024-01-04', value: 91 },
+            { date: '2024-01-05', value: 88 },
+            { date: '2024-01-06', value: 86 },
           ],
         },
         alerts: [
           {
-            id: "alert-001",
-            type: "critical",
-            parameter: "TDS",
-            message: "TDS levels consistently above 800 mg/L for 3 days",
+            id: 'alert-001',
+            type: 'critical',
+            parameter: 'TDS',
+            message: 'TDS levels consistently above 800 mg/L for 3 days',
             timestamp: new Date().toISOString(),
             resolved: false,
           },
@@ -221,16 +217,16 @@ const Analytics = () => {
           monthly: true,
           quarterly: false,
           annual: true,
-          lastAudit: "2024-01-01",
+          lastAudit: '2024-01-01',
         },
         feedback: [],
       },
       {
-        id: "plant-002",
-        name: "North Treatment Facility",
-        location: "Bangalore North",
-        operator: "Sarah Johnson",
-        status: "operational",
+        id: 'plant-002',
+        name: 'North Treatment Facility',
+        location: 'Bangalore North',
+        operator: 'Sarah Johnson',
+        status: 'operational',
         lastUpdated: new Date().toISOString(),
         currentMetrics: {
           turbidity: 6.2,
@@ -242,28 +238,28 @@ const Analytics = () => {
         },
         trends: {
           tds: [
-            { date: "2024-01-01", value: 580 },
-            { date: "2024-01-02", value: 575 },
-            { date: "2024-01-03", value: 570 },
-            { date: "2024-01-04", value: 585 },
-            { date: "2024-01-05", value: 580 },
-            { date: "2024-01-06", value: 580 },
+            { date: '2024-01-01', value: 580 },
+            { date: '2024-01-02', value: 575 },
+            { date: '2024-01-03', value: 570 },
+            { date: '2024-01-04', value: 585 },
+            { date: '2024-01-05', value: 580 },
+            { date: '2024-01-06', value: 580 },
           ],
           turbidity: [
-            { date: "2024-01-01", value: 6.5 },
-            { date: "2024-01-02", value: 6.3 },
-            { date: "2024-01-03", value: 6.1 },
-            { date: "2024-01-04", value: 6.2 },
-            { date: "2024-01-05", value: 6.2 },
-            { date: "2024-01-06", value: 6.2 },
+            { date: '2024-01-01', value: 6.5 },
+            { date: '2024-01-02', value: 6.3 },
+            { date: '2024-01-03', value: 6.1 },
+            { date: '2024-01-04', value: 6.2 },
+            { date: '2024-01-05', value: 6.2 },
+            { date: '2024-01-06', value: 6.2 },
           ],
           efficiency: [
-            { date: "2024-01-01", value: 92 },
-            { date: "2024-01-02", value: 93 },
-            { date: "2024-01-03", value: 94 },
-            { date: "2024-01-04", value: 92 },
-            { date: "2024-01-05", value: 93 },
-            { date: "2024-01-06", value: 93 },
+            { date: '2024-01-01', value: 92 },
+            { date: '2024-01-02', value: 93 },
+            { date: '2024-01-03', value: 94 },
+            { date: '2024-01-04', value: 92 },
+            { date: '2024-01-05', value: 93 },
+            { date: '2024-01-06', value: 93 },
           ],
         },
         alerts: [],
@@ -271,16 +267,16 @@ const Analytics = () => {
           monthly: true,
           quarterly: true,
           annual: true,
-          lastAudit: "2024-01-01",
+          lastAudit: '2024-01-01',
         },
         feedback: [],
       },
       {
-        id: "plant-003",
-        name: "South Industrial Plant",
-        location: "Bangalore South",
-        operator: "Mike Chen",
-        status: "maintenance",
+        id: 'plant-003',
+        name: 'South Industrial Plant',
+        location: 'Bangalore South',
+        operator: 'Mike Chen',
+        status: 'maintenance',
         lastUpdated: new Date().toISOString(),
         currentMetrics: {
           turbidity: 9.8,
@@ -292,36 +288,36 @@ const Analytics = () => {
         },
         trends: {
           tds: [
-            { date: "2024-01-01", value: 720 },
-            { date: "2024-01-02", value: 715 },
-            { date: "2024-01-03", value: 710 },
-            { date: "2024-01-04", value: 720 },
-            { date: "2024-01-05", value: 720 },
-            { date: "2024-01-06", value: 720 },
+            { date: '2024-01-01', value: 720 },
+            { date: '2024-01-02', value: 715 },
+            { date: '2024-01-03', value: 710 },
+            { date: '2024-01-04', value: 720 },
+            { date: '2024-01-05', value: 720 },
+            { date: '2024-01-06', value: 720 },
           ],
           turbidity: [
-            { date: "2024-01-01", value: 10.2 },
-            { date: "2024-01-02", value: 9.9 },
-            { date: "2024-01-03", value: 9.8 },
-            { date: "2024-01-04", value: 9.8 },
-            { date: "2024-01-05", value: 9.8 },
-            { date: "2024-01-06", value: 9.8 },
+            { date: '2024-01-01', value: 10.2 },
+            { date: '2024-01-02', value: 9.9 },
+            { date: '2024-01-03', value: 9.8 },
+            { date: '2024-01-04', value: 9.8 },
+            { date: '2024-01-05', value: 9.8 },
+            { date: '2024-01-06', value: 9.8 },
           ],
           efficiency: [
-            { date: "2024-01-01", value: 88 },
-            { date: "2024-01-02", value: 89 },
-            { date: "2024-01-03", value: 88 },
-            { date: "2024-01-04", value: 87 },
-            { date: "2024-01-05", value: 88 },
-            { date: "2024-01-06", value: 88 },
+            { date: '2024-01-01', value: 88 },
+            { date: '2024-01-02', value: 89 },
+            { date: '2024-01-03', value: 88 },
+            { date: '2024-01-04', value: 87 },
+            { date: '2024-01-05', value: 88 },
+            { date: '2024-01-06', value: 88 },
           ],
         },
         alerts: [
           {
-            id: "alert-002",
-            type: "warning",
-            parameter: "Turbidity",
-            message: "Turbidity approaching threshold limit",
+            id: 'alert-002',
+            type: 'warning',
+            parameter: 'Turbidity',
+            message: 'Turbidity approaching threshold limit',
             timestamp: new Date().toISOString(),
             resolved: false,
           },
@@ -330,18 +326,18 @@ const Analytics = () => {
           monthly: true,
           quarterly: true,
           annual: false,
-          lastAudit: "2023-12-15",
+          lastAudit: '2023-12-15',
         },
         feedback: [],
       },
     ];
-    
+
     setPlants(samplePlants);
   };
 
   useEffect(() => {
     // Initialize plant data for Environmental Officers
-    if (user?.role === "Environmental Officer") {
+    if (user?.role === 'Environmental Officer') {
       initializePlantData();
       setLoading(false);
       return;
@@ -354,10 +350,10 @@ const Analytics = () => {
         setError(null);
 
         // Get last simulation context from localStorage
-        const contextRaw = localStorage.getItem("lastSimulationContext");
+        const contextRaw = localStorage.getItem('lastSimulationContext');
         if (!contextRaw) {
           setError(
-            "No simulation data found. Please run a simulation first from the Simulation page."
+            'No simulation data found. Please run a simulation first from the Simulation page.'
           );
           setLoading(false);
           return;
@@ -367,15 +363,15 @@ const Analytics = () => {
 
         // Call AI generation API with authorization header
         const headers: HeadersInit = {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         };
 
         if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
+          headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const res = await fetch("/api/analytics/generate", {
-          method: "POST",
+        const res = await fetch('/api/analytics/generate', {
+          method: 'POST',
           headers,
           body: JSON.stringify(context),
         });
@@ -383,12 +379,12 @@ const Analytics = () => {
         const result = await res.json();
 
         if (!res.ok) {
-          throw new Error(result?.error || "Failed to generate analytics");
+          throw new Error(result?.error || 'Failed to generate analytics');
         }
 
         setAnalyticsData(result.data);
       } catch (e: any) {
-        setError(e?.message || "Failed to load analytics");
+        setError(e?.message || 'Failed to load analytics');
       } finally {
         setLoading(false);
       }
@@ -400,26 +396,26 @@ const Analytics = () => {
   // Environmental Officer functions
   const sendFeedbackToOperator = (plantId: string) => {
     if (!feedbackMessage.trim()) return;
-    
+
     const plant = plants.find(p => p.id === plantId);
     if (!plant) return;
-    
+
     const feedback = {
       id: `feedback-${Date.now()}`,
       message: feedbackMessage,
       timestamp: new Date().toISOString(),
-      officer: user?.organizationName || "Environmental Officer",
-      status: "sent" as const,
+      officer: user?.organizationName || 'Environmental Officer',
+      status: 'sent' as const,
     };
-    
+
     // Update plant with new feedback
-    setPlants(prev => prev.map(p => 
-      p.id === plantId 
-        ? { ...p, feedback: [...p.feedback, feedback] }
-        : p
-    ));
-    
-    setFeedbackMessage("");
+    setPlants(prev =>
+      prev.map(p =>
+        p.id === plantId ? { ...p, feedback: [...p.feedback, feedback] } : p
+      )
+    );
+
+    setFeedbackMessage('');
     setShowFeedbackDialog(false);
     alert(`Feedback sent to ${plant.operator} at ${plant.name}`);
   };
@@ -431,32 +427,48 @@ const Analytics = () => {
       year: new Date().getFullYear(),
       plants: plants.map(plant => ({
         name: plant.name,
-        compliance: plant.compliance.monthly && plant.compliance.quarterly && plant.compliance.annual ? 100 : 75,
+        compliance:
+          plant.compliance.monthly &&
+          plant.compliance.quarterly &&
+          plant.compliance.annual
+            ? 100
+            : 75,
         issues: plant.alerts.map(alert => alert.message),
-        recommendations: plant.alerts.length > 0 ? ["Address pending alerts", "Schedule maintenance"] : ["Continue current operations"]
+        recommendations:
+          plant.alerts.length > 0
+            ? ['Address pending alerts', 'Schedule maintenance']
+            : ['Continue current operations'],
       })),
-      overallCompliance: plants.reduce((acc, plant) => {
-        const compliance = plant.compliance.monthly && plant.compliance.quarterly && plant.compliance.annual ? 100 : 75;
-        return acc + compliance;
-      }, 0) / plants.length,
-      generatedBy: user?.organizationName || "Environmental Officer",
+      overallCompliance:
+        plants.reduce((acc, plant) => {
+          const compliance =
+            plant.compliance.monthly &&
+            plant.compliance.quarterly &&
+            plant.compliance.annual
+              ? 100
+              : 75;
+          return acc + compliance;
+        }, 0) / plants.length,
+      generatedBy: user?.organizationName || 'Environmental Officer',
       generatedAt: new Date().toISOString(),
     };
-    
+
     setComplianceReports(prev => [report, ...prev]);
-    
+
     // Download report
     const blob = new Blob([JSON.stringify(report, null, 2)], {
-      type: "application/json",
+      type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `compliance-report-${report.month}-${report.year}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    
-    alert(`Monthly compliance report generated for ${report.month} ${report.year}`);
+
+    alert(
+      `Monthly compliance report generated for ${report.month} ${report.year}`
+    );
   };
 
   // Original analytics functions
@@ -468,16 +480,16 @@ const Analytics = () => {
     if (!analyticsData) return;
 
     const rows = analyticsData.simulationHistory;
-    const header = Object.keys(rows[0] || {}).join(",");
-    const lines = rows.map((r) => Object.values(r).join(","));
-    const csv = [header, ...lines].join("\n");
+    const header = Object.keys(rows[0] || {}).join(',');
+    const lines = rows.map(r => Object.values(r).join(','));
+    const csv = [header, ...lines].join('\n');
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `analytics-report-${
-      new Date().toISOString().split("T")[0]
+      new Date().toISOString().split('T')[0]
     }.csv`;
     a.click();
     URL.revokeObjectURL(url);
@@ -492,13 +504,13 @@ const Analytics = () => {
     };
 
     const blob = new Blob([JSON.stringify(report, null, 2)], {
-      type: "application/json",
+      type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `treatment-report-${
-      new Date().toISOString().split("T")[0]
+      new Date().toISOString().split('T')[0]
     }.json`;
     a.click();
     URL.revokeObjectURL(url);
@@ -538,7 +550,7 @@ const Analytics = () => {
               <CardContent>
                 <p className="text-white/80 mb-4">{error}</p>
                 <Button
-                  onClick={() => (window.location.href = "/simulation")}
+                  onClick={() => (window.location.href = '/simulation')}
                   className="bg-cyan-500 hover:bg-cyan-600"
                 >
                   Go to Simulation
@@ -552,7 +564,7 @@ const Analytics = () => {
   }
 
   // Show Environmental Officer dashboard if user has that role
-  if (user?.role === "Environmental Officer") {
+  if (user?.role === 'Environmental Officer') {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
@@ -567,7 +579,7 @@ const Analytics = () => {
               className="mb-12"
             >
               <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-                Environmental{" "}
+                Environmental{' '}
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                   Oversight
                 </span>
@@ -578,15 +590,28 @@ const Analytics = () => {
             </motion.div>
 
             {/* Tabs for different views */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="space-y-6"
+            >
               <TabsList className="bg-white/5 border border-white/10">
-                <TabsTrigger value="overview" className="data-[state=active]:bg-cyan-500/20">
+                <TabsTrigger
+                  value="overview"
+                  className="data-[state=active]:bg-cyan-500/20"
+                >
                   Plant Overview
                 </TabsTrigger>
-                <TabsTrigger value="trends" className="data-[state=active]:bg-cyan-500/20">
+                <TabsTrigger
+                  value="trends"
+                  className="data-[state=active]:bg-cyan-500/20"
+                >
                   Trend Analysis
                 </TabsTrigger>
-                <TabsTrigger value="compliance" className="data-[state=active]:bg-cyan-500/20">
+                <TabsTrigger
+                  value="compliance"
+                  className="data-[state=active]:bg-cyan-500/20"
+                >
                   Compliance Reports
                 </TabsTrigger>
               </TabsList>
@@ -599,9 +624,13 @@ const Analytics = () => {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <Building2 className="h-5 w-5 text-blue-400" />
-                        <span className="text-xs text-white/60">Total Plants</span>
+                        <span className="text-xs text-white/60">
+                          Total Plants
+                        </span>
                       </div>
-                      <div className="text-2xl font-bold text-white">{plants.length}</div>
+                      <div className="text-2xl font-bold text-white">
+                        {plants.length}
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -609,10 +638,12 @@ const Analytics = () => {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <CheckCircle className="h-5 w-5 text-green-400" />
-                        <span className="text-xs text-white/60">Operational</span>
+                        <span className="text-xs text-white/60">
+                          Operational
+                        </span>
                       </div>
                       <div className="text-2xl font-bold text-white">
-                        {plants.filter(p => p.status === "operational").length}
+                        {plants.filter(p => p.status === 'operational').length}
                       </div>
                     </CardContent>
                   </Card>
@@ -624,7 +655,10 @@ const Analytics = () => {
                         <span className="text-xs text-white/60">Alerts</span>
                       </div>
                       <div className="text-2xl font-bold text-white">
-                        {plants.reduce((acc, plant) => acc + plant.alerts.length, 0)}
+                        {plants.reduce(
+                          (acc, plant) => acc + plant.alerts.length,
+                          0
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -633,10 +667,12 @@ const Analytics = () => {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <Activity className="h-5 w-5 text-yellow-400" />
-                        <span className="text-xs text-white/60">Maintenance</span>
+                        <span className="text-xs text-white/60">
+                          Maintenance
+                        </span>
                       </div>
                       <div className="text-2xl font-bold text-white">
-                        {plants.filter(p => p.status === "maintenance").length}
+                        {plants.filter(p => p.status === 'maintenance').length}
                       </div>
                     </CardContent>
                   </Card>
@@ -651,20 +687,30 @@ const Analytics = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
-                      <Card className={`${
-                        plant.status === "alert" ? "bg-red-500/10 border-red-500/30" :
-                        plant.status === "maintenance" ? "bg-yellow-500/10 border-yellow-500/30" :
-                        "bg-green-500/10 border-green-500/30"
-                      } backdrop-blur-lg cursor-pointer hover:scale-105 transition-transform`}
-                      onClick={() => setSelectedPlant(plant)}>
+                      <Card
+                        className={`${
+                          plant.status === 'alert'
+                            ? 'bg-red-500/10 border-red-500/30'
+                            : plant.status === 'maintenance'
+                              ? 'bg-yellow-500/10 border-yellow-500/30'
+                              : 'bg-green-500/10 border-green-500/30'
+                        } backdrop-blur-lg cursor-pointer hover:scale-105 transition-transform`}
+                        onClick={() => setSelectedPlant(plant)}
+                      >
                         <CardHeader>
                           <div className="flex items-center justify-between">
-                            <CardTitle className="text-white text-lg">{plant.name}</CardTitle>
-                            <Badge className={`${
-                              plant.status === "alert" ? "bg-red-500" :
-                              plant.status === "maintenance" ? "bg-yellow-500" :
-                              "bg-green-500"
-                            } text-white`}>
+                            <CardTitle className="text-white text-lg">
+                              {plant.name}
+                            </CardTitle>
+                            <Badge
+                              className={`${
+                                plant.status === 'alert'
+                                  ? 'bg-red-500'
+                                  : plant.status === 'maintenance'
+                                    ? 'bg-yellow-500'
+                                    : 'bg-green-500'
+                              } text-white`}
+                            >
                               {plant.status}
                             </Badge>
                           </div>
@@ -676,17 +722,27 @@ const Analytics = () => {
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
                               <span className="text-white/70 text-sm">TDS</span>
-                              <span className={`font-bold ${
-                                plant.currentMetrics.tds > 800 ? "text-red-400" : "text-green-400"
-                              }`}>
+                              <span
+                                className={`font-bold ${
+                                  plant.currentMetrics.tds > 800
+                                    ? 'text-red-400'
+                                    : 'text-green-400'
+                                }`}
+                              >
                                 {plant.currentMetrics.tds} mg/L
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-white/70 text-sm">Turbidity</span>
-                              <span className={`font-bold ${
-                                plant.currentMetrics.turbidity > 10 ? "text-red-400" : "text-green-400"
-                              }`}>
+                              <span className="text-white/70 text-sm">
+                                Turbidity
+                              </span>
+                              <span
+                                className={`font-bold ${
+                                  plant.currentMetrics.turbidity > 10
+                                    ? 'text-red-400'
+                                    : 'text-green-400'
+                                }`}
+                              >
                                 {plant.currentMetrics.turbidity} NTU
                               </span>
                             </div>
@@ -729,14 +785,25 @@ const Analytics = () => {
                       <CardContent>
                         <div className="grid md:grid-cols-3 gap-6">
                           <div>
-                            <h4 className="text-white font-semibold mb-3">TDS Trend</h4>
+                            <h4 className="text-white font-semibold mb-3">
+                              TDS Trend
+                            </h4>
                             <div className="space-y-2">
                               {selectedPlant.trends.tds.map((point, index) => (
-                                <div key={index} className="flex items-center justify-between">
-                                  <span className="text-white/70 text-sm">{point.date}</span>
-                                  <span className={`font-bold ${
-                                    point.value > 800 ? "text-red-400" : "text-green-400"
-                                  }`}>
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span className="text-white/70 text-sm">
+                                    {point.date}
+                                  </span>
+                                  <span
+                                    className={`font-bold ${
+                                      point.value > 800
+                                        ? 'text-red-400'
+                                        : 'text-green-400'
+                                    }`}
+                                  >
                                     {point.value} mg/L
                                   </span>
                                 </div>
@@ -744,31 +811,53 @@ const Analytics = () => {
                             </div>
                           </div>
                           <div>
-                            <h4 className="text-white font-semibold mb-3">Turbidity Trend</h4>
+                            <h4 className="text-white font-semibold mb-3">
+                              Turbidity Trend
+                            </h4>
                             <div className="space-y-2">
-                              {selectedPlant.trends.turbidity.map((point, index) => (
-                                <div key={index} className="flex items-center justify-between">
-                                  <span className="text-white/70 text-sm">{point.date}</span>
-                                  <span className={`font-bold ${
-                                    point.value > 10 ? "text-red-400" : "text-green-400"
-                                  }`}>
-                                    {point.value} NTU
-                                  </span>
-                                </div>
-                              ))}
+                              {selectedPlant.trends.turbidity.map(
+                                (point, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between"
+                                  >
+                                    <span className="text-white/70 text-sm">
+                                      {point.date}
+                                    </span>
+                                    <span
+                                      className={`font-bold ${
+                                        point.value > 10
+                                          ? 'text-red-400'
+                                          : 'text-green-400'
+                                      }`}
+                                    >
+                                      {point.value} NTU
+                                    </span>
+                                  </div>
+                                )
+                              )}
                             </div>
                           </div>
                           <div>
-                            <h4 className="text-white font-semibold mb-3">Efficiency Trend</h4>
+                            <h4 className="text-white font-semibold mb-3">
+                              Efficiency Trend
+                            </h4>
                             <div className="space-y-2">
-                              {selectedPlant.trends.efficiency.map((point, index) => (
-                                <div key={index} className="flex items-center justify-between">
-                                  <span className="text-white/70 text-sm">{point.date}</span>
-                                  <span className="text-cyan-400 font-bold">
-                                    {point.value}%
-                                  </span>
-                                </div>
-                              ))}
+                              {selectedPlant.trends.efficiency.map(
+                                (point, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between"
+                                  >
+                                    <span className="text-white/70 text-sm">
+                                      {point.date}
+                                    </span>
+                                    <span className="text-cyan-400 font-bold">
+                                      {point.value}%
+                                    </span>
+                                  </div>
+                                )
+                              )}
                             </div>
                           </div>
                         </div>
@@ -783,11 +872,15 @@ const Analytics = () => {
                           Send Corrective Feedback
                         </CardTitle>
                         <CardDescription className="text-white/60">
-                          Communicate with plant operator about performance issues
+                          Communicate with plant operator about performance
+                          issues
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <Dialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
+                        <Dialog
+                          open={showFeedbackDialog}
+                          onOpenChange={setShowFeedbackDialog}
+                        >
                           <DialogTrigger asChild>
                             <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white">
                               Send Feedback to {selectedPlant.operator}
@@ -795,20 +888,27 @@ const Analytics = () => {
                           </DialogTrigger>
                           <DialogContent className="bg-gray-900 border-gray-700">
                             <DialogHeader>
-                              <DialogTitle className="text-white">Send Feedback</DialogTitle>
+                              <DialogTitle className="text-white">
+                                Send Feedback
+                              </DialogTitle>
                               <DialogDescription className="text-gray-300">
-                                Send corrective feedback to {selectedPlant.operator} at {selectedPlant.name}
+                                Send corrective feedback to{' '}
+                                {selectedPlant.operator} at {selectedPlant.name}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
                               <Textarea
                                 placeholder="Enter your feedback message..."
                                 value={feedbackMessage}
-                                onChange={(e) => setFeedbackMessage(e.target.value)}
+                                onChange={e =>
+                                  setFeedbackMessage(e.target.value)
+                                }
                                 className="bg-gray-800 border-gray-600 text-white"
                               />
                               <Button
-                                onClick={() => sendFeedbackToOperator(selectedPlant.id)}
+                                onClick={() =>
+                                  sendFeedbackToOperator(selectedPlant.id)
+                                }
                                 className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
                               >
                                 Send Feedback
@@ -820,12 +920,22 @@ const Analytics = () => {
                         {/* Previous Feedback */}
                         {selectedPlant.feedback.length > 0 && (
                           <div className="mt-6 space-y-3">
-                            <h4 className="text-white font-semibold">Previous Feedback</h4>
-                            {selectedPlant.feedback.map((feedback) => (
-                              <div key={feedback.id} className="p-3 bg-gray-800/50 rounded-lg">
-                                <p className="text-white text-sm">{feedback.message}</p>
+                            <h4 className="text-white font-semibold">
+                              Previous Feedback
+                            </h4>
+                            {selectedPlant.feedback.map(feedback => (
+                              <div
+                                key={feedback.id}
+                                className="p-3 bg-gray-800/50 rounded-lg"
+                              >
+                                <p className="text-white text-sm">
+                                  {feedback.message}
+                                </p>
                                 <p className="text-gray-400 text-xs mt-1">
-                                  Sent by {feedback.officer} on {new Date(feedback.timestamp).toLocaleDateString()}
+                                  Sent by {feedback.officer} on{' '}
+                                  {new Date(
+                                    feedback.timestamp
+                                  ).toLocaleDateString()}
                                 </p>
                               </div>
                             ))}
@@ -860,16 +970,22 @@ const Analytics = () => {
 
                     {complianceReports.length > 0 && (
                       <div className="space-y-4">
-                        <h4 className="text-white font-semibold">Generated Reports</h4>
-                        {complianceReports.map((report) => (
-                          <div key={report.id} className="p-4 bg-gray-800/50 rounded-lg">
+                        <h4 className="text-white font-semibold">
+                          Generated Reports
+                        </h4>
+                        {complianceReports.map(report => (
+                          <div
+                            key={report.id}
+                            className="p-4 bg-gray-800/50 rounded-lg"
+                          >
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="text-white font-medium">
                                   {report.month} {report.year} Compliance Report
                                 </p>
                                 <p className="text-gray-400 text-sm">
-                                  Overall Compliance: {report.overallCompliance.toFixed(1)}%
+                                  Overall Compliance:{' '}
+                                  {report.overallCompliance.toFixed(1)}%
                                 </p>
                               </div>
                               <Badge className="bg-green-500 text-white">
@@ -908,7 +1024,7 @@ const Analytics = () => {
             className="mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Analytics &{" "}
+              Analytics &{' '}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Reports
               </span>
@@ -922,46 +1038,46 @@ const Analytics = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
             {[
               {
-                label: "Water Recycled",
+                label: 'Water Recycled',
                 value: `${(
                   sustainabilityMetrics.totalWaterRecycled / 1000
                 ).toFixed(0)}kL`,
                 icon: Droplets,
-                color: "cyan",
+                color: 'cyan',
               },
               {
-                label: "Freshwater Saved",
+                label: 'Freshwater Saved',
                 value: `${(
                   sustainabilityMetrics.freshwaterSaved / 1000
                 ).toFixed(0)}kL`,
                 icon: Droplets,
-                color: "blue",
+                color: 'blue',
               },
               {
-                label: "CO₂ Reduced",
+                label: 'CO₂ Reduced',
                 value: `${sustainabilityMetrics.co2Emissions}T`,
                 icon: Leaf,
-                color: "green",
+                color: 'green',
               },
               {
-                label: "Energy Efficiency",
+                label: 'Energy Efficiency',
                 value: `${sustainabilityMetrics.energyEfficiency}%`,
                 icon: Zap,
-                color: "amber",
+                color: 'amber',
               },
               {
-                label: "Cost Savings",
+                label: 'Cost Savings',
                 value: `$${(sustainabilityMetrics.costSavings / 1000).toFixed(
                   0
                 )}k`,
                 icon: TrendingUp,
-                color: "purple",
+                color: 'purple',
               },
               {
-                label: "Trees Equivalent",
+                label: 'Trees Equivalent',
                 value: sustainabilityMetrics.treesEquivalent,
                 icon: Leaf,
-                color: "emerald",
+                color: 'emerald',
               },
             ].map((metric, index) => (
               <motion.div
@@ -1035,7 +1151,7 @@ const Analytics = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {analyticsData.simulationHistory.map((sim, index) => (
+                      {analyticsData.simulationHistory.map((sim, _) => (
                         <div
                           key={sim.date}
                           className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
@@ -1162,14 +1278,14 @@ const Analytics = () => {
                             <div
                               className={`h-3 rounded-full ${
                                 index === 0
-                                  ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                                  ? 'bg-gradient-to-r from-green-500 to-emerald-500'
                                   : index === 1
-                                  ? "bg-gradient-to-r from-blue-500 to-cyan-500"
-                                  : index === 2
-                                  ? "bg-gradient-to-r from-purple-500 to-pink-500"
-                                  : index === 3
-                                  ? "bg-gradient-to-r from-amber-500 to-orange-500"
-                                  : "bg-gradient-to-r from-teal-500 to-cyan-500"
+                                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500'
+                                    : index === 2
+                                      ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                                      : index === 3
+                                        ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                                        : 'bg-gradient-to-r from-teal-500 to-cyan-500'
                               }`}
                               style={{ width: `${item.percentage}%` }}
                             />

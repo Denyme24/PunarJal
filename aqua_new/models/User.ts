@@ -1,12 +1,12 @@
-import mongoose, { Model, Schema, Document } from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose, { Model, Schema, Document } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   organizationName: string;
   organizationEmail: string;
   organizationType: string;
   location: string;
-  role: "Plant Operator" | "Environmental Officer";
+  role: 'Plant Operator' | 'Environmental Officer';
   password: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
   createdAt: Date;
@@ -17,80 +17,80 @@ const userSchema = new Schema<IUser>(
   {
     organizationName: {
       type: String,
-      required: [true, "Organization name is required"],
+      required: [true, 'Organization name is required'],
       trim: true,
     },
     organizationEmail: {
       type: String,
-      required: [true, "Organization email is required"],
+      required: [true, 'Organization email is required'],
       unique: true,
       lowercase: true,
       trim: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email",
+        'Please enter a valid email',
       ],
     },
     organizationType: {
       type: String,
-      required: [true, "Organization type is required"],
+      required: [true, 'Organization type is required'],
       enum: [
-        "Hospital",
-        "Hotel",
-        "Restaurant",
-        "Manufacturing Industry",
-        "IT/Tech Company",
-        "Educational Institution",
-        "Shopping Mall",
-        "Residential Complex",
-        "Commercial Complex",
-        "Food Processing Unit",
-        "Pharmaceutical Company",
-        "Textile Industry",
-        "Other",
+        'Hospital',
+        'Hotel',
+        'Restaurant',
+        'Manufacturing Industry',
+        'IT/Tech Company',
+        'Educational Institution',
+        'Shopping Mall',
+        'Residential Complex',
+        'Commercial Complex',
+        'Food Processing Unit',
+        'Pharmaceutical Company',
+        'Textile Industry',
+        'Other',
       ],
     },
     location: {
       type: String,
-      required: [true, "Location is required"],
+      required: [true, 'Location is required'],
       enum: [
-        "Whitefield",
-        "Electronic City",
-        "Koramangala",
-        "Indiranagar",
-        "JP Nagar",
-        "Jayanagar",
-        "BTM Layout",
-        "HSR Layout",
-        "Marathahalli",
-        "Sarjapur Road",
-        "Hebbal",
-        "Yelahanka",
-        "Banashankari",
-        "Rajajinagar",
-        "Malleshwaram",
-        "Yeshwanthpur",
-        "Peenya",
-        "Bommanahalli",
-        "Mahadevapura",
-        "Dasarahalli",
-        "RR Nagar",
-        "Kengeri",
-        "Hennur",
-        "Bellandur",
-        "MG Road",
+        'Whitefield',
+        'Electronic City',
+        'Koramangala',
+        'Indiranagar',
+        'JP Nagar',
+        'Jayanagar',
+        'BTM Layout',
+        'HSR Layout',
+        'Marathahalli',
+        'Sarjapur Road',
+        'Hebbal',
+        'Yelahanka',
+        'Banashankari',
+        'Rajajinagar',
+        'Malleshwaram',
+        'Yeshwanthpur',
+        'Peenya',
+        'Bommanahalli',
+        'Mahadevapura',
+        'Dasarahalli',
+        'RR Nagar',
+        'Kengeri',
+        'Hennur',
+        'Bellandur',
+        'MG Road',
       ],
     },
     role: {
       type: String,
-      required: [true, "Role is required"],
-      enum: ["Plant Operator", "Environmental Officer"],
-      default: "Plant Operator",
+      required: [true, 'Role is required'],
+      enum: ['Plant Operator', 'Environmental Officer'],
+      default: 'Plant Operator',
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
+      required: [true, 'Password is required'],
+      minlength: [6, 'Password must be at least 6 characters'],
       select: false,
     },
   },
@@ -100,8 +100,8 @@ const userSchema = new Schema<IUser>(
 );
 
 // Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
@@ -117,7 +117,6 @@ userSchema.methods.matchPassword = async function (
 };
 
 const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", userSchema);
+  mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
 export default User;
-

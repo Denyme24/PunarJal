@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
   _id: string;
@@ -8,7 +8,7 @@ interface User {
   organizationEmail: string;
   organizationType: string;
   location: string;
-  role: "Plant Operator" | "Environmental Officer";
+  role: 'Plant Operator' | 'Environmental Officer';
 }
 
 interface AuthContextType {
@@ -26,7 +26,7 @@ interface SignupData {
   organizationEmail: string;
   organizationType: string;
   location: string;
-  role: "Plant Operator" | "Environmental Officer";
+  role: 'Plant Operator' | 'Environmental Officer';
   password: string;
 }
 
@@ -35,7 +35,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -49,8 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // Check if user is logged in on mount
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
 
     if (storedToken && storedUser) {
       setToken(storedToken);
@@ -63,14 +63,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const verifyToken = async (token: string) => {
     try {
-      const response = await fetch("/api/auth/verify", {
+      const response = await fetch('/api/auth/verify', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Token verification failed");
+        throw new Error('Token verification failed');
       }
 
       const data = await response.json();
@@ -80,17 +80,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout();
       }
     } catch (error) {
-      console.error("Token verification error:", error);
+      console.error('Token verification error:', error);
       logout();
     }
   };
 
   const signup = async (userData: SignupData) => {
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
       });
@@ -98,27 +98,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Signup failed");
+        throw new Error(data.message || 'Signup failed');
       }
 
       // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
 
       setToken(data.token);
       setUser(data);
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error('Signup error:', error);
       throw error;
     }
   };
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           organizationEmail: email,
@@ -129,28 +129,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        throw new Error(data.message || 'Login failed');
       }
 
       // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
 
       setToken(data.token);
       setUser(data);
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       throw error;
     }
   };
 
   const logout = () => {
     // Call logout API
-    fetch("/api/auth/logout", { method: "POST" }).catch(console.error);
+    fetch('/api/auth/logout', { method: 'POST' }).catch(console.error);
 
     // Clear client-side storage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setToken(null);
     setUser(null);
   };

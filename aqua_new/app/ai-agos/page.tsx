@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send,
   Mic,
@@ -12,56 +12,56 @@ import {
   Bot,
   User as UserIcon,
   Languages,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import Header from "@/components/Header";
+} from '@/components/ui/select';
+import Header from '@/components/Header';
 
 interface Message {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
   image?: string;
   timestamp: Date;
 }
 
 const languages = [
-  { code: "en", name: "English" },
-  { code: "hi", name: "हिंदी (Hindi)" },
-  { code: "mr", name: "मराठी (Marathi)" },
-  { code: "kn", name: "ಕನ್ನಡ (Kannada)" },
-  { code: "bn", name: "বাংলা (Bengali)" },
-  { code: "ur", name: "اردو (Urdu)" },
+  { code: 'en', name: 'English' },
+  { code: 'hi', name: 'हिंदी (Hindi)' },
+  { code: 'mr', name: 'मराठी (Marathi)' },
+  { code: 'kn', name: 'ಕನ್ನಡ (Kannada)' },
+  { code: 'bn', name: 'বাংলা (Bengali)' },
+  { code: 'ur', name: 'اردو (Urdu)' },
 ];
 
 export default function AIAgosPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      role: "assistant",
+      role: 'assistant',
       content:
         "Hello! I'm AI AGOS, your intelligent assistant for PunarJal's wastewater treatment system. I can help you understand water treatment processes, simulation results, IoT sensor data, and more. How can I assist you today?",
       timestamp: new Date(),
     },
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -72,23 +72,23 @@ export default function AIAgosPage() {
     if ((!input.trim() && !selectedImage) || isLoading) return;
 
     const userMessage: Message = {
-      role: "user",
+      role: 'user',
       content: input.trim(),
       image: selectedImage || undefined,
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
     const imageToSend = selectedImage;
     setSelectedImage(null);
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/ai-agos/chat", {
-        method: "POST",
+      const response = await fetch('/api/ai-agos/chat', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           message: input.trim(),
@@ -99,34 +99,34 @@ export default function AIAgosPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get response");
+        throw new Error('Failed to get response');
       }
 
       const data = await response.json();
 
       const assistantMessage: Message = {
-        role: "assistant",
+        role: 'assistant',
         content: data.response,
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       const errorMessage: Message = {
-        role: "assistant",
+        role: 'assistant',
         content:
-          "I apologize, but I encountered an error. Please try again later.",
+          'I apologize, but I encountered an error. Please try again later.',
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -150,7 +150,7 @@ export default function AIAgosPage() {
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
-      mediaRecorder.ondataavailable = (event) => {
+      mediaRecorder.ondataavailable = event => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
@@ -158,17 +158,17 @@ export default function AIAgosPage() {
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
+          type: 'audio/webm',
         });
         await transcribeAudio(audioBlob);
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error("Error accessing microphone:", error);
-      alert("Unable to access microphone. Please check your permissions.");
+      console.error('Error accessing microphone:', error);
+      alert('Unable to access microphone. Please check your permissions.');
     }
   };
 
@@ -183,23 +183,23 @@ export default function AIAgosPage() {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob);
-      formData.append("language", selectedLanguage);
+      formData.append('audio', audioBlob);
+      formData.append('language', selectedLanguage);
 
-      const response = await fetch("/api/ai-agos/transcribe", {
-        method: "POST",
+      const response = await fetch('/api/ai-agos/transcribe', {
+        method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Failed to transcribe audio");
+        throw new Error('Failed to transcribe audio');
       }
 
       const data = await response.json();
       setInput(data.text);
     } catch (error) {
-      console.error("Error transcribing audio:", error);
-      alert("Failed to transcribe audio. Please try again.");
+      console.error('Error transcribing audio:', error);
+      alert('Failed to transcribe audio. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -244,7 +244,7 @@ export default function AIAgosPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {languages.map((lang) => (
+                  {languages.map(lang => (
                     <SelectItem key={lang.code} value={lang.code}>
                       {lang.name}
                     </SelectItem>
@@ -267,10 +267,10 @@ export default function AIAgosPage() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                     className={`flex gap-3 ${
-                      message.role === "user" ? "justify-end" : "justify-start"
+                      message.role === 'user' ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    {message.role === "assistant" && (
+                    {message.role === 'assistant' && (
                       <div className="flex-shrink-0">
                         <div className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full p-2">
                           <Bot className="h-5 w-5 text-white" />
@@ -280,9 +280,9 @@ export default function AIAgosPage() {
 
                     <div
                       className={`max-w-[70%] rounded-2xl p-4 ${
-                        message.role === "user"
-                          ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white"
-                          : "bg-white/10 text-white border border-white/10"
+                        message.role === 'user'
+                          ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white'
+                          : 'bg-white/10 text-white border border-white/10'
                       }`}
                     >
                       {message.image && (
@@ -297,16 +297,16 @@ export default function AIAgosPage() {
                       </div>
                       <div
                         className={`text-xs mt-2 ${
-                          message.role === "user"
-                            ? "text-white/70"
-                            : "text-white/50"
+                          message.role === 'user'
+                            ? 'text-white/70'
+                            : 'text-white/50'
                         }`}
                       >
                         {message.timestamp.toLocaleTimeString()}
                       </div>
                     </div>
 
-                    {message.role === "user" && (
+                    {message.role === 'user' && (
                       <div className="flex-shrink-0">
                         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-2">
                           <UserIcon className="h-5 w-5 text-white" />
@@ -360,10 +360,10 @@ export default function AIAgosPage() {
                 <div className="flex-1 relative">
                   <Textarea
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={e => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={`Ask me anything about PunarJal... ${
-                      isRecording ? "(Recording...)" : ""
+                      isRecording ? '(Recording...)' : ''
                     }`}
                     className="bg-white/5 border-white/10 text-white placeholder:text-white/40 resize-none focus-visible:ring-cyan-500 min-h-[60px]"
                     disabled={isLoading || isRecording}
@@ -377,8 +377,8 @@ export default function AIAgosPage() {
                     disabled={isLoading}
                     className={`h-[60px] px-4 ${
                       isRecording
-                        ? "bg-red-600 hover:bg-red-700"
-                        : "bg-white/10 hover:bg-white/20"
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : 'bg-white/10 hover:bg-white/20'
                     } border border-white/10`}
                     title="Voice input"
                   >

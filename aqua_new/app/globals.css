@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* Leaflet map styles */
-@import "leaflet/dist/leaflet.css";
+@import 'leaflet/dist/leaflet.css';
 
 /* Custom map marker styles */
 .custom-marker {
@@ -189,7 +189,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "kern" 1;
+    font-feature-settings: 'kern' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

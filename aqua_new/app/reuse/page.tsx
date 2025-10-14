@@ -1,16 +1,10 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   CheckCircle2,
   XCircle,
@@ -22,10 +16,10 @@ import {
   Wind,
   Toilet,
   Loader2,
-} from "lucide-react";
-import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { useAuth } from "@/contexts/AuthContext";
+} from 'lucide-react';
+import Header from '@/components/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface WaterQuality {
   turbidity: number;
@@ -90,7 +84,7 @@ const Reuse = () => {
         // Load treated water quality from latest simulation
         let waterQuality = treatedWater;
         try {
-          const contextRaw = localStorage.getItem("lastSimulationContext");
+          const contextRaw = localStorage.getItem('lastSimulationContext');
           if (contextRaw) {
             const context = JSON.parse(contextRaw);
             const params = context.parameters;
@@ -117,20 +111,20 @@ const Reuse = () => {
             setTreatedWater(waterQuality);
           }
         } catch (err) {
-          console.error("Error loading simulation data:", err);
+          console.error('Error loading simulation data:', err);
         }
 
         // Call AI generation API with authorization header
         const headers: HeadersInit = {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         };
 
         if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
+          headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const res = await fetch("/api/reuse/generate", {
-          method: "POST",
+        const res = await fetch('/api/reuse/generate', {
+          method: 'POST',
           headers,
           body: JSON.stringify({ treatedWaterQuality: waterQuality }),
         });
@@ -138,13 +132,13 @@ const Reuse = () => {
         const result = await res.json();
 
         if (!res.ok) {
-          throw new Error(result?.error || "Failed to generate reuse options");
+          throw new Error(result?.error || 'Failed to generate reuse options');
         }
 
         setReuseData(result.data);
       } catch (err: any) {
-        console.error("Error fetching reuse options:", err);
-        setError(err.message || "Failed to load reuse recommendations");
+        console.error('Error fetching reuse options:', err);
+        setError(err.message || 'Failed to load reuse recommendations');
       } finally {
         setLoading(false);
       }
@@ -156,117 +150,117 @@ const Reuse = () => {
   // Fallback data if API fails
   const fallbackReuseOptions: ReuseOption[] = [
     {
-      id: "irrigation",
-      name: "Agricultural Irrigation",
+      id: 'irrigation',
+      name: 'Agricultural Irrigation',
       icon: Sprout,
       suitable: true,
       confidence: 95,
       requirements: [
-        "Turbidity < 5 NTU ✓",
-        "pH 6.5-8.5 ✓",
-        "COD < 100 mg/L ✓",
-        "Nitrogen acceptable ✓",
+        'Turbidity < 5 NTU ✓',
+        'pH 6.5-8.5 ✓',
+        'COD < 100 mg/L ✓',
+        'Nitrogen acceptable ✓',
       ],
       benefits: [
-        "Reduces freshwater consumption",
-        "Provides nutrients to crops",
-        "Cost-effective solution",
-        "Environmentally sustainable",
+        'Reduces freshwater consumption',
+        'Provides nutrients to crops',
+        'Cost-effective solution',
+        'Environmentally sustainable',
       ],
     },
     {
-      id: "industrial",
-      name: "Industrial Process Water",
+      id: 'industrial',
+      name: 'Industrial Process Water',
       icon: Factory,
       suitable: true,
       confidence: 88,
       requirements: [
-        "TDS < 500 mg/L ✓",
-        "pH controlled ✓",
-        "Low organic content ✓",
+        'TDS < 500 mg/L ✓',
+        'pH controlled ✓',
+        'Low organic content ✓',
       ],
       benefits: [
-        "Suitable for cooling systems",
-        "Can be used in manufacturing",
-        "Reduces industrial water costs",
-        "Meets process water standards",
+        'Suitable for cooling systems',
+        'Can be used in manufacturing',
+        'Reduces industrial water costs',
+        'Meets process water standards',
       ],
     },
     {
-      id: "landscape",
-      name: "Landscape Irrigation",
+      id: 'landscape',
+      name: 'Landscape Irrigation',
       icon: Sprout,
       suitable: true,
       confidence: 98,
       requirements: [
-        "Turbidity < 5 NTU ✓",
-        "Basic disinfection ✓",
-        "Visual clarity ✓",
+        'Turbidity < 5 NTU ✓',
+        'Basic disinfection ✓',
+        'Visual clarity ✓',
       ],
       benefits: [
-        "Perfect for parks and gardens",
-        "Maintains green spaces",
-        "No health risks",
-        "High water savings",
+        'Perfect for parks and gardens',
+        'Maintains green spaces',
+        'No health risks',
+        'High water savings',
       ],
     },
     {
-      id: "toilet",
-      name: "Toilet Flushing",
+      id: 'toilet',
+      name: 'Toilet Flushing',
       icon: Toilet,
       suitable: true,
       confidence: 92,
       requirements: [
-        "Basic treatment completed ✓",
-        "Odor controlled ✓",
-        "Color acceptable ✓",
+        'Basic treatment completed ✓',
+        'Odor controlled ✓',
+        'Color acceptable ✓',
       ],
       benefits: [
-        "Significant water savings",
-        "Easy implementation",
-        "No human contact",
-        "Reduces sewage load",
+        'Significant water savings',
+        'Easy implementation',
+        'No human contact',
+        'Reduces sewage load',
       ],
     },
     {
-      id: "cooling",
-      name: "Cooling Tower Systems",
+      id: 'cooling',
+      name: 'Cooling Tower Systems',
       icon: Wind,
       suitable: true,
       confidence: 85,
       requirements: [
-        "TDS controlled ✓",
-        "pH balanced ✓",
-        "Low scaling potential ✓",
+        'TDS controlled ✓',
+        'pH balanced ✓',
+        'Low scaling potential ✓',
       ],
       benefits: [
-        "Industrial cooling applications",
-        "Energy efficiency maintained",
-        "Reduces cooling water demand",
+        'Industrial cooling applications',
+        'Energy efficiency maintained',
+        'Reduces cooling water demand',
       ],
       warnings: [
-        "Monitor for scaling regularly",
-        "May need additional treatment for specific systems",
+        'Monitor for scaling regularly',
+        'May need additional treatment for specific systems',
       ],
     },
     {
-      id: "potable",
-      name: "Potable Water (Drinking)",
+      id: 'potable',
+      name: 'Potable Water (Drinking)',
       icon: Coffee,
       suitable: false,
       confidence: 45,
       requirements: [
-        "Turbidity < 1 NTU ✗",
-        "Advanced disinfection needed ✗",
-        "Complete nutrient removal ✗",
-        "Multiple quality checks required ✗",
+        'Turbidity < 1 NTU ✗',
+        'Advanced disinfection needed ✗',
+        'Complete nutrient removal ✗',
+        'Multiple quality checks required ✗',
       ],
-      benefits: ["Highest value water reuse", "Complete water cycle closure"],
+      benefits: ['Highest value water reuse', 'Complete water cycle closure'],
       warnings: [
-        "Requires additional tertiary treatment",
-        "Needs UV disinfection or chlorination",
-        "Regulatory approval required",
-        "Not recommended with current treatment level",
+        'Requires additional tertiary treatment',
+        'Needs UV disinfection or chlorination',
+        'Regulatory approval required',
+        'Not recommended with current treatment level',
       ],
     },
   ];
@@ -284,7 +278,7 @@ const Reuse = () => {
   const waterSavings = reuseData?.waterSavings || fallbackWaterSavings;
 
   // Map icon names to actual icon components
-  const mappedReuseOptions = reuseOptions.map((option) => ({
+  const mappedReuseOptions = reuseOptions.map(option => ({
     ...option,
     icon: iconMap[option.icon] || Droplets,
   }));
@@ -348,7 +342,7 @@ const Reuse = () => {
             className="mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Reuse{" "}
+              Reuse{' '}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Recommendations
               </span>
@@ -357,7 +351,7 @@ const Reuse = () => {
               AI-powered recommendations based on your water quality and
               historical data
             </p>
-            {localStorage.getItem("lastSimulationContext") && (
+            {localStorage.getItem('lastSimulationContext') && (
               <p className="text-sm text-cyan-400 mt-2">
                 ✓ Using data from your latest simulation
               </p>
@@ -382,8 +376,8 @@ const Reuse = () => {
                   <Card
                     className={`bg-white/5 backdrop-blur-lg border-white/10 h-full ${
                       option.suitable
-                        ? "ring-2 ring-green-500/30"
-                        : "ring-2 ring-red-500/30"
+                        ? 'ring-2 ring-green-500/30'
+                        : 'ring-2 ring-red-500/30'
                     }`}
                   >
                     <CardHeader>
@@ -392,15 +386,15 @@ const Reuse = () => {
                           <div
                             className={`p-3 rounded-lg ${
                               option.suitable
-                                ? "bg-green-500/20"
-                                : "bg-red-500/20"
+                                ? 'bg-green-500/20'
+                                : 'bg-red-500/20'
                             }`}
                           >
                             <option.icon
                               className={`h-6 w-6 ${
                                 option.suitable
-                                  ? "text-green-400"
-                                  : "text-red-400"
+                                  ? 'text-green-400'
+                                  : 'text-red-400'
                               }`}
                             />
                           </div>

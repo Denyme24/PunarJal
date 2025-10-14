@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { motion } from 'framer-motion';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import {
   Droplets,
   Beaker,
@@ -28,10 +28,10 @@ import {
   TrendingDown,
   Sparkles,
   MapPin,
-} from "lucide-react";
-import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from 'lucide-react';
+import Header from '@/components/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface WaterParameters {
   turbidity: number;
@@ -43,7 +43,7 @@ interface WaterParameters {
   reuseType: string;
 }
 
-type NumericParameters = Exclude<keyof WaterParameters, "reuseType">;
+type NumericParameters = Exclude<keyof WaterParameters, 'reuseType'>;
 
 const SimulationContent = () => {
   const searchParams = useSearchParams();
@@ -55,18 +55,18 @@ const SimulationContent = () => {
     tds: 500,
     nitrogen: 20,
     phosphorus: 5,
-    reuseType: "",
+    reuseType: '',
   });
 
   // Load parameters from URL if coming from map
   useEffect(() => {
-    const turbidity = searchParams.get("turbidity");
-    const pH = searchParams.get("pH");
-    const cod = searchParams.get("cod");
-    const tds = searchParams.get("tds");
-    const nitrogen = searchParams.get("nitrogen");
-    const phosphorus = searchParams.get("phosphorus");
-    const name = searchParams.get("sourceName");
+    const turbidity = searchParams.get('turbidity');
+    const pH = searchParams.get('pH');
+    const cod = searchParams.get('cod');
+    const tds = searchParams.get('tds');
+    const nitrogen = searchParams.get('nitrogen');
+    const phosphorus = searchParams.get('phosphorus');
+    const name = searchParams.get('sourceName');
 
     if (turbidity || pH || cod || tds) {
       setParameters({
@@ -76,7 +76,7 @@ const SimulationContent = () => {
         tds: tds ? parseFloat(tds) : 500,
         nitrogen: nitrogen ? parseFloat(nitrogen) : 20,
         phosphorus: phosphorus ? parseFloat(phosphorus) : 5,
-        reuseType: "",
+        reuseType: '',
       });
 
       if (name) {
@@ -98,63 +98,63 @@ const SimulationContent = () => {
   const parameterCards = [
     {
       icon: Waves,
-      label: "Turbidity (NTU)",
-      field: "turbidity" as NumericParameters,
+      label: 'Turbidity (NTU)',
+      field: 'turbidity' as NumericParameters,
       min: 0,
       max: 1000,
       step: 10,
-      description: "Measure of water cloudiness",
-      color: "cyan",
+      description: 'Measure of water cloudiness',
+      color: 'cyan',
     },
     {
       icon: Beaker,
-      label: "pH Level",
-      field: "pH" as NumericParameters,
+      label: 'pH Level',
+      field: 'pH' as NumericParameters,
       min: 0,
       max: 14,
       step: 0.1,
-      description: "Acidity/alkalinity measure",
-      color: "blue",
+      description: 'Acidity/alkalinity measure',
+      color: 'blue',
     },
     {
       icon: TrendingDown,
-      label: "COD (mg/L)",
-      field: "cod" as NumericParameters,
+      label: 'COD (mg/L)',
+      field: 'cod' as NumericParameters,
       min: 0,
       max: 1000,
       step: 10,
-      description: "Chemical Oxygen Demand",
-      color: "purple",
+      description: 'Chemical Oxygen Demand',
+      color: 'purple',
     },
     {
       icon: Droplets,
-      label: "TDS (mg/L)",
-      field: "tds" as NumericParameters,
+      label: 'TDS (mg/L)',
+      field: 'tds' as NumericParameters,
       min: 0,
       max: 2000,
       step: 50,
-      description: "Total Dissolved Solids",
-      color: "teal",
+      description: 'Total Dissolved Solids',
+      color: 'teal',
     },
     {
       icon: Sparkles,
-      label: "Nitrogen (mg/L)",
-      field: "nitrogen" as NumericParameters,
+      label: 'Nitrogen (mg/L)',
+      field: 'nitrogen' as NumericParameters,
       min: 0,
       max: 100,
       step: 1,
-      description: "Nitrogen content",
-      color: "green",
+      description: 'Nitrogen content',
+      color: 'green',
     },
     {
       icon: Sparkles,
-      label: "Phosphorus (mg/L)",
-      field: "phosphorus" as NumericParameters,
+      label: 'Phosphorus (mg/L)',
+      field: 'phosphorus' as NumericParameters,
       min: 0,
       max: 50,
       step: 0.5,
-      description: "Phosphorus content",
-      color: "amber",
+      description: 'Phosphorus content',
+      color: 'amber',
     },
   ];
 
@@ -171,7 +171,7 @@ const SimulationContent = () => {
             className="text-center mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Water Quality{" "}
+              Water Quality{' '}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Simulation
               </span>
@@ -192,7 +192,7 @@ const SimulationContent = () => {
                 <Alert className="bg-cyan-500/10 border-cyan-500/30">
                   <MapPin className="h-4 w-4 text-cyan-400" />
                   <AlertDescription className="text-white ml-2">
-                    Parameters loaded from{" "}
+                    Parameters loaded from{' '}
                     <span className="font-semibold text-cyan-400">
                       {sourceName}
                     </span>
@@ -237,7 +237,7 @@ const SimulationContent = () => {
                         <Input
                           type="number"
                           value={parameters[param.field]}
-                          onChange={(e) =>
+                          onChange={e =>
                             setParameters({
                               ...parameters,
                               [param.field]: parseFloat(e.target.value) || 0,
@@ -251,7 +251,7 @@ const SimulationContent = () => {
                       </div>
                       <Slider
                         value={[parameters[param.field]]}
-                        onValueChange={(value) =>
+                        onValueChange={value =>
                           handleSliderChange(param.field, value)
                         }
                         min={param.min}
@@ -293,7 +293,7 @@ const SimulationContent = () => {
                     </Label>
                     <Select
                       value={parameters.reuseType}
-                      onValueChange={(value) =>
+                      onValueChange={value =>
                         setParameters({ ...parameters, reuseType: value })
                       }
                     >
@@ -333,23 +333,23 @@ const SimulationContent = () => {
                 {parameters.reuseType && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
+                    animate={{ opacity: 1, height: 'auto' }}
                     className="mt-6 p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg"
                   >
                     <p className="text-white/80 text-sm">
-                      <strong className="text-cyan-400">Selected:</strong>{" "}
-                      {parameters.reuseType === "irrigation" &&
-                        "Agricultural irrigation requires moderate treatment levels"}
-                      {parameters.reuseType === "industrial" &&
-                        "Industrial use requires removal of specific contaminants"}
-                      {parameters.reuseType === "potable" &&
-                        "Drinking water requires the highest treatment standards"}
-                      {parameters.reuseType === "landscape" &&
-                        "Landscape irrigation requires basic treatment"}
-                      {parameters.reuseType === "cooling" &&
-                        "Cooling systems require low TDS and controlled pH"}
-                      {parameters.reuseType === "toilet" &&
-                        "Toilet flushing requires basic disinfection"}
+                      <strong className="text-cyan-400">Selected:</strong>{' '}
+                      {parameters.reuseType === 'irrigation' &&
+                        'Agricultural irrigation requires moderate treatment levels'}
+                      {parameters.reuseType === 'industrial' &&
+                        'Industrial use requires removal of specific contaminants'}
+                      {parameters.reuseType === 'potable' &&
+                        'Drinking water requires the highest treatment standards'}
+                      {parameters.reuseType === 'landscape' &&
+                        'Landscape irrigation requires basic treatment'}
+                      {parameters.reuseType === 'cooling' &&
+                        'Cooling systems require low TDS and controlled pH'}
+                      {parameters.reuseType === 'toilet' &&
+                        'Toilet flushing requires basic disinfection'}
                     </p>
                   </motion.div>
                 )}

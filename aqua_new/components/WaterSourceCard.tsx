@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { WaterSource } from "@/lib/waterSourcesData";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { MapPin, Droplets, Activity, Clock } from "lucide-react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { WaterSource } from '@/lib/waterSourcesData';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { MapPin, Droplets, Activity, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface WaterSourceCardProps {
   source: WaterSource | null;
@@ -29,7 +29,7 @@ export default function WaterSourceCard({
     setDisplayMetrics(source.metrics);
 
     const interval = setInterval(() => {
-      setDisplayMetrics((prev) => {
+      setDisplayMetrics(prev => {
         if (!prev) return source.metrics;
 
         // Very subtle variations (±0.3 to ±1%) to simulate realistic sensor drift
@@ -55,7 +55,7 @@ export default function WaterSourceCard({
 
     // Countdown timer
     const countdown = setInterval(() => {
-      setSecondsUntilUpdate((prev) => (prev > 0 ? prev - 1 : 45));
+      setSecondsUntilUpdate(prev => (prev > 0 ? prev - 1 : 45));
     }, 1000);
 
     return () => {
@@ -69,12 +69,12 @@ export default function WaterSourceCard({
   const handleInitiateSimulation = () => {
     // Navigate to simulation page with pre-filled parameters
     const params = new URLSearchParams({
-      turbidity: displayMetrics?.turbidity.toString() || "0",
-      pH: displayMetrics?.pH.toString() || "7",
-      cod: displayMetrics?.cod.toString() || "0",
-      tds: displayMetrics?.tds.toString() || "0",
-      nitrogen: displayMetrics?.nitrogen.toString() || "0",
-      phosphorus: displayMetrics?.phosphorus.toString() || "0",
+      turbidity: displayMetrics?.turbidity.toString() || '0',
+      pH: displayMetrics?.pH.toString() || '7',
+      cod: displayMetrics?.cod.toString() || '0',
+      tds: displayMetrics?.tds.toString() || '0',
+      nitrogen: displayMetrics?.nitrogen.toString() || '0',
+      phosphorus: displayMetrics?.phosphorus.toString() || '0',
       sourceName: source.name,
     });
     router.push(`/simulation?${params.toString()}`);
@@ -82,97 +82,97 @@ export default function WaterSourceCard({
 
   const getQualityColor = (quality: string) => {
     switch (quality) {
-      case "safe":
-        return "text-green-600";
-      case "attention":
-        return "text-amber-600";
-      case "critical":
-        return "text-red-600";
+      case 'safe':
+        return 'text-green-600';
+      case 'attention':
+        return 'text-amber-600';
+      case 'critical':
+        return 'text-red-600';
       default:
-        return "text-gray-500";
+        return 'text-gray-500';
     }
   };
 
   const getQualityBgColor = (quality: string) => {
     switch (quality) {
-      case "safe":
-        return "bg-green-50 border-green-200";
-      case "attention":
-        return "bg-amber-50 border-amber-200";
-      case "critical":
-        return "bg-red-50 border-red-200";
+      case 'safe':
+        return 'bg-green-50 border-green-200';
+      case 'attention':
+        return 'bg-amber-50 border-amber-200';
+      case 'critical':
+        return 'bg-red-50 border-red-200';
       default:
-        return "bg-gray-50 border-gray-200";
+        return 'bg-gray-50 border-gray-200';
     }
   };
 
   const getQualityBadge = (quality: string) => {
     switch (quality) {
-      case "safe":
-        return "bg-green-100 text-green-700 border-green-200";
-      case "attention":
-        return "bg-amber-100 text-amber-700 border-amber-200";
-      case "critical":
-        return "bg-red-100 text-red-700 border-red-200";
+      case 'safe':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'attention':
+        return 'bg-amber-100 text-amber-700 border-amber-200';
+      case 'critical':
+        return 'bg-red-100 text-red-700 border-red-200';
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
   const metrics = [
     {
       icon: Droplets,
-      label: "Turbidity",
+      label: 'Turbidity',
       value: displayMetrics?.turbidity,
-      unit: "NTU",
-      gradient: "from-cyan-50 to-blue-50",
-      iconColor: "text-cyan-600",
-      iconBg: "bg-cyan-100",
+      unit: 'NTU',
+      gradient: 'from-cyan-50 to-blue-50',
+      iconColor: 'text-cyan-600',
+      iconBg: 'bg-cyan-100',
     },
     {
       icon: Activity,
-      label: "pH Level",
+      label: 'pH Level',
       value: displayMetrics?.pH,
-      unit: "",
-      gradient: "from-blue-50 to-indigo-50",
-      iconColor: "text-blue-600",
-      iconBg: "bg-blue-100",
+      unit: '',
+      gradient: 'from-blue-50 to-indigo-50',
+      iconColor: 'text-blue-600',
+      iconBg: 'bg-blue-100',
     },
     {
       icon: Droplets,
-      label: "COD",
+      label: 'COD',
       value: displayMetrics?.cod,
-      unit: "mg/L",
-      gradient: "from-purple-50 to-pink-50",
-      iconColor: "text-purple-600",
-      iconBg: "bg-purple-100",
+      unit: 'mg/L',
+      gradient: 'from-purple-50 to-pink-50',
+      iconColor: 'text-purple-600',
+      iconBg: 'bg-purple-100',
     },
     {
       icon: Droplets,
-      label: "TDS",
+      label: 'TDS',
       value: displayMetrics?.tds,
-      unit: "mg/L",
-      gradient: "from-teal-50 to-emerald-50",
-      iconColor: "text-teal-600",
-      iconBg: "bg-teal-100",
+      unit: 'mg/L',
+      gradient: 'from-teal-50 to-emerald-50',
+      iconColor: 'text-teal-600',
+      iconBg: 'bg-teal-100',
     },
     {
       icon: Activity,
-      label: "Nitrogen",
+      label: 'Nitrogen',
       value: displayMetrics?.nitrogen,
-      unit: "mg/L",
-      gradient: "from-green-50 to-lime-50",
-      iconColor: "text-green-600",
-      iconBg: "bg-green-100",
+      unit: 'mg/L',
+      gradient: 'from-green-50 to-lime-50',
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
     },
     {
       icon: Droplets,
-      label: "Phosphorus",
+      label: 'Phosphorus',
       value: displayMetrics?.phosphorus,
-      unit: "mg/L",
-      gradient: "from-amber-50 to-orange-50",
-      iconColor: "text-amber-600",
-      iconBg: "bg-amber-100",
+      unit: 'mg/L',
+      gradient: 'from-amber-50 to-orange-50',
+      iconColor: 'text-amber-600',
+      iconBg: 'bg-amber-100',
     },
   ];
 
@@ -230,9 +230,9 @@ export default function WaterSourceCard({
                 source.quality
               )}`}
             >
-              {source.quality === "safe" && "✓ Safe Quality"}
-              {source.quality === "attention" && "⚠ Needs Attention"}
-              {source.quality === "critical" && "⚠ Critical"}
+              {source.quality === 'safe' && '✓ Safe Quality'}
+              {source.quality === 'attention' && '⚠ Needs Attention'}
+              {source.quality === 'critical' && '⚠ Critical'}
             </span>
             <div className="flex items-center gap-1 text-xs text-gray-500">
               <Clock className="h-3 w-3" />
@@ -276,7 +276,7 @@ export default function WaterSourceCard({
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{
                         duration: 2,
-                        ease: "easeOut",
+                        ease: 'easeOut',
                       }}
                       className="text-3xl font-bold text-gray-900"
                     >
@@ -290,18 +290,18 @@ export default function WaterSourceCard({
                     <motion.div
                       key={`bar-${metric.value}`}
                       className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 bg-[length:200%_100%]"
-                      initial={{ x: "-100%" }}
+                      initial={{ x: '-100%' }}
                       animate={{
-                        x: "0%",
-                        backgroundPosition: ["0% 0%", "100% 0%"],
+                        x: '0%',
+                        backgroundPosition: ['0% 0%', '100% 0%'],
                       }}
                       transition={{
-                        x: { duration: 1.5, ease: "easeInOut" },
+                        x: { duration: 1.5, ease: 'easeInOut' },
                         backgroundPosition: {
                           duration: 3,
-                          ease: "linear",
+                          ease: 'linear',
                           repeat: Infinity,
-                          repeatType: "reverse",
+                          repeatType: 'reverse',
                         },
                       }}
                     />
@@ -330,11 +330,11 @@ export default function WaterSourceCard({
               <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-cyan-500"
-                  initial={{ width: "100%" }}
-                  animate={{ width: "0%" }}
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
                   transition={{
                     duration: 45,
-                    ease: "linear",
+                    ease: 'linear',
                     repeat: Infinity,
                     repeatDelay: 0,
                   }}

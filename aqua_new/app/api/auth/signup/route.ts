@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import User from "@/models/User";
-import { generateToken, setAuthCookie } from "@/lib/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import dbConnect from '@/lib/mongodb';
+import User from '@/models/User';
+import { generateToken, setAuthCookie } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       !password
     ) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        { message: 'All fields are required' },
         { status: 400 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     if (userExists) {
       return NextResponse.json(
-        { message: "Organization already registered" },
+        { message: 'Organization already registered' },
         { status: 400 }
       );
     }
@@ -72,16 +72,15 @@ export async function POST(request: NextRequest) {
       );
     } else {
       return NextResponse.json(
-        { message: "Invalid user data" },
+        { message: 'Invalid user data' },
         { status: 400 }
       );
     }
   } catch (error: any) {
-    console.error("Signup error:", error);
+    console.error('Signup error:', error);
     return NextResponse.json(
-      { message: error.message || "Server error" },
+      { message: error.message || 'Server error' },
       { status: 500 }
     );
   }
 }
-

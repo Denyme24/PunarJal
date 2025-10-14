@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import dynamic from "next/dynamic";
-import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Header from "@/components/Header";
-import WaterSourceCard from "@/components/WaterSourceCard";
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Header from '@/components/Header';
+import WaterSourceCard from '@/components/WaterSourceCard';
 import {
   WaterSource,
   getWaterSourcesByLocation,
   locationCoordinates,
-} from "@/lib/waterSourcesData";
-import { MapPin, Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from '@/lib/waterSourcesData';
+import { MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // Dynamically import map component to avoid SSR issues
-const WaterSourcesMap = dynamic(() => import("@/components/WaterSourcesMap"), {
+const WaterSourcesMap = dynamic(() => import('@/components/WaterSourcesMap'), {
   ssr: false,
 });
 
@@ -30,7 +30,7 @@ export default function MapPage() {
   const [mapCenter, setMapCenter] = useState<[number, number]>([
     12.9716, 77.5946,
   ]);
-  const [filter, setFilter] = useState<"all" | "safe" | "attention">("all");
+  const [filter, setFilter] = useState<'all' | 'safe' | 'attention'>('all');
 
   useEffect(() => {
     if (user?.location) {
@@ -41,7 +41,7 @@ export default function MapPage() {
       // Set map center to user's specific location (e.g., Whitefield, Koramangala)
       // Fall back to general Bangalore if specific neighborhood not found
       const center =
-        locationCoordinates[user.location] || locationCoordinates["Bangalore"];
+        locationCoordinates[user.location] || locationCoordinates['Bangalore'];
       if (center) {
         setMapCenter(center);
       }
@@ -57,14 +57,14 @@ export default function MapPage() {
   };
 
   const filteredSources =
-    filter === "all"
+    filter === 'all'
       ? waterSources
-      : waterSources.filter((source) => source.quality === filter);
+      : waterSources.filter(source => source.quality === filter);
 
   const stats = {
     total: waterSources.length,
-    safe: waterSources.filter((s) => s.quality === "safe").length,
-    attention: waterSources.filter((s) => s.quality === "attention").length,
+    safe: waterSources.filter(s => s.quality === 'safe').length,
+    attention: waterSources.filter(s => s.quality === 'attention').length,
   };
 
   return (
@@ -81,7 +81,7 @@ export default function MapPage() {
             className="mb-8"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Explore Water{" "}
+              Explore Water{' '}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Bodies
               </span>
@@ -95,38 +95,38 @@ export default function MapPage() {
               {/* Filter Buttons */}
               <div className="flex gap-2 items-center bg-white/5 backdrop-blur-lg rounded-lg p-2 border border-white/10">
                 <Button
-                  variant={filter === "all" ? "default" : "ghost"}
+                  variant={filter === 'all' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setFilter("all")}
+                  onClick={() => setFilter('all')}
                   className={
-                    filter === "all"
-                      ? "bg-cyan-500 hover:bg-cyan-600"
-                      : "text-white hover:bg-white/10"
+                    filter === 'all'
+                      ? 'bg-cyan-500 hover:bg-cyan-600'
+                      : 'text-white hover:bg-white/10'
                   }
                 >
                   All ({stats.total})
                 </Button>
                 <Button
-                  variant={filter === "safe" ? "default" : "ghost"}
+                  variant={filter === 'safe' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setFilter("safe")}
+                  onClick={() => setFilter('safe')}
                   className={
-                    filter === "safe"
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "text-white hover:bg-white/10"
+                    filter === 'safe'
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : 'text-white hover:bg-white/10'
                   }
                 >
                   <MapPin className="h-4 w-4 mr-1" />
                   Safe ({stats.safe})
                 </Button>
                 <Button
-                  variant={filter === "attention" ? "default" : "ghost"}
+                  variant={filter === 'attention' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setFilter("attention")}
+                  onClick={() => setFilter('attention')}
                   className={
-                    filter === "attention"
-                      ? "bg-amber-500 hover:bg-amber-600"
-                      : "text-white hover:bg-white/10"
+                    filter === 'attention'
+                      ? 'bg-amber-500 hover:bg-amber-600'
+                      : 'text-white hover:bg-white/10'
                   }
                 >
                   <MapPin className="h-4 w-4 mr-1" />
@@ -185,10 +185,10 @@ export default function MapPage() {
 
                   {/* Card */}
                   <motion.div
-                    initial={{ opacity: 0, x: "100%" }}
+                    initial={{ opacity: 0, x: '100%' }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: "100%" }}
-                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    exit={{ opacity: 0, x: '100%' }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                     className="fixed lg:absolute top-0 right-0 h-full lg:h-[calc(100vh-400px)] lg:min-h-[600px] w-full sm:w-[400px] lg:w-[380px] z-50 lg:z-10"
                   >
                     <div className="h-full overflow-y-auto">
@@ -212,7 +212,7 @@ export default function MapPage() {
               className="mt-8 text-center"
             >
               <p className="text-white/60 text-sm">
-                Showing water sources near{" "}
+                Showing water sources near{' '}
                 <span className="font-semibold text-cyan-400">
                   {user.location}
                 </span>
