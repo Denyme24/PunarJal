@@ -24,6 +24,7 @@ import {
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AnalyticsData = {
   simulationHistory: Array<{
@@ -66,6 +67,7 @@ type AnalyticsData = {
 };
 
 const Analytics = () => {
+  const { token } = useAuth();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
@@ -90,10 +92,18 @@ const Analytics = () => {
 
         const context = JSON.parse(contextRaw);
 
-        // Call AI generation API
+        // Call AI generation API with authorization header
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+        };
+
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const res = await fetch("/api/analytics/generate", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify(context),
         });
 
@@ -112,7 +122,7 @@ const Analytics = () => {
     };
 
     fetchAnalytics();
-  }, []);
+  }, [token]);
 
   const exportAsPdf = () => {
     window.print();

@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
+import connectDB from "@/lib/mongodb";
+import SimulationLog from "@/models/SimulationLog";
 
 // Simple Gemini 1.5 Flash call using fetch to avoid adding SDK dependency
 export async function POST(request: Request) {
@@ -13,15 +16,139 @@ export async function POST(request: Request) {
       );
     }
 
+    // Try to get historical simulation data
+    let historicalData: any[] = [];
+    let historicalStats: any = {};
+    
+    try {
+      const authHeader = request.headers.get("authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1];
+        const decoded = verifyToken(token);
+        
+        if (decoded && decoded.id) {
+          // Connect to database and fetch historical logs
+          await connectDB();
+          
+          // Get last 20 simulations for this user
+          // @ts-ignore - Mongoose type inference issue with find overloads
+          const logs = await SimulationLog.find({ userId: decoded.id })
+            .sort({ timestamp: -1 })
+            .limit(20)
+            .select("inputParameters simulationResult timestamp source sourceName");
+          
+          historicalData = logs.map((log: any) => ({
+            date: new Date(log.timestamp).toISOString().split('T')[0],
+            time: new Date(log.timestamp).toLocaleTimeString(),
+            parameters: log.inputParameters,
+            result: {
+              status: log.simulationResult?.overallStatus,
+              stagesRequired: log.simulationResult?.totalStagesRequired,
+              efficiency: log.simulationResult?.estimatedEfficiency,
+              treatmentTime: log.simulationResult?.estimatedTreatmentTime,
+              primaryRequired: log.simulationResult?.primaryTreatment?.required,
+              secondaryRequired: log.simulationResult?.secondaryTreatment?.required,
+              tertiaryRequired: log.simulationResult?.tertiaryTreatment?.required,
+            },
+            source: log.source,
+            sourceName: log.sourceName,
+          }));
+          
+          // Calculate statistics from historical data
+          if (logs.length > 0) {
+            const avgEfficiency = logs.reduce((sum: number, log: any) => 
+              sum + (log.simulationResult?.estimatedEfficiency || 0), 0) / logs.length;
+            const avgTreatmentTime = logs.reduce((sum: number, log: any) => 
+              sum + (log.simulationResult?.estimatedTreatmentTime || 0), 0) / logs.length;
+            
+            // Calculate average parameters
+            const avgParameters = {
+              turbidity: (logs.reduce((sum: number, log: any) => sum + (log.inputParameters?.turbidity || 0), 0) / logs.length).toFixed(1),
+              pH: (logs.reduce((sum: number, log: any) => sum + (log.inputParameters?.pH || 0), 0) / logs.length).toFixed(2),
+              cod: Math.round(logs.reduce((sum: number, log: any) => sum + (log.inputParameters?.cod || 0), 0) / logs.length),
+              tds: Math.round(logs.reduce((sum: number, log: any) => sum + (log.inputParameters?.tds || 0), 0) / logs.length),
+              nitrogen: (logs.reduce((sum: number, log: any) => sum + (log.inputParameters?.nitrogen || 0), 0) / logs.length).toFixed(1),
+              phosphorus: (logs.reduce((sum: number, log: any) => sum + (log.inputParameters?.phosphorus || 0), 0) / logs.length).toFixed(2),
+            };
+            
+            historicalStats = {
+              totalSimulations: logs.length,
+              averageEfficiency: avgEfficiency.toFixed(1),
+              averageTreatmentTime: avgTreatmentTime.toFixed(1),
+              averageParameters: avgParameters,
+              statusDistribution: {
+                safe: logs.filter((log: any) => log.simulationResult?.overallStatus === "safe").length,
+                needsTreatment: logs.filter((log: any) => log.simulationResult?.overallStatus === "needs-treatment").length,
+                critical: logs.filter((log: any) => log.simulationResult?.overallStatus === "critical").length,
+              },
+              treatmentStagesFrequency: {
+                primary: logs.filter((log: any) => log.simulationResult?.primaryTreatment?.required).length,
+                secondary: logs.filter((log: any) => log.simulationResult?.secondaryTreatment?.required).length,
+                tertiary: logs.filter((log: any) => log.simulationResult?.tertiaryTreatment?.required).length,
+              },
+              sourceDistribution: {
+                simulation_page: logs.filter((log: any) => log.source === "simulation_page").length,
+                iot_sensors: logs.filter((log: any) => log.source === "iot_sensors").length,
+                map_view: logs.filter((log: any) => log.source === "map_view").length,
+              },
+              dateRange: {
+                oldest: new Date(logs[logs.length - 1].timestamp).toISOString().split('T')[0],
+                newest: new Date(logs[0].timestamp).toISOString().split('T')[0],
+              }
+            };
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching historical data:", error);
+      // Continue without historical data
+    }
+
     const apiKey =
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_GENAI_API_KEY
 
-    const prompt = `Generate wastewater treatment analytics JSON based on:
-Parameters: ${JSON.stringify(parameters)}
-Result: ${JSON.stringify(simulationResult)}
+    const historicalContext = historicalData.length > 0 
+      ? `
 
-Return ONLY valid JSON (no markdown):
+HISTORICAL SIMULATION DATA (Last ${historicalData.length} simulations from database):
+${JSON.stringify(historicalData, null, 2)}
+
+HISTORICAL STATISTICS CALCULATED FROM DATABASE:
+${JSON.stringify(historicalStats, null, 2)}
+
+IMPORTANT INSTRUCTIONS FOR USING HISTORICAL DATA:
+1. Compare the current simulation's efficiency (${simulationResult.estimatedEfficiency}%) with the historical average efficiency (${historicalStats?.averageEfficiency || 'N/A'}%)
+2. Analyze trends: Is water quality improving or degrading over time?
+3. Use actual historical dates and efficiency values for the "simulationHistory" array
+4. Calculate realistic "treatmentEfficiency" based on the patterns seen in historical data
+5. Generate "reuseBreakdown" percentages that align with historical treatment patterns
+6. Base "sustainabilityMetrics" on cumulative data from all ${historicalStats?.totalSimulations || 0} simulations
+7. Provide personalized recommendations based on the user's historical performance
+8. Highlight any anomalies or significant changes from historical patterns
+9. Use the source distribution to understand which monitoring methods are most used
+10. Compare current parameters with historical averages to identify unusual values
+
+TREND ANALYSIS REQUIRED:
+- If current efficiency is better than average: mention improvement
+- If current efficiency is worse than average: suggest areas for optimization
+- Note which treatment stages are most commonly required based on historical data
+- Identify any recurring patterns or issues`
+      : `
+
+NOTE: This is the FIRST simulation for this user. No historical data available yet.
+- Provide general analytics based on the current simulation only
+- Encourage the user to run more simulations to get personalized insights
+- Explain that analytics will improve with more data`;
+
+    const prompt = `You are an AI water treatment analytics expert. Generate comprehensive wastewater treatment analytics based on real simulation data.
+
+CURRENT SIMULATION:
+Parameters: ${JSON.stringify(parameters, null, 2)}
+Result: ${JSON.stringify(simulationResult, null, 2)}
+${historicalContext}
+
+Generate analytics as ONLY valid JSON (no markdown, no explanations outside JSON):
 {
   "simulationHistory": [5 entries with date, waterSaved, energySaved, efficiency],
   "treatmentEfficiency": {
