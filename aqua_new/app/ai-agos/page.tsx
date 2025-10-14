@@ -46,7 +46,7 @@ export default function AIAgosPage() {
     {
       role: 'assistant',
       content:
-        "Hello! I'm AI AGOS, your intelligent assistant for PunarJal's wastewater treatment system. I can help you understand water treatment processes, simulation results, IoT sensor data, and more. How can I assist you today?",
+        "Hello! I'm your AI Assistant for PunarJal's wastewater treatment system. I can help you understand water treatment processes, simulation results, real-time dashboard data, and more. How can I assist you today?",
       timestamp: new Date(),
     },
   ]);
@@ -225,11 +225,11 @@ export default function AIAgosPage() {
                 </div>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-200 via-blue-200 to-white bg-clip-text text-transparent">
-                AI AGOS
+                AI Assistant
               </h1>
             </div>
             <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto">
-              Your intelligent assistant for wastewater treatment, IoT sensors,
+              Your intelligent assistant for wastewater treatment, real-time monitoring,
               and water quality management
             </p>
 
@@ -426,7 +426,7 @@ export default function AIAgosPage() {
               </div>
 
               <p className="text-xs text-white/40 mt-2 text-center">
-                AI AGOS is trained on PunarJal data. Press Shift+Enter for new
+                AI Assistant is trained on PunarJal data. Press Shift+Enter for new
                 line
               </p>
             </div>
