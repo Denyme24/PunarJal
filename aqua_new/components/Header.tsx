@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Menu, X, LogOut, User, Bot, Settings, TrendingUp } from "lucide-react";
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { Menu, X, LogOut, User, Bot, Settings, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,31 +23,33 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    router.push("/");
+    router.push('/');
   };
 
   // Base navigation links
   const baseNavLinks = [
-    { href: "/map", label: "MAP VIEW" },
-    { href: "/simulation", label: "SIMULATION" },
-    { href: "/iot-sensors", label: "IOT SENSORS" },
-    { href: "/ai-agos", label: "AI AGOS", icon: Bot },
+    { href: '/map', label: 'MAP VIEW' },
+    { href: '/simulation', label: 'SIMULATION' },
+    { href: '/iot-sensors', label: 'IOT SENSORS' },
+    { href: '/ai-agos', label: 'AI AGOS', icon: Bot },
   ];
 
   // Role-specific navigation links
   const getRoleSpecificLinks = () => {
     if (!user) return [];
-    
-    if (user.role === "Plant Operator") {
+
+    if (user.role === 'Plant Operator') {
       return [
-        { href: "/treatment-dashboard", label: "OPERATOR DASHBOARD", icon: Settings },
+        {
+          href: '/treatment-dashboard',
+          label: 'OPERATOR DASHBOARD',
+          icon: Settings,
+        },
       ];
-    } else if (user.role === "Environmental Officer") {
-      return [
-        { href: "/analytics", label: "ANALYTICS", icon: TrendingUp },
-      ];
+    } else if (user.role === 'Environmental Officer') {
+      return [{ href: '/analytics', label: 'ANALYTICS', icon: TrendingUp }];
     }
-    
+
     return [];
   };
 
@@ -65,9 +67,9 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="group flex items-center space-x-3">
-            <img 
-              src="/assets/logo.png" 
-              alt="PunarJal Logo" 
+            <img
+              src="/assets/logo.png"
+              alt="PunarJal Logo"
               className="h-16 w-16 transition-transform duration-300 group-hover:scale-110"
             />
             <span className="text-2xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent tracking-tight hover:from-cyan-200 hover:via-blue-200 hover:to-white transition-all duration-300">
@@ -132,14 +134,14 @@ const Header = () => {
             ) : (
               <div className="flex items-center gap-2">
                 <Button
-                  onClick={() => router.push("/onboarding")}
+                  onClick={() => router.push('/onboarding')}
                   variant="outline"
                   className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
                   Login
                 </Button>
                 <Button
-                  onClick={() => router.push("/onboarding")}
+                  onClick={() => router.push('/onboarding')}
                   className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
                 >
                   Sign Up
@@ -165,11 +167,11 @@ const Header = () => {
         {mobileMenuOpen && (
           <motion.nav
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden mt-4 pt-4 border-t border-white/10"
           >
-            {navLinks.map((link) => {
+            {navLinks.map(link => {
               const Icon = link.icon;
               return (
                 <Link key={link.href} href={link.href}>
@@ -212,7 +214,7 @@ const Header = () => {
               <div className="px-4 py-3 border-t border-white/10 mt-2 space-y-2">
                 <Button
                   onClick={() => {
-                    router.push("/onboarding");
+                    router.push('/onboarding');
                     setMobileMenuOpen(false);
                   }}
                   variant="outline"
@@ -222,7 +224,7 @@ const Header = () => {
                 </Button>
                 <Button
                   onClick={() => {
-                    router.push("/onboarding");
+                    router.push('/onboarding');
                     setMobileMenuOpen(false);
                   }}
                   className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"

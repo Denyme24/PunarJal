@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Activity,
   Wifi,
@@ -21,254 +21,254 @@ import {
   MapPin,
   Droplets,
   Play,
-} from "lucide-react";
-import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { useAuth } from "@/contexts/AuthContext";
+} from 'lucide-react';
+import Header from '@/components/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SensorData {
   id: string;
   name: string;
   value: number;
   unit: string;
-  status: "online" | "offline";
+  status: 'online' | 'offline';
   threshold: { min: number; max: number };
-  trend: "up" | "down" | "stable";
+  trend: 'up' | 'down' | 'stable';
   history: number[];
   location: string;
-  paramKey: "turbidity" | "pH" | "cod" | "tds" | "nitrogen" | "phosphorus";
+  paramKey: 'turbidity' | 'pH' | 'cod' | 'tds' | 'nitrogen' | 'phosphorus';
 }
 
 interface LocationData {
   name: string;
   lakeName: string;
   sensorCount: number;
-  status: "active" | "maintenance" | "offline";
+  status: 'active' | 'maintenance' | 'offline';
 }
 
 const IoTSensors = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const [selectedLocation, setSelectedLocation] = useState<string>("Hebbal");
+  const [selectedLocation, setSelectedLocation] = useState<string>('Hebbal');
   const [allSensors, setAllSensors] = useState<SensorData[]>([
     // Location 1 - Hebbal Lake (all 6 sensors matching simulation page)
     {
-      id: "turbidity-hebbal",
-      name: "Turbidity Sensor",
+      id: 'turbidity-hebbal',
+      name: 'Turbidity Sensor',
       value: 45.2,
-      unit: "NTU",
-      status: "online",
+      unit: 'NTU',
+      status: 'online',
       threshold: { min: 0, max: 100 },
-      trend: "down",
+      trend: 'down',
       history: [50, 48, 47, 46, 45.2],
-      location: "Hebbal",
-      paramKey: "turbidity",
+      location: 'Hebbal',
+      paramKey: 'turbidity',
     },
     {
-      id: "ph-hebbal",
-      name: "pH Sensor",
+      id: 'ph-hebbal',
+      name: 'pH Sensor',
       value: 7.3,
-      unit: "",
-      status: "online",
+      unit: '',
+      status: 'online',
       threshold: { min: 6.5, max: 8.5 },
-      trend: "stable",
+      trend: 'stable',
       history: [7.2, 7.3, 7.2, 7.3, 7.3],
-      location: "Hebbal",
-      paramKey: "pH",
+      location: 'Hebbal',
+      paramKey: 'pH',
     },
     {
-      id: "cod-hebbal",
-      name: "COD Analyzer",
+      id: 'cod-hebbal',
+      name: 'COD Analyzer',
       value: 142,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 500 },
-      trend: "down",
+      trend: 'down',
       history: [180, 165, 155, 148, 142],
-      location: "Hebbal",
-      paramKey: "cod",
+      location: 'Hebbal',
+      paramKey: 'cod',
     },
     {
-      id: "tds-hebbal",
-      name: "TDS Meter",
+      id: 'tds-hebbal',
+      name: 'TDS Meter',
       value: 456,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 2000 },
-      trend: "stable",
+      trend: 'stable',
       history: [450, 455, 458, 454, 456],
-      location: "Hebbal",
-      paramKey: "tds",
+      location: 'Hebbal',
+      paramKey: 'tds',
     },
     {
-      id: "nitrogen-hebbal",
-      name: "Nitrogen Sensor",
+      id: 'nitrogen-hebbal',
+      name: 'Nitrogen Sensor',
       value: 18,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 100 },
-      trend: "stable",
+      trend: 'stable',
       history: [19, 18.5, 18, 18.2, 18],
-      location: "Hebbal",
-      paramKey: "nitrogen",
+      location: 'Hebbal',
+      paramKey: 'nitrogen',
     },
     {
-      id: "phosphorus-hebbal",
-      name: "Phosphorus Analyzer",
+      id: 'phosphorus-hebbal',
+      name: 'Phosphorus Analyzer',
       value: 4.2,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 50 },
-      trend: "down",
+      trend: 'down',
       history: [5.0, 4.8, 4.5, 4.3, 4.2],
-      location: "Hebbal",
-      paramKey: "phosphorus",
+      location: 'Hebbal',
+      paramKey: 'phosphorus',
     },
     // Location 2 - Bellandur Lake (all 6 sensors)
     {
-      id: "turbidity-bellandur",
-      name: "Turbidity Sensor",
+      id: 'turbidity-bellandur',
+      name: 'Turbidity Sensor',
       value: 68.5,
-      unit: "NTU",
-      status: "online",
+      unit: 'NTU',
+      status: 'online',
       threshold: { min: 0, max: 100 },
-      trend: "up",
+      trend: 'up',
       history: [62, 64, 66, 67, 68.5],
-      location: "Bellandur",
-      paramKey: "turbidity",
+      location: 'Bellandur',
+      paramKey: 'turbidity',
     },
     {
-      id: "ph-bellandur",
-      name: "pH Sensor",
+      id: 'ph-bellandur',
+      name: 'pH Sensor',
       value: 8.1,
-      unit: "",
-      status: "online",
+      unit: '',
+      status: 'online',
       threshold: { min: 6.5, max: 8.5 },
-      trend: "up",
+      trend: 'up',
       history: [7.8, 7.9, 8.0, 8.0, 8.1],
-      location: "Bellandur",
-      paramKey: "pH",
+      location: 'Bellandur',
+      paramKey: 'pH',
     },
     {
-      id: "cod-bellandur",
-      name: "COD Analyzer",
+      id: 'cod-bellandur',
+      name: 'COD Analyzer',
       value: 285,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 500 },
-      trend: "up",
+      trend: 'up',
       history: [260, 270, 275, 280, 285],
-      location: "Bellandur",
-      paramKey: "cod",
+      location: 'Bellandur',
+      paramKey: 'cod',
     },
     {
-      id: "tds-bellandur",
-      name: "TDS Meter",
+      id: 'tds-bellandur',
+      name: 'TDS Meter',
       value: 890,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 2000 },
-      trend: "stable",
+      trend: 'stable',
       history: [880, 885, 890, 888, 890],
-      location: "Bellandur",
-      paramKey: "tds",
+      location: 'Bellandur',
+      paramKey: 'tds',
     },
     {
-      id: "nitrogen-bellandur",
-      name: "Nitrogen Sensor",
+      id: 'nitrogen-bellandur',
+      name: 'Nitrogen Sensor',
       value: 32,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 100 },
-      trend: "up",
+      trend: 'up',
       history: [28, 29, 30, 31, 32],
-      location: "Bellandur",
-      paramKey: "nitrogen",
+      location: 'Bellandur',
+      paramKey: 'nitrogen',
     },
     {
-      id: "phosphorus-bellandur",
-      name: "Phosphorus Analyzer",
+      id: 'phosphorus-bellandur',
+      name: 'Phosphorus Analyzer',
       value: 8.5,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 50 },
-      trend: "up",
+      trend: 'up',
       history: [7.5, 7.8, 8.0, 8.2, 8.5],
-      location: "Bellandur",
-      paramKey: "phosphorus",
+      location: 'Bellandur',
+      paramKey: 'phosphorus',
     },
     // Location 3 - Ulsoor Lake (all 6 sensors)
     {
-      id: "turbidity-ulsoor",
-      name: "Turbidity Sensor",
+      id: 'turbidity-ulsoor',
+      name: 'Turbidity Sensor',
       value: 32.1,
-      unit: "NTU",
-      status: "online",
+      unit: 'NTU',
+      status: 'online',
       threshold: { min: 0, max: 100 },
-      trend: "stable",
+      trend: 'stable',
       history: [32, 32.5, 31.8, 32.2, 32.1],
-      location: "Ulsoor",
-      paramKey: "turbidity",
+      location: 'Ulsoor',
+      paramKey: 'turbidity',
     },
     {
-      id: "ph-ulsoor",
-      name: "pH Sensor",
+      id: 'ph-ulsoor',
+      name: 'pH Sensor',
       value: 6.9,
-      unit: "",
-      status: "online",
+      unit: '',
+      status: 'online',
       threshold: { min: 6.5, max: 8.5 },
-      trend: "stable",
+      trend: 'stable',
       history: [6.9, 7.0, 6.8, 6.9, 6.9],
-      location: "Ulsoor",
-      paramKey: "pH",
+      location: 'Ulsoor',
+      paramKey: 'pH',
     },
     {
-      id: "cod-ulsoor",
-      name: "COD Analyzer",
+      id: 'cod-ulsoor',
+      name: 'COD Analyzer',
       value: 165,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 500 },
-      trend: "down",
+      trend: 'down',
       history: [180, 175, 170, 168, 165],
-      location: "Ulsoor",
-      paramKey: "cod",
+      location: 'Ulsoor',
+      paramKey: 'cod',
     },
     {
-      id: "tds-ulsoor",
-      name: "TDS Meter",
+      id: 'tds-ulsoor',
+      name: 'TDS Meter',
       value: 620,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 2000 },
-      trend: "stable",
+      trend: 'stable',
       history: [615, 618, 622, 619, 620],
-      location: "Ulsoor",
-      paramKey: "tds",
+      location: 'Ulsoor',
+      paramKey: 'tds',
     },
     {
-      id: "nitrogen-ulsoor",
-      name: "Nitrogen Sensor",
+      id: 'nitrogen-ulsoor',
+      name: 'Nitrogen Sensor',
       value: 15,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 100 },
-      trend: "down",
+      trend: 'down',
       history: [17, 16.5, 16, 15.5, 15],
-      location: "Ulsoor",
-      paramKey: "nitrogen",
+      location: 'Ulsoor',
+      paramKey: 'nitrogen',
     },
     {
-      id: "phosphorus-ulsoor",
-      name: "Phosphorus Analyzer",
+      id: 'phosphorus-ulsoor',
+      name: 'Phosphorus Analyzer',
       value: 3.8,
-      unit: "mg/L",
-      status: "online",
+      unit: 'mg/L',
+      status: 'online',
       threshold: { min: 0, max: 50 },
-      trend: "down",
+      trend: 'down',
       history: [4.5, 4.2, 4.0, 3.9, 3.8],
-      location: "Ulsoor",
-      paramKey: "phosphorus",
+      location: 'Ulsoor',
+      paramKey: 'phosphorus',
     },
   ]);
 
@@ -277,105 +277,105 @@ const IoTSensors = () => {
     const locationMap: { [key: string]: LocationData[] } = {
       Hebbal: [
         {
-          name: "Hebbal",
-          lakeName: "Hebbal Lake",
+          name: 'Hebbal',
+          lakeName: 'Hebbal Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Bellandur",
-          lakeName: "Bellandur Lake",
+          name: 'Bellandur',
+          lakeName: 'Bellandur Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Ulsoor",
-          lakeName: "Ulsoor Lake",
+          name: 'Ulsoor',
+          lakeName: 'Ulsoor Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
       ],
       Bellandur: [
         {
-          name: "Bellandur",
-          lakeName: "Bellandur Lake",
+          name: 'Bellandur',
+          lakeName: 'Bellandur Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Hebbal",
-          lakeName: "Hebbal Lake",
+          name: 'Hebbal',
+          lakeName: 'Hebbal Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Ulsoor",
-          lakeName: "Ulsoor Lake",
+          name: 'Ulsoor',
+          lakeName: 'Ulsoor Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
       ],
       Ulsoor: [
         {
-          name: "Ulsoor",
-          lakeName: "Ulsoor Lake",
+          name: 'Ulsoor',
+          lakeName: 'Ulsoor Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Hebbal",
-          lakeName: "Hebbal Lake",
+          name: 'Hebbal',
+          lakeName: 'Hebbal Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Bellandur",
-          lakeName: "Bellandur Lake",
+          name: 'Bellandur',
+          lakeName: 'Bellandur Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
       ],
       // Default for other locations
       default: [
         {
-          name: "Hebbal",
-          lakeName: "Hebbal Lake",
+          name: 'Hebbal',
+          lakeName: 'Hebbal Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Bellandur",
-          lakeName: "Bellandur Lake",
+          name: 'Bellandur',
+          lakeName: 'Bellandur Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
         {
-          name: "Ulsoor",
-          lakeName: "Ulsoor Lake",
+          name: 'Ulsoor',
+          lakeName: 'Ulsoor Lake',
           sensorCount: 6,
-          status: "active",
+          status: 'active',
         },
       ],
     };
 
-    return locationMap[userLocation] || locationMap["default"];
+    return locationMap[userLocation] || locationMap['default'];
   };
 
-  const nearbyLocations = getNearbyLocations(user?.location || "");
+  const nearbyLocations = getNearbyLocations(user?.location || '');
   const [sensors, setSensors] = useState<SensorData[]>([]);
 
   // Filter sensors based on selected location
   useEffect(() => {
     setSensors(
-      allSensors.filter((sensor) => sensor.location === selectedLocation)
+      allSensors.filter(sensor => sensor.location === selectedLocation)
     );
   }, [selectedLocation, allSensors]);
 
   // Simulate live sensor updates
   useEffect(() => {
     const interval = setInterval(() => {
-      setAllSensors((prevSensors) =>
-        prevSensors.map((sensor) => {
+      setAllSensors(prevSensors =>
+        prevSensors.map(sensor => {
           const variation = (Math.random() - 0.5) * 5;
           const newValue = Math.max(
             sensor.threshold.min,
@@ -385,9 +385,9 @@ const IoTSensors = () => {
           const newHistory = [...sensor.history.slice(1), newValue];
           const lastValue = sensor.history[sensor.history.length - 1];
 
-          let trend: "up" | "down" | "stable" = "stable";
-          if (newValue > lastValue + 1) trend = "up";
-          else if (newValue < lastValue - 1) trend = "down";
+          let trend: 'up' | 'down' | 'stable' = 'stable';
+          if (newValue > lastValue + 1) trend = 'up';
+          else if (newValue < lastValue - 1) trend = 'down';
 
           return {
             ...sensor,
@@ -407,20 +407,20 @@ const IoTSensors = () => {
     const percentage =
       ((value - threshold.min) / (threshold.max - threshold.min)) * 100;
 
-    if (percentage < 20) return { color: "green", status: "Optimal" };
-    if (percentage < 50) return { color: "blue", status: "Good" };
-    if (percentage < 80) return { color: "yellow", status: "Warning" };
-    return { color: "red", status: "Critical" };
+    if (percentage < 20) return { color: 'green', status: 'Optimal' };
+    if (percentage < 50) return { color: 'blue', status: 'Good' };
+    if (percentage < 80) return { color: 'yellow', status: 'Warning' };
+    return { color: 'red', status: 'Critical' };
   };
 
   const handleInitiateSimulation = () => {
     const locationSensors = allSensors.filter(
-      (s) => s.location === selectedLocation
+      s => s.location === selectedLocation
     );
 
     // Build parameters object from sensors
     const params: any = {};
-    locationSensors.forEach((sensor) => {
+    locationSensors.forEach(sensor => {
       params[sensor.paramKey] = sensor.value;
     });
 
@@ -428,7 +428,7 @@ const IoTSensors = () => {
     const queryParams = new URLSearchParams({
       ...params,
       sourceName:
-        nearbyLocations.find((l) => l.name === selectedLocation)?.lakeName ||
+        nearbyLocations.find(l => l.name === selectedLocation)?.lakeName ||
         selectedLocation,
     });
 
@@ -471,7 +471,7 @@ const IoTSensors = () => {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-                  IoT{" "}
+                  IoT{' '}
                   <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     Sensor Network
                   </span>
@@ -521,8 +521,8 @@ const IoTSensors = () => {
                   <Card
                     className={`bg-white/5 backdrop-blur-lg border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer group ${
                       selectedLocation === location.name
-                        ? "ring-2 ring-cyan-400 bg-cyan-500/10"
-                        : ""
+                        ? 'ring-2 ring-cyan-400 bg-cyan-500/10'
+                        : ''
                     }`}
                     onClick={() => setSelectedLocation(location.name)}
                   >
@@ -534,11 +534,11 @@ const IoTSensors = () => {
                         </div>
                         <Badge
                           className={`${
-                            location.status === "active"
-                              ? "bg-green-500/20 text-green-400 border-green-500/30"
-                              : location.status === "maintenance"
-                              ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                              : "bg-red-500/20 text-red-400 border-red-500/30"
+                            location.status === 'active'
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : location.status === 'maintenance'
+                                ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                : 'bg-red-500/20 text-red-400 border-red-500/30'
                           }`}
                         >
                           {location.status}
@@ -563,11 +563,11 @@ const IoTSensors = () => {
                           <span className="text-white/60">Status:</span>
                           <span
                             className={`font-medium ${
-                              location.status === "active"
-                                ? "text-green-400"
-                                : location.status === "maintenance"
-                                ? "text-yellow-400"
-                                : "text-red-400"
+                              location.status === 'active'
+                                ? 'text-green-400'
+                                : location.status === 'maintenance'
+                                  ? 'text-yellow-400'
+                                  : 'text-red-400'
                             }`}
                           >
                             {location.status.charAt(0).toUpperCase() +
@@ -594,9 +594,9 @@ const IoTSensors = () => {
               <div className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full">
                 <Droplets className="h-4 w-4 text-cyan-400" />
                 <span className="text-cyan-400 text-sm font-medium">
-                  Showing sensors for:{" "}
+                  Showing sensors for:{' '}
                   {
-                    nearbyLocations.find((l) => l.name === selectedLocation)
+                    nearbyLocations.find(l => l.name === selectedLocation)
                       ?.lakeName
                   }
                 </span>
@@ -617,7 +617,7 @@ const IoTSensors = () => {
             {[
               {
                 label: `Active Sensors (${selectedLocation})`,
-                value: sensors.filter((s) => s.status === "online").length,
+                value: sensors.filter(s => s.status === 'online').length,
                 icon: Activity,
               },
               {
@@ -625,8 +625,8 @@ const IoTSensors = () => {
                 value: `${(sensors.length * 2.5).toFixed(1)}k`,
                 icon: TrendingUp,
               },
-              { label: "Uptime", value: "99.9%", icon: Wifi },
-              { label: "Last Update", value: "2s ago", icon: Activity },
+              { label: 'Uptime', value: '99.9%', icon: Wifi },
+              { label: 'Last Update', value: '2s ago', icon: Activity },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -659,11 +659,8 @@ const IoTSensors = () => {
           >
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Activity className="h-5 w-5 text-cyan-400" />
-              Sensor Data -{" "}
-              {
-                nearbyLocations.find((l) => l.name === selectedLocation)
-                  ?.lakeName
-              }
+              Sensor Data -{' '}
+              {nearbyLocations.find(l => l.name === selectedLocation)?.lakeName}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sensors.map((sensor, index) => {
@@ -680,7 +677,7 @@ const IoTSensors = () => {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <Activity className="h-4 w-4 text-cyan-400 animate-pulse" />
-                            {sensor.status === "online" ? (
+                            {sensor.status === 'online' ? (
                               <Wifi className="h-4 w-4 text-green-400" />
                             ) : (
                               <WifiOff className="h-4 w-4 text-red-400" />
@@ -696,13 +693,13 @@ const IoTSensors = () => {
                           {sensor.name}
                         </CardTitle>
                         <CardDescription className="text-white/60 flex items-center gap-2">
-                          {sensor.trend === "up" && (
+                          {sensor.trend === 'up' && (
                             <TrendingUp className="h-3 w-3 text-red-400" />
                           )}
-                          {sensor.trend === "down" && (
+                          {sensor.trend === 'down' && (
                             <TrendingDown className="h-3 w-3 text-green-400" />
                           )}
-                          {sensor.trend === "stable" && (
+                          {sensor.trend === 'stable' && (
                             <span className="text-blue-400">—</span>
                           )}
                           <span className="capitalize">{sensor.trend}</span>
@@ -718,7 +715,7 @@ const IoTSensors = () => {
                               </span>
                             </div>
                             <div className="text-xs text-white/50">
-                              Range: {sensor.threshold.min} -{" "}
+                              Range: {sensor.threshold.min} -{' '}
                               {sensor.threshold.max} {sensor.unit}
                             </div>
                           </div>

@@ -1,25 +1,25 @@
-import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/mongodb";
-import SimulationLog from "@/models/SimulationLog";
-import User from "@/models/User";
+import { NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/mongodb';
+import SimulationLog from '@/models/SimulationLog';
+import User from '@/models/User';
 
 export async function POST(request: Request) {
   try {
     // Verify authentication
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: "Unauthorized - No token provided" },
+        { error: 'Unauthorized - No token provided' },
         { status: 401 }
       );
     }
 
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
     if (!decoded || !decoded.id) {
       return NextResponse.json(
-        { error: "Unauthorized - Invalid token" },
+        { error: 'Unauthorized - Invalid token' },
         { status: 401 }
       );
     }
@@ -28,34 +28,31 @@ export async function POST(request: Request) {
     await connectDB();
 
     // Get user details
-    const user = await User.findById(decoded.id).select("organizationEmail location");
+    const user = await User.findById(decoded.id).select(
+      'organizationEmail location'
+    );
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Parse request body
     const body = await request.json();
-    const {
-      source,
-      sourceName,
-      inputParameters,
-      simulationResult,
-      sessionId,
-    } = body;
+    const { source, sourceName, inputParameters, simulationResult, sessionId } =
+      body;
 
     // Validate required fields
     if (!source || !inputParameters || !simulationResult) {
       return NextResponse.json(
         {
           error:
-            "Missing required fields: source, inputParameters, simulationResult",
+            'Missing required fields: source, inputParameters, simulationResult',
         },
         { status: 400 }
       );
     }
 
     // Validate source
-    if (!["simulation_page", "iot_sensors", "map_view"].includes(source)) {
+    if (!['simulation_page', 'iot_sensors', 'map_view'].includes(source)) {
       return NextResponse.json(
         {
           error:
@@ -98,15 +95,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Simulation log saved successfully",
+      message: 'Simulation log saved successfully',
       logId: simulationLog._id,
     });
   } catch (error: any) {
-    console.error("Error saving simulation log:", error);
+    console.error('Error saving simulation log:', error);
     return NextResponse.json(
-      { error: error?.message || "Failed to save simulation log" },
+      { error: error?.message || 'Failed to save simulation log' },
       { status: 500 }
     );
   }
 }
-

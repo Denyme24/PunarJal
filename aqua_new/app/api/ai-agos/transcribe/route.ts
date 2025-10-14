@@ -1,20 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini API
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY || ""
-);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const audioFile = formData.get("audio") as Blob;
-    const language = (formData.get("language") as string) || "en";
+    const audioFile = formData.get('audio') as Blob;
+    const language = (formData.get('language') as string) || 'en';
 
     if (!audioFile) {
       return NextResponse.json(
-        { error: "No audio file provided" },
+        { error: 'No audio file provided' },
         { status: 400 }
       );
     }
@@ -22,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Validate API key
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        { error: "Gemini API key not configured" },
+        { error: 'Gemini API key not configured' },
         { status: 500 }
       );
     }
@@ -32,18 +30,18 @@ export async function POST(request: NextRequest) {
     // Convert Blob to base64
     const arrayBuffer = await audioFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const base64Audio = buffer.toString("base64");
+    const base64Audio = buffer.toString('base64');
 
     const languageNames: Record<string, string> = {
-      en: "English",
-      hi: "Hindi",
-      mr: "Marathi",
-      kn: "Kannada",
-      bn: "Bengali",
-      ur: "Urdu",
+      en: 'English',
+      hi: 'Hindi',
+      mr: 'Marathi',
+      kn: 'Kannada',
+      bn: 'Bengali',
+      ur: 'Urdu',
     };
 
-    const languageName = languageNames[language] || "English";
+    const languageName = languageNames[language] || 'English';
 
     const prompt = `Please transcribe the following audio. The audio is likely in ${languageName}. Provide only the transcription text, nothing else.`;
 
@@ -56,29 +54,30 @@ export async function POST(request: NextRequest) {
     if (listResp.ok) {
       const listData = await listResp.json();
       availableModels = (listData?.models || [])
-        .filter((m: any) => 
-          m.supportedGenerationMethods?.includes("generateContent") &&
-          m.name?.includes("gemini")
+        .filter(
+          (m: any) =>
+            m.supportedGenerationMethods?.includes('generateContent') &&
+            m.name?.includes('gemini')
         )
-        .map((m: any) => m.name.replace("models/", ""));
+        .map((m: any) => m.name.replace('models/', ''));
     }
 
     // Fallback list if listing fails
     if (availableModels.length === 0) {
       availableModels = [
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro-latest", 
-        "gemini-1.5-pro",
-        "gemini-pro",
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro-latest',
+        'gemini-1.5-pro',
+        'gemini-pro',
       ];
     }
 
     let data: any | null = null;
-    let lastErrText = "";
+    let lastErrText = '';
 
     // Try both v1 and v1beta endpoints
-    const apiVersions = ["v1", "v1beta"];
+    const apiVersions = ['v1', 'v1beta'];
 
     for (const version of apiVersions) {
       for (const model of availableModels) {
@@ -86,12 +85,12 @@ export async function POST(request: NextRequest) {
           const requestBody = {
             contents: [
               {
-                role: "user",
+                role: 'user',
                 parts: [
                   { text: prompt },
                   {
                     inline_data: {
-                      mime_type: "audio/webm",
+                      mime_type: 'audio/webm',
                       data: base64Audio,
                     },
                   },
@@ -107,8 +106,8 @@ export async function POST(request: NextRequest) {
           const resp = await fetch(
             `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
             {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(requestBody),
             }
           );
@@ -130,17 +129,18 @@ export async function POST(request: NextRequest) {
     if (!data) {
       return NextResponse.json(
         {
-          error: "Audio transcription failed with all models: " + lastErrText,
+          error: 'Audio transcription failed with all models: ' + lastErrText,
         },
         { status: 500 }
       );
     }
 
     // Check multiple possible locations for the response text
-    const transcription = 
+    const transcription =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       data?.candidates?.[0]?.output ||
-      data?.candidates?.[0]?.text || "";
+      data?.candidates?.[0]?.text ||
+      '';
 
     const cleanTranscription = transcription.trim();
 
@@ -149,16 +149,15 @@ export async function POST(request: NextRequest) {
       language,
     });
   } catch (error: any) {
-    console.error("Error transcribing audio:", error);
-    
+    console.error('Error transcribing audio:', error);
+
     // Return a user-friendly message if transcription fails
     return NextResponse.json(
       {
-        error: "Failed to transcribe audio",
+        error: 'Failed to transcribe audio',
         details: error.message,
       },
       { status: 500 }
     );
   }
 }
-

@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
-import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
+import Header from '@/components/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   simulateTreatment,
   WaterQualityParameters,
   TreatmentSimulationResult,
-} from "@/lib/treatmentLogic";
+} from '@/lib/treatmentLogic';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   CheckCircle2,
   XCircle,
@@ -36,7 +36,7 @@ import {
   Settings,
   FileText,
   RefreshCw,
-} from "lucide-react";
+} from 'lucide-react';
 
 function TreatmentDashboardContent() {
   const searchParams = useSearchParams();
@@ -47,12 +47,21 @@ function TreatmentDashboardContent() {
     null
   );
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Real-time monitoring state
   const [currentTurbidity, setCurrentTurbidity] = useState(12.5); // Example: starts above threshold
-  const [alerts, setAlerts] = useState<Array<{id: string, message: string, type: 'warning' | 'critical', timestamp: Date}>>([]);
+  const [alerts, setAlerts] = useState<
+    Array<{
+      id: string;
+      message: string;
+      type: 'warning' | 'critical';
+      timestamp: Date;
+    }>
+  >([]);
   const [isRealTimeMode, setIsRealTimeMode] = useState(true);
-  const [maintenanceLogs, setMaintenanceLogs] = useState<Array<{id: string, activity: string, timestamp: Date, operator: string}>>([]);
+  const [maintenanceLogs, setMaintenanceLogs] = useState<
+    Array<{ id: string; activity: string; timestamp: Date; operator: string }>
+  >([]);
 
   // Check for turbidity alerts
   useEffect(() => {
@@ -61,7 +70,7 @@ function TreatmentDashboardContent() {
         id: `turbidity-${Date.now()}`,
         message: `Turbidity Alert: ${currentTurbidity.toFixed(1)} NTU exceeds threshold of 10 NTU`,
         type: 'critical' as const,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
       setAlerts(prev => {
         // Avoid duplicate alerts
@@ -76,7 +85,7 @@ function TreatmentDashboardContent() {
   // Simulate real-time data updates
   useEffect(() => {
     if (!isRealTimeMode) return;
-    
+
     const interval = setInterval(() => {
       // Simulate turbidity fluctuations
       setCurrentTurbidity(prev => {
@@ -93,18 +102,20 @@ function TreatmentDashboardContent() {
   const handleFilterFlush = () => {
     // Reset turbidity to safe levels
     setCurrentTurbidity(8.5);
-    
+
     // Log maintenance activity
     const logEntry = {
       id: `maintenance-${Date.now()}`,
       activity: 'Primary Treatment Filter Flush',
       timestamp: new Date(),
-      operator: user?.organizationName || 'Unknown Operator'
+      operator: user?.organizationName || 'Unknown Operator',
     };
     setMaintenanceLogs(prev => [logEntry, ...prev]);
-    
+
     // Clear turbidity alerts
-    setAlerts(prev => prev.filter(alert => !alert.message.includes('Turbidity Alert')));
+    setAlerts(prev =>
+      prev.filter(alert => !alert.message.includes('Turbidity Alert'))
+    );
   };
 
   // Generate daily report
@@ -115,9 +126,9 @@ function TreatmentDashboardContent() {
       alerts: alerts.length,
       maintenanceActivities: maintenanceLogs.length,
       avgTurbidity: currentTurbidity,
-      status: currentTurbidity > 10 ? 'Action Required' : 'Normal Operation'
+      status: currentTurbidity > 10 ? 'Action Required' : 'Normal Operation',
     };
-    
+
     // In a real app, this would save to database or generate PDF
     console.log('Daily Report Generated:', report);
     alert('Daily report generated and saved to system logs');
@@ -127,20 +138,20 @@ function TreatmentDashboardContent() {
   const saveSimulationLog = async (
     params: WaterQualityParameters,
     result: TreatmentSimulationResult,
-    source: "simulation_page" | "iot_sensors" | "map_view",
+    source: 'simulation_page' | 'iot_sensors' | 'map_view',
     sourceName?: string
   ) => {
     if (!token) {
-      console.warn("No token available, skipping log save");
+      console.warn('No token available, skipping log save');
       return;
     }
 
     try {
       setIsSaving(true);
-      const response = await fetch("/api/simulation-logs/save", {
-        method: "POST",
+      const response = await fetch('/api/simulation-logs/save', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -155,12 +166,12 @@ function TreatmentDashboardContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error("Failed to save simulation log:", data.error);
+        console.error('Failed to save simulation log:', data.error);
       } else {
-        console.log("Simulation log saved successfully:", data.logId);
+        console.log('Simulation log saved successfully:', data.logId);
       }
     } catch (error) {
-      console.error("Error saving simulation log:", error);
+      console.error('Error saving simulation log:', error);
     } finally {
       setIsSaving(false);
     }
@@ -168,14 +179,14 @@ function TreatmentDashboardContent() {
 
   useEffect(() => {
     // Get parameters from URL
-    const turbidity = parseFloat(searchParams.get("turbidity") || "0");
-    const pH = parseFloat(searchParams.get("pH") || "7");
-    const cod = parseFloat(searchParams.get("cod") || "0");
-    const tds = parseFloat(searchParams.get("tds") || "0");
-    const nitrogen = parseFloat(searchParams.get("nitrogen") || "0");
-    const phosphorus = parseFloat(searchParams.get("phosphorus") || "0");
-    const reuseType = searchParams.get("reuseType") || undefined;
-    const sourceName = searchParams.get("sourceName") || undefined;
+    const turbidity = parseFloat(searchParams.get('turbidity') || '0');
+    const pH = parseFloat(searchParams.get('pH') || '7');
+    const cod = parseFloat(searchParams.get('cod') || '0');
+    const tds = parseFloat(searchParams.get('tds') || '0');
+    const nitrogen = parseFloat(searchParams.get('nitrogen') || '0');
+    const phosphorus = parseFloat(searchParams.get('phosphorus') || '0');
+    const reuseType = searchParams.get('reuseType') || undefined;
+    const sourceName = searchParams.get('sourceName') || undefined;
 
     const params: WaterQualityParameters = {
       turbidity,
@@ -195,19 +206,19 @@ function TreatmentDashboardContent() {
     // Persist latest simulation context for Analytics page AI generation
     try {
       const payload = { parameters: params, simulationResult: result };
-      localStorage.setItem("lastSimulationContext", JSON.stringify(payload));
+      localStorage.setItem('lastSimulationContext', JSON.stringify(payload));
     } catch {}
 
     // Determine the source of the simulation
     // If sourceName is present, it's either from map or IoT sensors
-    let source: "simulation_page" | "iot_sensors" | "map_view" =
-      "simulation_page";
+    let source: 'simulation_page' | 'iot_sensors' | 'map_view' =
+      'simulation_page';
     if (sourceName) {
       // Check if it contains "Lake" - likely from map or IoT
-      if (sourceName.includes("Lake")) {
+      if (sourceName.includes('Lake')) {
         // Check if there's sensor data patterns to differentiate
         // For now, we'll use map_view as default when sourceName is present
-        source = "map_view";
+        source = 'map_view';
       }
     }
 
@@ -227,24 +238,24 @@ function TreatmentDashboardContent() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "safe":
-        return "text-green-500";
-      case "needs-treatment":
-        return "text-yellow-500";
-      case "critical":
-        return "text-red-500";
+      case 'safe':
+        return 'text-green-500';
+      case 'needs-treatment':
+        return 'text-yellow-500';
+      case 'critical':
+        return 'text-red-500';
       default:
-        return "text-gray-500";
+        return 'text-gray-500';
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "safe":
+      case 'safe':
         return <Badge className="bg-green-500">Safe</Badge>;
-      case "needs-treatment":
+      case 'needs-treatment':
         return <Badge className="bg-yellow-500">Needs Treatment</Badge>;
-      case "critical":
+      case 'critical':
         return <Badge className="bg-red-500">Critical</Badge>;
       default:
         return <Badge>Unknown</Badge>;
@@ -253,11 +264,11 @@ function TreatmentDashboardContent() {
 
   const getTreatmentIcon = (stageName: string) => {
     switch (stageName) {
-      case "Primary Treatment":
+      case 'Primary Treatment':
         return <Filter className="h-6 w-6" />;
-      case "Secondary Treatment":
+      case 'Secondary Treatment':
         return <Beaker className="h-6 w-6" />;
-      case "Tertiary Treatment":
+      case 'Tertiary Treatment':
         return <Sparkles className="h-6 w-6" />;
       default:
         return <Droplets className="h-6 w-6" />;
@@ -278,7 +289,7 @@ function TreatmentDashboardContent() {
             className="text-center mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Plant Operator{" "}
+              Plant Operator{' '}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Dashboard
               </span>
@@ -288,7 +299,9 @@ function TreatmentDashboardContent() {
             </p>
             <div className="flex items-center justify-center gap-4">
               {getStatusBadge(simulationResult.overallStatus)}
-              <Badge className={`${isRealTimeMode ? 'bg-green-500' : 'bg-gray-500'} flex items-center gap-1`}>
+              <Badge
+                className={`${isRealTimeMode ? 'bg-green-500' : 'bg-gray-500'} flex items-center gap-1`}
+              >
                 <Activity className="h-3 w-3" />
                 {isRealTimeMode ? 'Live' : 'Paused'}
               </Badge>
@@ -304,7 +317,9 @@ function TreatmentDashboardContent() {
           >
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Turbidity Monitor */}
-              <Card className={`${currentTurbidity > 10 ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'} backdrop-blur-lg`}>
+              <Card
+                className={`${currentTurbidity > 10 ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'} backdrop-blur-lg`}
+              >
                 <CardHeader className="pb-2">
                   <CardTitle className="text-white flex items-center gap-2 text-sm">
                     <Droplets className="h-4 w-4" />
@@ -322,7 +337,9 @@ function TreatmentDashboardContent() {
                     ) : (
                       <Badge className="bg-green-500 text-white">Normal</Badge>
                     )}
-                    <span className="text-xs text-white/60">Threshold: 10 NTU</span>
+                    <span className="text-xs text-white/60">
+                      Threshold: 10 NTU
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -392,8 +409,11 @@ function TreatmentDashboardContent() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {alerts.map((alert) => (
-                      <Alert key={alert.id} className="bg-red-500/20 border-red-500/40">
+                    {alerts.map(alert => (
+                      <Alert
+                        key={alert.id}
+                        className="bg-red-500/20 border-red-500/40"
+                      >
                         <AlertTriangle className="h-4 w-4 text-red-400" />
                         <AlertDescription className="text-white">
                           <div className="flex justify-between items-center">
@@ -431,7 +451,9 @@ function TreatmentDashboardContent() {
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="space-y-4">
-                    <h4 className="text-white font-semibold">Primary Treatment</h4>
+                    <h4 className="text-white font-semibold">
+                      Primary Treatment
+                    </h4>
                     <Button
                       onClick={handleFilterFlush}
                       disabled={currentTurbidity <= 10}
@@ -441,7 +463,9 @@ function TreatmentDashboardContent() {
                       Flush Filter
                     </Button>
                     <p className="text-xs text-white/60">
-                      {currentTurbidity <= 10 ? 'Filter operating normally' : 'Filter flush recommended'}
+                      {currentTurbidity <= 10
+                        ? 'Filter operating normally'
+                        : 'Filter flush recommended'}
                     </p>
                   </div>
 
@@ -456,7 +480,9 @@ function TreatmentDashboardContent() {
                       {isRealTimeMode ? 'Pause Updates' : 'Resume Updates'}
                     </Button>
                     <p className="text-xs text-white/60">
-                      {isRealTimeMode ? 'Real-time data enabled' : 'Data updates paused'}
+                      {isRealTimeMode
+                        ? 'Real-time data enabled'
+                        : 'Data updates paused'}
                     </p>
                   </div>
 
@@ -495,11 +521,18 @@ function TreatmentDashboardContent() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {maintenanceLogs.slice(0, 5).map((log) => (
-                      <div key={log.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    {maintenanceLogs.slice(0, 5).map(log => (
+                      <div
+                        key={log.id}
+                        className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg"
+                      >
                         <div>
-                          <p className="text-white font-medium">{log.activity}</p>
-                          <p className="text-white/60 text-sm">Operator: {log.operator}</p>
+                          <p className="text-white font-medium">
+                            {log.activity}
+                          </p>
+                          <p className="text-white/60 text-sm">
+                            Operator: {log.operator}
+                          </p>
                         </div>
                         <span className="text-white/60 text-sm">
                           {log.timestamp.toLocaleTimeString()}
@@ -600,7 +633,7 @@ function TreatmentDashboardContent() {
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 rounded-full mb-4">
                     <Sparkles className="h-5 w-5 text-cyan-400 animate-pulse" />
                     <span className="text-cyan-400 font-semibold text-sm uppercase tracking-wider">
-                      What's Next?
+                      What&apos;s Next?
                     </span>
                   </div>
                   <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
@@ -613,7 +646,7 @@ function TreatmentDashboardContent() {
 
                 <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                   <Button
-                    onClick={() => (window.location.href = "/reuse")}
+                    onClick={() => (window.location.href = '/reuse')}
                     className="group relative h-20 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 hover:from-emerald-600 hover:via-green-600 hover:to-teal-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 border-2 border-emerald-400/50"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
@@ -629,7 +662,7 @@ function TreatmentDashboardContent() {
                   </Button>
 
                   <Button
-                    onClick={() => (window.location.href = "/analytics")}
+                    onClick={() => (window.location.href = '/analytics')}
                     className="group relative h-20 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 border-2 border-cyan-400/50"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
@@ -664,8 +697,8 @@ function TreatmentDashboardContent() {
                 <Card
                   className={`${
                     stage.required
-                      ? "bg-red-500/10 border-red-500/30"
-                      : "bg-green-500/10 border-green-500/30"
+                      ? 'bg-red-500/10 border-red-500/30'
+                      : 'bg-green-500/10 border-green-500/30'
                   } backdrop-blur-lg`}
                 >
                   <CardHeader>
@@ -673,7 +706,7 @@ function TreatmentDashboardContent() {
                       <CardTitle className="text-white flex items-center gap-3">
                         <div
                           className={`p-3 rounded-lg ${
-                            stage.required ? "bg-red-500/20" : "bg-green-500/20"
+                            stage.required ? 'bg-red-500/20' : 'bg-green-500/20'
                           }`}
                         >
                           {getTreatmentIcon(stage.name)}
@@ -688,8 +721,8 @@ function TreatmentDashboardContent() {
                     </div>
                     <CardDescription className="text-white/70 text-base mt-2">
                       {stage.required
-                        ? "⚠️ Treatment Required"
-                        : "✓ Within Safe Limits"}
+                        ? '⚠️ Treatment Required'
+                        : '✓ Within Safe Limits'}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -718,8 +751,8 @@ function TreatmentDashboardContent() {
                           key={idx}
                           className={`p-4 rounded-lg ${
                             param.exceedsThreshold
-                              ? "bg-red-500/10 border border-red-500/30"
-                              : "bg-green-500/10 border border-green-500/30"
+                              ? 'bg-red-500/10 border border-red-500/30'
+                              : 'bg-green-500/10 border border-green-500/30'
                           }`}
                         >
                           <div className="flex items-center justify-between mb-2">
@@ -745,7 +778,7 @@ function TreatmentDashboardContent() {
                           </div>
                           {param.exceedsThreshold && (
                             <div className="mt-2 text-xs text-red-400 font-medium">
-                              Exceeds limit by{" "}
+                              Exceeds limit by{' '}
                               {(
                                 (param.value / param.threshold - 1) *
                                 100
@@ -788,9 +821,9 @@ function TreatmentDashboardContent() {
                   ) : (
                     <>
                       <p className="text-xl font-bold text-white">
-                        Initiate {simulationResult.totalStagesRequired}{" "}
+                        Initiate {simulationResult.totalStagesRequired}{' '}
                         treatment stage
-                        {simulationResult.totalStagesRequired > 1 ? "s" : ""}:
+                        {simulationResult.totalStagesRequired > 1 ? 's' : ''}:
                       </p>
                       <ul className="space-y-3">
                         {simulationResult.primaryTreatment.required && (
@@ -799,10 +832,10 @@ function TreatmentDashboardContent() {
                               →
                             </span>
                             <span className="text-white text-base">
-                              Start with{" "}
+                              Start with{' '}
                               <strong className="text-cyan-300">
                                 primary treatment
-                              </strong>{" "}
+                              </strong>{' '}
                               for physical removal of suspended solids
                             </span>
                           </li>
@@ -813,10 +846,10 @@ function TreatmentDashboardContent() {
                               →
                             </span>
                             <span className="text-white text-base">
-                              Proceed to{" "}
+                              Proceed to{' '}
                               <strong className="text-cyan-300">
                                 secondary treatment
-                              </strong>{" "}
+                              </strong>{' '}
                               for biological removal of organic matter
                             </span>
                           </li>
@@ -827,10 +860,10 @@ function TreatmentDashboardContent() {
                               →
                             </span>
                             <span className="text-white text-base">
-                              Complete with{" "}
+                              Complete with{' '}
                               <strong className="text-cyan-300">
                                 tertiary treatment
-                              </strong>{" "}
+                              </strong>{' '}
                               for nutrient removal and pH adjustment
                             </span>
                           </li>
@@ -838,13 +871,13 @@ function TreatmentDashboardContent() {
                       </ul>
                       <div className="mt-6 p-4 bg-slate-800/70 border border-slate-700 rounded-lg">
                         <p className="text-white text-base leading-relaxed">
-                          <strong className="text-cyan-300">📋 Note:</strong>{" "}
+                          <strong className="text-cyan-300">📋 Note:</strong>{' '}
                           Treatment stages should be executed sequentially for
-                          optimal results. Total estimated time:{" "}
+                          optimal results. Total estimated time:{' '}
                           <span className="font-bold text-cyan-300">
                             {simulationResult.estimatedTreatmentTime} hours
-                          </span>{" "}
-                          with{" "}
+                          </span>{' '}
+                          with{' '}
                           <span className="font-bold text-cyan-300">
                             {simulationResult.estimatedEfficiency}% efficiency
                           </span>

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,14 +11,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: "Plant Operator" | "Environmental Officer";
+  requiredRole?: 'Plant Operator' | 'Environmental Officer';
 }
 
-export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  requiredRole,
+}: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -31,7 +34,7 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
 
   const handleGoToHome = () => {
     setShowAuthDialog(false);
-    router.push("/");
+    router.push('/');
   };
 
   // Show loading state while checking authentication
@@ -79,7 +82,8 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   // Role-based check
   if (requiredRole && user && user.role !== requiredRole) {
     // Redirect based on role to the right home
-    const redirect = user.role === "Plant Operator" ? "/simulation" : "/analytics";
+    const redirect =
+      user.role === 'Plant Operator' ? '/simulation' : '/analytics';
     router.push(redirect);
     return null;
   }

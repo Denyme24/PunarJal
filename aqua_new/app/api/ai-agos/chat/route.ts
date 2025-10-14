@@ -1,10 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini API
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY || ""
-);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 // System context about PunarJal
 const SYSTEM_CONTEXT = `You are AI AGOS, an intelligent assistant for PunarJal - a Smart Wastewater Treatment System. 
@@ -73,23 +71,23 @@ Hospitals, Hotels, Restaurants, Manufacturing Industries, IT/Tech Companies, Edu
 
 // Language instructions for multilingual support
 const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
-  en: "Respond in clear, professional English using plain text only (no markdown formatting).",
-  hi: "कृपया अपना उत्तर सादे पाठ में हिंदी में दें। कोई मार्कडाउन फ़ॉर्मेटिंग का उपयोग न करें।",
-  mr: "कृपया आपले उत्तर साध्या मजकुरात मराठीत द्या. मार्कडाउन फॉरमॅटिंग वापरू नका.",
-  kn: "ದಯವಿಟ್ಟು ಸಾದಾ ಪಠ್ಯದಲ್ಲಿ ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರಿಸಿ. ಮಾರ್ಕ್‌ಡೌನ್ ಫಾರ್ಮ್ಯಾಟಿಂಗ್ ಬಳಸಬೇಡಿ.",
-  bn: "দয়া করে সরল পাঠ্যে বাংলায় উত্তর দিন। মার্কডাউন ফরম্যাটিং ব্যবহার করবেন না।",
-  ur: "براہ کرم سادہ متن میں اردو میں جواب دیں۔ مارک ڈاؤن فارمیٹنگ استعمال نہ کریں۔",
+  en: 'Respond in clear, professional English using plain text only (no markdown formatting).',
+  hi: 'कृपया अपना उत्तर सादे पाठ में हिंदी में दें। कोई मार्कडाउन फ़ॉर्मेटिंग का उपयोग न करें।',
+  mr: 'कृपया आपले उत्तर साध्या मजकुरात मराठीत द्या. मार्कडाउन फॉरमॅटिंग वापरू नका.',
+  kn: 'ದಯವಿಟ್ಟು ಸಾದಾ ಪಠ್ಯದಲ್ಲಿ ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರಿಸಿ. ಮಾರ್ಕ್‌ಡೌನ್ ಫಾರ್ಮ್ಯಾಟಿಂಗ್ ಬಳಸಬೇಡಿ.',
+  bn: 'দয়া করে সরল পাঠ্যে বাংলায় উত্তর দিন। মার্কডাউন ফরম্যাটিং ব্যবহার করবেন না।',
+  ur: 'براہ کرم سادہ متن میں اردو میں جواب دیں۔ مارک ڈاؤن فارمیٹنگ استعمال نہ کریں۔',
 };
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message, image, language = "en", history = [] } = body;
+    const { message, image, language = 'en', history = [] } = body;
 
     // Validate API key
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        { error: "Gemini API key not configured" },
+        { error: 'Gemini API key not configured' },
         { status: 500 }
       );
     }
@@ -109,39 +107,40 @@ export async function POST(request: NextRequest) {
     if (listResp.ok) {
       const listData = await listResp.json();
       availableModels = (listData?.models || [])
-        .filter((m: any) => 
-          m.supportedGenerationMethods?.includes("generateContent") &&
-          m.name?.includes("gemini")
+        .filter(
+          (m: any) =>
+            m.supportedGenerationMethods?.includes('generateContent') &&
+            m.name?.includes('gemini')
         )
-        .map((m: any) => m.name.replace("models/", ""));
+        .map((m: any) => m.name.replace('models/', ''));
     }
 
     // Fallback list if listing fails
     if (availableModels.length === 0) {
       availableModels = [
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro-latest", 
-        "gemini-1.5-pro",
-        "gemini-pro",
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro-latest',
+        'gemini-1.5-pro',
+        'gemini-pro',
       ];
     }
 
     // Build conversation history for context
     let conversationContext = `${SYSTEM_CONTEXT}\n\n${languageInstruction}\n\n`;
-    
+
     // Add recent history (last 5 exchanges)
     const recentHistory = history.slice(-10);
     if (recentHistory.length > 0) {
-      conversationContext += "Previous conversation:\n";
+      conversationContext += 'Previous conversation:\n';
       recentHistory.forEach((msg: any) => {
-        if (msg.role === "user") {
+        if (msg.role === 'user') {
           conversationContext += `User: ${msg.content}\n`;
-        } else if (msg.role === "assistant") {
+        } else if (msg.role === 'assistant') {
           conversationContext += `Assistant: ${msg.content}\n`;
         }
       });
-      conversationContext += "\n";
+      conversationContext += '\n';
     }
 
     // Prepare the prompt
@@ -152,22 +151,22 @@ export async function POST(request: NextRequest) {
 
     // Generate response using direct fetch approach
     let data: any | null = null;
-    let lastErrText = "";
+    let lastErrText = '';
 
     // Try both v1 and v1beta endpoints
-    const apiVersions = ["v1", "v1beta"];
+    const apiVersions = ['v1', 'v1beta'];
 
     for (const version of apiVersions) {
       for (const model of availableModels) {
         try {
           let requestBody: any;
-          
+
           if (image) {
             // Handle image input
-            const imageData = image.split(",")[1]; // Remove data:image/xxx;base64, prefix
+            const imageData = image.split(',')[1]; // Remove data:image/xxx;base64, prefix
             const mimeType = image.substring(
-              image.indexOf(":") + 1,
-              image.indexOf(";")
+              image.indexOf(':') + 1,
+              image.indexOf(';')
             );
 
             const imagePrompt = message
@@ -177,7 +176,7 @@ export async function POST(request: NextRequest) {
             requestBody = {
               contents: [
                 {
-                  role: "user",
+                  role: 'user',
                   parts: [
                     { text: imagePrompt },
                     {
@@ -199,7 +198,7 @@ export async function POST(request: NextRequest) {
             requestBody = {
               contents: [
                 {
-                  role: "user",
+                  role: 'user',
                   parts: [{ text: prompt }],
                 },
               ],
@@ -213,8 +212,8 @@ export async function POST(request: NextRequest) {
           const resp = await fetch(
             `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
             {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(requestBody),
             }
           );
@@ -237,9 +236,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "All Gemini model fallbacks failed. Available models: " +
-            availableModels.join(", ") +
-            ". Last error: " +
+            'All Gemini model fallbacks failed. Available models: ' +
+            availableModels.join(', ') +
+            '. Last error: ' +
             lastErrText,
         },
         { status: 500 }
@@ -247,7 +246,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check multiple possible locations for the response text
-    const text = 
+    const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       data?.candidates?.[0]?.output ||
       data?.candidates?.[0]?.text;
@@ -257,14 +256,13 @@ export async function POST(request: NextRequest) {
       language,
     });
   } catch (error: any) {
-    console.error("Error in AI chat:", error);
+    console.error('Error in AI chat:', error);
     return NextResponse.json(
       {
-        error: "Failed to generate response",
+        error: 'Failed to generate response',
         details: error.message,
       },
       { status: 500 }
     );
   }
 }
-

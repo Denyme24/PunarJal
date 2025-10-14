@@ -6,7 +6,7 @@ const nextConfig = {
   // Enable experimental features if needed
   experimental: {
     serverActions: {
-      bodySizeLimit: "2mb",
+      bodySizeLimit: '2mb',
     },
   },
 };

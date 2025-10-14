@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import AuthModal from "./AuthModal";
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import AuthModal from './AuthModal';
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -14,7 +14,7 @@ const HeroSection = () => {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"],
+    offset: ['start start', 'end start'],
   });
 
   // Fade out hero as user scrolls
@@ -23,11 +23,11 @@ const HeroSection = () => {
 
   const handleStartSimulation = () => {
     if (isAuthenticated) {
-      router.push("/simulation");
+      router.push('/simulation');
     } else {
       // Add a small delay for smooth transition
       setTimeout(() => {
-        router.push("/onboarding");
+        router.push('/onboarding');
       }, 100);
     }
   };
@@ -66,7 +66,7 @@ const HeroSection = () => {
               duration: Math.random() * 3 + 2,
               repeat: Infinity,
               delay: Math.random() * 2,
-              ease: "easeOut",
+              ease: 'easeOut',
             }}
           />
         ))}
@@ -83,7 +83,7 @@ const HeroSection = () => {
           transition={{
             duration: 1,
             delay: 0.2,
-            type: "spring",
+            type: 'spring',
             stiffness: 60,
           }}
           className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance leading-[1.15] tracking-tight"
@@ -100,9 +100,9 @@ const HeroSection = () => {
             className="block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-2xl"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.5, type: "spring" }}
+            transition={{ duration: 0.8, delay: 0.5, type: 'spring' }}
             style={{
-              textShadow: "0 0 30px rgba(52, 211, 153, 0.3)",
+              textShadow: '0 0 30px rgba(52, 211, 153, 0.3)',
             }}
           >
             Wastewater Treatment

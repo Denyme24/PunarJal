@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { WaterSource } from "@/lib/waterSourcesData";
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { WaterSource } from '@/lib/waterSourcesData';
 
 // Fix for default marker icons in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
 // Custom marker icons based on quality
-const createCustomIcon = (quality: "safe" | "attention" | "critical") => {
+const createCustomIcon = (quality: 'safe' | 'attention' | 'critical') => {
   const colors = {
-    safe: "#10b981", // green
-    attention: "#f59e0b", // amber
-    critical: "#ef4444", // red
+    safe: '#10b981', // green
+    attention: '#f59e0b', // amber
+    critical: '#ef4444', // red
   };
 
   const svgIcon = `
@@ -34,7 +34,7 @@ const createCustomIcon = (quality: "safe" | "attention" | "critical") => {
 
   return L.divIcon({
     html: svgIcon,
-    className: "custom-marker",
+    className: 'custom-marker',
     iconSize: [32, 42],
     iconAnchor: [16, 42],
     popupAnchor: [0, -42],
@@ -84,7 +84,7 @@ export default function WaterSourcesMap({
     <MapContainer
       center={center}
       zoom={13}
-      style={{ height: "100%", width: "100%", borderRadius: "0.5rem" }}
+      style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
       className="z-0"
     >
       <MapController center={center} />
@@ -92,7 +92,7 @@ export default function WaterSourcesMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {waterSources.map((source) => (
+      {waterSources.map(source => (
         <Marker
           key={source.id}
           position={source.coordinates}

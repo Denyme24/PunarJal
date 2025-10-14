@@ -28,7 +28,7 @@ export interface TreatmentSimulationResult {
   primaryTreatment: TreatmentStage;
   secondaryTreatment: TreatmentStage;
   tertiaryTreatment: TreatmentStage;
-  overallStatus: "safe" | "needs-treatment" | "critical";
+  overallStatus: 'safe' | 'needs-treatment' | 'critical';
   totalStagesRequired: number;
   estimatedTreatmentTime: number; // in hours
   estimatedEfficiency: number; // percentage
@@ -68,132 +68,141 @@ function estimateBOD(cod: number): number {
 function checkPrimaryTreatment(params: WaterQualityParameters): TreatmentStage {
   const tss = params.tss || estimateTSS(params.turbidity);
   const reasons: string[] = [];
-  const parameters: TreatmentStage["parameters"] = [];
+  const parameters: TreatmentStage['parameters'] = [];
 
   const turbidityExceeds = params.turbidity > THRESHOLDS.PRIMARY.TURBIDITY;
   const tssExceeds = tss > THRESHOLDS.PRIMARY.TSS;
 
   if (turbidityExceeds) {
-    reasons.push("High turbidity detected - physical screening and sedimentation needed");
+    reasons.push(
+      'High turbidity detected - physical screening and sedimentation needed'
+    );
   }
   if (tssExceeds) {
-    reasons.push("High suspended solids - requires removal of large particles");
+    reasons.push('High suspended solids - requires removal of large particles');
   }
 
   parameters.push(
     {
-      name: "Turbidity",
+      name: 'Turbidity',
       value: params.turbidity,
       threshold: THRESHOLDS.PRIMARY.TURBIDITY,
-      unit: "NTU",
+      unit: 'NTU',
       exceedsThreshold: turbidityExceeds,
     },
     {
-      name: "Total Suspended Solids",
+      name: 'Total Suspended Solids',
       value: tss,
       threshold: THRESHOLDS.PRIMARY.TSS,
-      unit: "mg/L",
+      unit: 'mg/L',
       exceedsThreshold: tssExceeds,
     }
   );
 
   return {
-    name: "Primary Treatment",
+    name: 'Primary Treatment',
     required: turbidityExceeds || tssExceeds,
-    reason: reasons.length > 0 ? reasons : ["No primary treatment needed"],
+    reason: reasons.length > 0 ? reasons : ['No primary treatment needed'],
     parameters,
   };
 }
 
 // Check if secondary treatment is required
-function checkSecondaryTreatment(params: WaterQualityParameters): TreatmentStage {
+function checkSecondaryTreatment(
+  params: WaterQualityParameters
+): TreatmentStage {
   const bod = params.bod || estimateBOD(params.cod);
   const reasons: string[] = [];
-  const parameters: TreatmentStage["parameters"] = [];
+  const parameters: TreatmentStage['parameters'] = [];
 
   const codExceeds = params.cod > THRESHOLDS.SECONDARY.COD;
   const bodExceeds = bod > THRESHOLDS.SECONDARY.BOD;
 
   if (codExceeds) {
-    reasons.push("High COD levels - biological treatment required");
+    reasons.push('High COD levels - biological treatment required');
   }
   if (bodExceeds) {
-    reasons.push("High BOD levels - aerobic/anaerobic digestion needed");
+    reasons.push('High BOD levels - aerobic/anaerobic digestion needed');
   }
 
   parameters.push(
     {
-      name: "Chemical Oxygen Demand",
+      name: 'Chemical Oxygen Demand',
       value: params.cod,
       threshold: THRESHOLDS.SECONDARY.COD,
-      unit: "mg/L",
+      unit: 'mg/L',
       exceedsThreshold: codExceeds,
     },
     {
-      name: "Biological Oxygen Demand",
+      name: 'Biological Oxygen Demand',
       value: bod,
       threshold: THRESHOLDS.SECONDARY.BOD,
-      unit: "mg/L",
+      unit: 'mg/L',
       exceedsThreshold: bodExceeds,
     }
   );
 
   return {
-    name: "Secondary Treatment",
+    name: 'Secondary Treatment',
     required: codExceeds || bodExceeds,
-    reason: reasons.length > 0 ? reasons : ["No secondary treatment needed"],
+    reason: reasons.length > 0 ? reasons : ['No secondary treatment needed'],
     parameters,
   };
 }
 
 // Check if tertiary treatment is required
-function checkTertiaryTreatment(params: WaterQualityParameters): TreatmentStage {
+function checkTertiaryTreatment(
+  params: WaterQualityParameters
+): TreatmentStage {
   const reasons: string[] = [];
-  const parameters: TreatmentStage["parameters"] = [];
+  const parameters: TreatmentStage['parameters'] = [];
 
   const nitrogenExceeds = params.nitrogen > THRESHOLDS.TERTIARY.NITROGEN;
   const phosphorusExceeds = params.phosphorus > THRESHOLDS.TERTIARY.PHOSPHORUS;
   const pHOutOfRange =
-    params.pH < THRESHOLDS.TERTIARY.PH_MIN || params.pH > THRESHOLDS.TERTIARY.PH_MAX;
+    params.pH < THRESHOLDS.TERTIARY.PH_MIN ||
+    params.pH > THRESHOLDS.TERTIARY.PH_MAX;
 
   if (nitrogenExceeds) {
-    reasons.push("High nitrogen levels - nitrification/denitrification required");
+    reasons.push(
+      'High nitrogen levels - nitrification/denitrification required'
+    );
   }
   if (phosphorusExceeds) {
-    reasons.push("High phosphorus levels - chemical precipitation needed");
+    reasons.push('High phosphorus levels - chemical precipitation needed');
   }
   if (pHOutOfRange) {
-    reasons.push("pH adjustment required for optimal discharge");
+    reasons.push('pH adjustment required for optimal discharge');
   }
 
   parameters.push(
     {
-      name: "Total Nitrogen",
+      name: 'Total Nitrogen',
       value: params.nitrogen,
       threshold: THRESHOLDS.TERTIARY.NITROGEN,
-      unit: "mg/L",
+      unit: 'mg/L',
       exceedsThreshold: nitrogenExceeds,
     },
     {
-      name: "Total Phosphorus",
+      name: 'Total Phosphorus',
       value: params.phosphorus,
       threshold: THRESHOLDS.TERTIARY.PHOSPHORUS,
-      unit: "mg/L",
+      unit: 'mg/L',
       exceedsThreshold: phosphorusExceeds,
     },
     {
-      name: "pH Level",
+      name: 'pH Level',
       value: params.pH,
       threshold: THRESHOLDS.TERTIARY.PH_MIN,
-      unit: "",
+      unit: '',
       exceedsThreshold: pHOutOfRange,
     }
   );
 
   return {
-    name: "Tertiary Treatment",
+    name: 'Tertiary Treatment',
     required: nitrogenExceeds || phosphorusExceeds || pHOutOfRange,
-    reason: reasons.length > 0 ? reasons : ["No tertiary treatment needed"],
+    reason: reasons.length > 0 ? reasons : ['No tertiary treatment needed'],
     parameters,
   };
 }
@@ -229,12 +238,12 @@ function determineOverallStatus(
   primary: boolean,
   secondary: boolean,
   tertiary: boolean
-): "safe" | "needs-treatment" | "critical" {
+): 'safe' | 'needs-treatment' | 'critical' {
   const stagesRequired = [primary, secondary, tertiary].filter(Boolean).length;
-  
-  if (stagesRequired === 0) return "safe";
-  if (stagesRequired <= 2) return "needs-treatment";
-  return "critical";
+
+  if (stagesRequired === 0) return 'safe';
+  if (stagesRequired <= 2) return 'needs-treatment';
+  return 'critical';
 }
 
 // Main function to simulate treatment requirements
@@ -284,4 +293,3 @@ export function simulateTreatment(
 
 // Export thresholds for reference
 export { THRESHOLDS };
-

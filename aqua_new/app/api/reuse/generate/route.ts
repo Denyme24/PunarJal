@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/mongodb";
-import SimulationLog from "@/models/SimulationLog";
+import { NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/mongodb';
+import SimulationLog from '@/models/SimulationLog';
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (!treatedWaterQuality) {
       return NextResponse.json(
-        { error: "treatedWaterQuality is required" },
+        { error: 'treatedWaterQuality is required' },
         { status: 400 }
       );
     }
@@ -18,24 +18,26 @@ export async function POST(request: Request) {
     // Try to get historical simulation data
     let historicalData: any[] = [];
     let historicalStats: any = {};
-    
+
     try {
-      const authHeader = request.headers.get("authorization");
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        const token = authHeader.split(" ")[1];
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
         const decoded = verifyToken(token);
-        
+
         if (decoded && decoded.id) {
           // Connect to database and fetch historical logs
           await connectDB();
-          
+
           // Get last 20 simulations for this user
           // @ts-ignore - Mongoose type inference issue with find overloads
           const logs = await SimulationLog.find({ userId: decoded.id })
             .sort({ timestamp: -1 })
             .limit(20)
-            .select("inputParameters simulationResult timestamp source sourceName");
-          
+            .select(
+              'inputParameters simulationResult timestamp source sourceName'
+            );
+
           historicalData = logs.map((log: any) => ({
             date: new Date(log.timestamp).toISOString().split('T')[0],
             parameters: log.inputParameters,
@@ -48,15 +50,21 @@ export async function POST(request: Request) {
             source: log.source,
             sourceName: log.sourceName,
           }));
-          
+
           // Calculate statistics
           if (logs.length > 0) {
             historicalStats = {
               totalSimulations: logs.length,
-              averageEfficiency: (logs.reduce((sum: number, log: any) => 
-                sum + (log.simulationResult?.estimatedEfficiency || 0), 0) / logs.length).toFixed(1),
+              averageEfficiency: (
+                logs.reduce(
+                  (sum: number, log: any) =>
+                    sum + (log.simulationResult?.estimatedEfficiency || 0),
+                  0
+                ) / logs.length
+              ).toFixed(1),
               mostCommonReuseType: logs.reduce((acc: any, log: any) => {
-                const reuseType = log.inputParameters?.reuseType || 'not specified';
+                const reuseType =
+                  log.inputParameters?.reuseType || 'not specified';
                 acc[reuseType] = (acc[reuseType] || 0) + 1;
                 return acc;
               }, {}),
@@ -65,16 +73,16 @@ export async function POST(request: Request) {
         }
       }
     } catch (error) {
-      console.error("Error fetching historical data:", error);
+      console.error('Error fetching historical data:', error);
       // Continue without historical data
     }
 
     const apiKey =
-      process.env.GEMINI_API_KEY ||
-      process.env.GOOGLE_GENAI_API_KEY;
+      process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
 
-    const historicalContext = historicalData.length > 0 
-      ? `
+    const historicalContext =
+      historicalData.length > 0
+        ? `
 
 HISTORICAL SIMULATION DATA (Last ${historicalData.length} simulations from database):
 ${JSON.stringify(historicalData, null, 2)}
@@ -87,7 +95,7 @@ IMPORTANT: Use this historical data to provide personalized reuse recommendation
 - Common reuse types chosen by this user
 - Historical water quality parameters
 - Typical treatment outcomes`
-      : `
+        : `
 
 NOTE: This is the first simulation or no historical data available. Provide general recommendations based on the treated water quality.`;
 
@@ -155,39 +163,40 @@ Be specific, accurate, and base all recommendations on actual water quality para
     if (listResp.ok) {
       const listData = await listResp.json();
       availableModels = (listData?.models || [])
-        .filter((m: any) => 
-          m.supportedGenerationMethods?.includes("generateContent") &&
-          m.name?.includes("gemini")
+        .filter(
+          (m: any) =>
+            m.supportedGenerationMethods?.includes('generateContent') &&
+            m.name?.includes('gemini')
         )
-        .map((m: any) => m.name.replace("models/", ""));
+        .map((m: any) => m.name.replace('models/', ''));
     }
 
     if (availableModels.length === 0) {
       availableModels = [
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro-latest",
-        "gemini-1.5-pro",
-        "gemini-pro",
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro-latest',
+        'gemini-1.5-pro',
+        'gemini-pro',
       ];
     }
 
     let data: any | null = null;
-    let lastErrText = "";
+    let lastErrText = '';
 
-    const apiVersions = ["v1", "v1beta"];
+    const apiVersions = ['v1', 'v1beta'];
 
     for (const version of apiVersions) {
       for (const model of availableModels) {
         const resp = await fetch(
           `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
           {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [
                 {
-                  role: "user",
+                  role: 'user',
                   parts: [{ text: prompt }],
                 },
               ],
@@ -213,25 +222,26 @@ Be specific, accurate, and base all recommendations on actual water quality para
       return NextResponse.json(
         {
           error:
-            "All Gemini model fallbacks failed. Available models: " +
-            availableModels.join(", ") +
-            ". Last error: " +
+            'All Gemini model fallbacks failed. Available models: ' +
+            availableModels.join(', ') +
+            '. Last error: ' +
             lastErrText,
         },
         { status: 500 }
       );
     }
 
-    let text = 
+    const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       data?.candidates?.[0]?.output ||
       data?.candidates?.[0]?.text;
 
     if (!text) {
       return NextResponse.json(
-        { 
-          error: "Gemini returned empty response. Finish reason: " + 
-                 (data?.candidates?.[0]?.finishReason || "unknown")
+        {
+          error:
+            'Gemini returned empty response. Finish reason: ' +
+            (data?.candidates?.[0]?.finishReason || 'unknown'),
         },
         { status: 500 }
       );
@@ -240,152 +250,151 @@ Be specific, accurate, and base all recommendations on actual water quality para
     let parsed;
     try {
       let jsonText = text.trim();
-      
-      if (jsonText.startsWith("```json")) {
-        jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
-      } else if (jsonText.startsWith("```")) {
-        jsonText = jsonText.replace(/^```\s*/, "").replace(/```\s*$/, "");
+
+      if (jsonText.startsWith('```json')) {
+        jsonText = jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '');
+      } else if (jsonText.startsWith('```')) {
+        jsonText = jsonText.replace(/^```\s*/, '').replace(/```\s*$/, '');
       }
-      
+
       parsed = JSON.parse(jsonText);
     } catch (e) {
       // Fallback data
       parsed = {
         reuseOptions: [
           {
-            id: "irrigation",
-            name: "Agricultural Irrigation",
-            icon: "Sprout",
+            id: 'irrigation',
+            name: 'Agricultural Irrigation',
+            icon: 'Sprout',
             suitable: true,
             confidence: 95,
             requirements: [
-              "Turbidity < 5 NTU ✓",
-              "pH 6.5-8.5 ✓",
-              "COD < 100 mg/L ✓",
-              "Nitrogen acceptable ✓"
+              'Turbidity < 5 NTU ✓',
+              'pH 6.5-8.5 ✓',
+              'COD < 100 mg/L ✓',
+              'Nitrogen acceptable ✓',
             ],
             benefits: [
-              "Reduces freshwater consumption",
-              "Provides nutrients to crops",
-              "Cost-effective solution",
-              "Environmentally sustainable"
-            ]
+              'Reduces freshwater consumption',
+              'Provides nutrients to crops',
+              'Cost-effective solution',
+              'Environmentally sustainable',
+            ],
           },
           {
-            id: "industrial",
-            name: "Industrial Process Water",
-            icon: "Factory",
+            id: 'industrial',
+            name: 'Industrial Process Water',
+            icon: 'Factory',
             suitable: true,
             confidence: 88,
             requirements: [
-              "TDS < 500 mg/L ✓",
-              "pH controlled ✓",
-              "Low organic content ✓"
+              'TDS < 500 mg/L ✓',
+              'pH controlled ✓',
+              'Low organic content ✓',
             ],
             benefits: [
-              "Suitable for cooling systems",
-              "Can be used in manufacturing",
-              "Reduces industrial water costs",
-              "Meets process water standards"
-            ]
+              'Suitable for cooling systems',
+              'Can be used in manufacturing',
+              'Reduces industrial water costs',
+              'Meets process water standards',
+            ],
           },
           {
-            id: "landscape",
-            name: "Landscape Irrigation",
-            icon: "Sprout",
+            id: 'landscape',
+            name: 'Landscape Irrigation',
+            icon: 'Sprout',
             suitable: true,
             confidence: 98,
             requirements: [
-              "Turbidity < 5 NTU ✓",
-              "Basic disinfection ✓",
-              "Visual clarity ✓"
+              'Turbidity < 5 NTU ✓',
+              'Basic disinfection ✓',
+              'Visual clarity ✓',
             ],
             benefits: [
-              "Perfect for parks and gardens",
-              "Maintains green spaces",
-              "No health risks",
-              "High water savings"
-            ]
+              'Perfect for parks and gardens',
+              'Maintains green spaces',
+              'No health risks',
+              'High water savings',
+            ],
           },
           {
-            id: "toilet",
-            name: "Toilet Flushing",
-            icon: "Toilet",
+            id: 'toilet',
+            name: 'Toilet Flushing',
+            icon: 'Toilet',
             suitable: true,
             confidence: 92,
             requirements: [
-              "Basic treatment completed ✓",
-              "Odor controlled ✓",
-              "Color acceptable ✓"
+              'Basic treatment completed ✓',
+              'Odor controlled ✓',
+              'Color acceptable ✓',
             ],
             benefits: [
-              "Significant water savings",
-              "Easy implementation",
-              "No human contact",
-              "Reduces sewage load"
-            ]
+              'Significant water savings',
+              'Easy implementation',
+              'No human contact',
+              'Reduces sewage load',
+            ],
           },
           {
-            id: "cooling",
-            name: "Cooling Tower Systems",
-            icon: "Wind",
+            id: 'cooling',
+            name: 'Cooling Tower Systems',
+            icon: 'Wind',
             suitable: true,
             confidence: 85,
             requirements: [
-              "TDS controlled ✓",
-              "pH balanced ✓",
-              "Low scaling potential ✓"
+              'TDS controlled ✓',
+              'pH balanced ✓',
+              'Low scaling potential ✓',
             ],
             benefits: [
-              "Industrial cooling applications",
-              "Energy efficiency maintained",
-              "Reduces cooling water demand"
+              'Industrial cooling applications',
+              'Energy efficiency maintained',
+              'Reduces cooling water demand',
             ],
             warnings: [
-              "Monitor for scaling regularly",
-              "May need additional treatment for specific systems"
-            ]
+              'Monitor for scaling regularly',
+              'May need additional treatment for specific systems',
+            ],
           },
           {
-            id: "potable",
-            name: "Potable Water (Drinking)",
-            icon: "Coffee",
+            id: 'potable',
+            name: 'Potable Water (Drinking)',
+            icon: 'Coffee',
             suitable: false,
             confidence: 45,
             requirements: [
-              "Turbidity < 1 NTU ✗",
-              "Advanced disinfection needed ✗",
-              "Complete nutrient removal ✗",
-              "Multiple quality checks required ✗"
+              'Turbidity < 1 NTU ✗',
+              'Advanced disinfection needed ✗',
+              'Complete nutrient removal ✗',
+              'Multiple quality checks required ✗',
             ],
             benefits: [
-              "Highest value water reuse",
-              "Complete water cycle closure"
+              'Highest value water reuse',
+              'Complete water cycle closure',
             ],
             warnings: [
-              "Requires additional tertiary treatment",
-              "Needs UV disinfection or chlorination",
-              "Regulatory approval required",
-              "Not recommended with current treatment level"
-            ]
-          }
+              'Requires additional tertiary treatment',
+              'Needs UV disinfection or chlorination',
+              'Regulatory approval required',
+              'Not recommended with current treatment level',
+            ],
+          },
         ],
         waterSavings: {
           daily: 1200,
           monthly: 36000,
           yearly: 432000,
           co2Reduced: 2.5,
-          energySaved: 1800
-        }
+          energySaved: 1800,
+        },
       };
     }
 
     return NextResponse.json({ data: parsed });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error?.message || "Unknown server error" },
+      { error: error?.message || 'Unknown server error' },
       { status: 500 }
     );
   }
 }
-
