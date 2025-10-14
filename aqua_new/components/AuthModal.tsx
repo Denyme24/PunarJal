@@ -82,6 +82,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     organizationEmail: "",
     organizationType: "",
     location: "",
+    role: "Plant Operator" as "Plant Operator" | "Environmental Officer",
     password: "",
     confirmPassword: "",
   });
@@ -114,6 +115,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           organizationEmail: formData.organizationEmail,
           organizationType: formData.organizationType,
           location: formData.location,
+              role: formData.role,
           password: formData.password,
         });
 
@@ -125,7 +127,13 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       }
 
       onClose();
-      router.push("/simulation");
+      // Role-based onboarding redirect
+      const next = isSignup
+        ? formData.role === "Plant Operator"
+          ? "/onboarding/plant-operator"
+          : "/onboarding/environmental-officer"
+        : "/simulation";
+      router.push(next);
     } catch (error: any) {
       toast.error(error.message || "An error occurred");
     } finally {
@@ -139,6 +147,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       organizationEmail: "",
       organizationType: "",
       location: "",
+      role: "Plant Operator",
       password: "",
       confirmPassword: "",
     });
@@ -197,6 +206,25 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                         {type}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="role">Role *</Label>
+                <Select
+                  value={formData.role}
+                  onValueChange={(value) =>
+                    handleChange("role", value)
+                  }
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Plant Operator">Plant Operator</SelectItem>
+                    <SelectItem value="Environmental Officer">Environmental Officer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

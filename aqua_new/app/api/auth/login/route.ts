@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
         organizationEmail: user.organizationEmail,
         organizationType: user.organizationType,
         location: user.location,
+        role: user.role,
         token,
       });
     } else {
