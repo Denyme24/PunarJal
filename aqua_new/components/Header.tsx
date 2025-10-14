@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Menu, X, LogOut, User, Bot } from "lucide-react";
+import { Menu, X, LogOut, User, Bot, Settings, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -26,12 +26,33 @@ const Header = () => {
     router.push("/");
   };
 
-  const navLinks = [
+  // Base navigation links
+  const baseNavLinks = [
     { href: "/map", label: "MAP VIEW" },
     { href: "/simulation", label: "SIMULATION" },
     { href: "/iot-sensors", label: "IOT SENSORS" },
     { href: "/ai-agos", label: "AI AGOS", icon: Bot },
   ];
+
+  // Role-specific navigation links
+  const getRoleSpecificLinks = () => {
+    if (!user) return [];
+    
+    if (user.role === "Plant Operator") {
+      return [
+        { href: "/treatment-dashboard", label: "OPERATOR DASHBOARD", icon: Settings },
+      ];
+    } else if (user.role === "Environmental Officer") {
+      return [
+        { href: "/analytics", label: "ANALYTICS", icon: TrendingUp },
+      ];
+    }
+    
+    return [];
+  };
+
+  // Combine base and role-specific links
+  const navLinks = [...baseNavLinks, ...getRoleSpecificLinks()];
 
   return (
     <motion.header
@@ -91,6 +112,9 @@ const Header = () => {
                       <p className="text-xs leading-none text-muted-foreground">
                         {user.organizationEmail}
                       </p>
+                      <p className="text-xs leading-none text-cyan-400 font-medium">
+                        {user.role}
+                      </p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -147,6 +171,9 @@ const Header = () => {
                   </p>
                   <p className="text-xs text-white/60">
                     {user.organizationEmail}
+                  </p>
+                  <p className="text-xs text-cyan-400 font-medium">
+                    {user.role}
                   </p>
                 </div>
                 <button
