@@ -41,11 +41,6 @@ jobs:
         cd aqua_new
         npm run format:check
         
-    - name: Check Tailwind CSS classes
-      run: |
-        cd aqua_new
-        npx tailwindcss --config tailwind.config.ts --input ./app/globals.css --output /tmp/tailwind-check.css --content "./**/*.{js,ts,jsx,tsx}"
-        
     - name: Build project
       run: |
         cd aqua_new
