@@ -21,8 +21,8 @@ export default function EnvironmentalOfficerOnboardingPage() {
 
         <div className="flex gap-3">
           <Link href="/analytics">
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white">
-              Continue to Analytics
+            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white text-lg px-8 py-3">
+              Start Analytics Dashboard
             </Button>
           </Link>
           <Link href="/map">

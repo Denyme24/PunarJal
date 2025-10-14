@@ -92,8 +92,8 @@ const Header = () => {
               })}
             </nav>
 
-            {/* User Menu */}
-            {isAuthenticated && user && (
+            {/* Authentication */}
+            {isAuthenticated && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -124,6 +124,22 @@ const Header = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => router.push("/onboarding")}
+                  variant="outline"
+                  className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => router.push("/onboarding")}
+                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+                >
+                  Sign Up
+                </Button>
+              </div>
             )}
           </div>
 
@@ -162,7 +178,7 @@ const Header = () => {
                 </Link>
               );
             })}
-            {isAuthenticated && user && (
+            {isAuthenticated && user ? (
               <>
                 <div className="px-4 py-3 border-t border-white/10 mt-2">
                   <p className="text-xs text-white/60 mb-1">Signed in as</p>
@@ -187,6 +203,28 @@ const Header = () => {
                   <span>Log out</span>
                 </button>
               </>
+            ) : (
+              <div className="px-4 py-3 border-t border-white/10 mt-2 space-y-2">
+                <Button
+                  onClick={() => {
+                    router.push("/onboarding");
+                    setMobileMenuOpen(false);
+                  }}
+                  variant="outline"
+                  className="w-full border-white/20 text-white hover:bg-white/10"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => {
+                    router.push("/onboarding");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+                >
+                  Sign Up
+                </Button>
+              </div>
             )}
           </motion.nav>
         )}

@@ -21,8 +21,8 @@ export default function PlantOperatorOnboardingPage() {
 
         <div className="flex gap-3">
           <Link href="/simulation">
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white">
-              Continue to Simulation
+            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white text-lg px-8 py-3">
+              Start Simulation
             </Button>
           </Link>
           <Link href="/treatment-dashboard">
