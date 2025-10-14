@@ -1,0 +1,52 @@
+name: Lint and Format Check
+
+on:
+  push:
+    branches: [ main, "*" ]
+  pull_request:
+    branches: [ main, "*" ]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'aqua_new/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        cd aqua_new
+        npm ci
+        
+    - name: Run ESLint
+      run: |
+        cd aqua_new
+        npm run lint
+        
+    - name: Check TypeScript types
+      run: |
+        cd aqua_new
+        npx tsc --noEmit
+        
+    - name: Check Prettier formatting
+      run: |
+        cd aqua_new
+        npm run format:check
+        
+    - name: Check Tailwind CSS classes
+      run: |
+        cd aqua_new
+        npx tailwindcss --config tailwind.config.ts --input ./app/globals.css --output /tmp/tailwind-check.css --content "./**/*.{js,ts,jsx,tsx}"
+        
+    - name: Build project
+      run: |
+        cd aqua_new
+        npm run build
