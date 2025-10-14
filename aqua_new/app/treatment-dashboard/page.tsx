@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   simulateTreatment,
   WaterQualityParameters,
@@ -33,11 +34,56 @@ import {
 
 export default function TreatmentDashboard() {
   const searchParams = useSearchParams();
+  const { token } = useAuth();
   const [simulationResult, setSimulationResult] =
     useState<TreatmentSimulationResult | null>(null);
   const [parameters, setParameters] = useState<WaterQualityParameters | null>(
     null
   );
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Function to save simulation log to database
+  const saveSimulationLog = async (
+    params: WaterQualityParameters,
+    result: TreatmentSimulationResult,
+    source: "simulation_page" | "iot_sensors" | "map_view",
+    sourceName?: string
+  ) => {
+    if (!token) {
+      console.warn("No token available, skipping log save");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      const response = await fetch("/api/simulation-logs/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          source,
+          sourceName,
+          inputParameters: params,
+          simulationResult: result,
+          sessionId: `session_${Date.now()}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to save simulation log:", data.error);
+      } else {
+        console.log("Simulation log saved successfully:", data.logId);
+      }
+    } catch (error) {
+      console.error("Error saving simulation log:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     // Get parameters from URL
@@ -47,6 +93,8 @@ export default function TreatmentDashboard() {
     const tds = parseFloat(searchParams.get("tds") || "0");
     const nitrogen = parseFloat(searchParams.get("nitrogen") || "0");
     const phosphorus = parseFloat(searchParams.get("phosphorus") || "0");
+    const reuseType = searchParams.get("reuseType") || undefined;
+    const sourceName = searchParams.get("sourceName") || undefined;
 
     const params: WaterQualityParameters = {
       turbidity,
@@ -68,7 +116,23 @@ export default function TreatmentDashboard() {
       const payload = { parameters: params, simulationResult: result };
       localStorage.setItem("lastSimulationContext", JSON.stringify(payload));
     } catch {}
-  }, [searchParams]);
+
+    // Determine the source of the simulation
+    // If sourceName is present, it's either from map or IoT sensors
+    let source: "simulation_page" | "iot_sensors" | "map_view" =
+      "simulation_page";
+    if (sourceName) {
+      // Check if it contains "Lake" - likely from map or IoT
+      if (sourceName.includes("Lake")) {
+        // Check if there's sensor data patterns to differentiate
+        // For now, we'll use map_view as default when sourceName is present
+        source = "map_view";
+      }
+    }
+
+    // Save simulation log to database
+    saveSimulationLog(params, result, source, sourceName);
+  }, [searchParams, token]);
 
   if (!simulationResult || !parameters) {
     return (
