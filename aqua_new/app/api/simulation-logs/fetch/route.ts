@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
-import SimulationLog from "@/models/SimulationLog";
+import SimulationLog, { ISimulationLog } from "@/models/SimulationLog";
 
 export async function GET(request: Request) {
   try {
@@ -33,14 +33,14 @@ export async function GET(request: Request) {
     const includeAll = searchParams.get("includeAll") === "true"; // Include all users' logs
 
     // Build query
-    const query: any = includeAll ? {} : { userId: decoded.id };
+    const query: Record<string, any> = includeAll ? {} : { userId: decoded.id };
     
     if (source && ["simulation_page", "iot_sensors", "map_view"].includes(source)) {
       query.source = source;
     }
 
     // Fetch simulation logs
-    const logs = await SimulationLog.find(query)
+    const logs = await (SimulationLog as any).find(query)
       .sort({ timestamp: -1 }) // Most recent first
       .limit(Math.min(limit, 100)) // Cap at 100
       .select("-__v") // Exclude version key

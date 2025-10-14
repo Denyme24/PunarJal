@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,20 +9,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
-    // List available models
-    const models = await genAI.listModels();
-    
-    const modelList = models.map((model: any) => ({
-      name: model.name,
-      displayName: model.displayName,
-      supportedGenerationMethods: model.supportedGenerationMethods,
-    }));
+    // Return available Gemini models that we know are supported
+    const availableModels = [
+      {
+        name: "gemini-1.5-flash",
+        displayName: "Gemini 1.5 Flash",
+        description: "Fast and efficient model for quick responses",
+        supportedGenerationMethods: ["generateContent"],
+      },
+      {
+        name: "gemini-1.5-pro",
+        displayName: "Gemini 1.5 Pro", 
+        description: "Advanced model for complex reasoning and analysis",
+        supportedGenerationMethods: ["generateContent"],
+      },
+      {
+        name: "gemini-1.0-pro",
+        displayName: "Gemini 1.0 Pro",
+        description: "Reliable model for general purpose tasks",
+        supportedGenerationMethods: ["generateContent"],
+      },
+    ];
 
     return NextResponse.json({
-      models: modelList,
-      count: modelList.length,
+      models: availableModels,
+      count: availableModels.length,
+      message: "Available Gemini models for PunarJal AI AGOS",
     });
   } catch (error: any) {
     console.error("Error listing models:", error);

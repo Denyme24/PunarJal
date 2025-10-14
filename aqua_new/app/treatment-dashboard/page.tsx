@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
@@ -38,7 +38,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-export default function TreatmentDashboard() {
+function TreatmentDashboardContent() {
   const searchParams = useSearchParams();
   const { token, user } = useAuth();
   const [simulationResult, setSimulationResult] =
@@ -860,5 +860,13 @@ export default function TreatmentDashboard() {
         </div>
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function TreatmentDashboard() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TreatmentDashboardContent />
+    </Suspense>
   );
 }
