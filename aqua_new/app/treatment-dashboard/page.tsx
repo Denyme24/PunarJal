@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   CheckCircle2,
   XCircle,
@@ -279,6 +280,70 @@ export default function TreatmentDashboard() {
               </Card>
             </motion.div>
           </div>
+
+          {/* Action Buttons - Prominent Position */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mb-12"
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/90 via-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
+              {/* Animated background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 animate-pulse"></div>
+
+              <div className="relative p-8">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 rounded-full mb-4">
+                    <Sparkles className="h-5 w-5 text-cyan-400 animate-pulse" />
+                    <span className="text-cyan-400 font-semibold text-sm uppercase tracking-wider">
+                      What's Next?
+                    </span>
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                    Explore Detailed Insights
+                  </h3>
+                  <p className="text-white/70 text-base">
+                    Get AI-powered recommendations and comprehensive analytics
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                  <Button
+                    onClick={() => (window.location.href = "/reuse")}
+                    className="group relative h-20 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 hover:from-emerald-600 hover:via-green-600 hover:to-teal-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 border-2 border-emerald-400/50"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                    <div className="relative flex items-center justify-center gap-3">
+                      <Droplets className="h-6 w-6 group-hover:animate-bounce" />
+                      <div className="text-left">
+                        <div className="text-lg font-bold">Reuse Options</div>
+                        <div className="text-xs text-white/90 font-normal">
+                          Water reuse recommendations
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => (window.location.href = "/analytics")}
+                    className="group relative h-20 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 border-2 border-cyan-400/50"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                    <div className="relative flex items-center justify-center gap-3">
+                      <TrendingUp className="h-6 w-6 group-hover:animate-bounce" />
+                      <div className="text-left">
+                        <div className="text-lg font-bold">Analytics</div>
+                        <div className="text-xs text-white/90 font-normal">
+                          Detailed performance insights
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Treatment Stages */}
           <div className="space-y-6">
