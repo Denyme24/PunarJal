@@ -96,9 +96,10 @@ const AboutSection = () => {
                 benefits both industry and environment.
               </p>
               <p className="text-lg text-white/80 leading-relaxed">
-                Through cutting-edge real-time monitoring, AI-driven analytics, and
-                automated treatment processes, we&apos;re making water reuse not
-                just possible, but profitable and environmentally responsible.
+                Through cutting-edge real-time monitoring, AI-driven analytics,
+                and automated treatment processes, we&apos;re making water reuse
+                not just possible, but profitable and environmentally
+                responsible.
               </p>
             </div>
 

@@ -3,24 +3,18 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Activity,
   Wifi,
-  WifiOff,
   TrendingUp,
   TrendingDown,
+  Minus,
   MapPin,
-  Droplets,
   Play,
+  Pause,
+  RefreshCw,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -29,425 +23,238 @@ import { useAuth } from '@/contexts/AuthContext';
 interface SensorData {
   id: string;
   name: string;
-  value: number;
+  currentValue: number;
   unit: string;
-  status: 'online' | 'offline';
-  threshold: { min: number; max: number };
+  status: 'Good' | 'Optimal' | 'Warning' | 'Critical';
   trend: 'up' | 'down' | 'stable';
-  history: number[];
-  location: string;
-  paramKey: 'turbidity' | 'pH' | 'cod' | 'tds' | 'nitrogen' | 'phosphorus';
+  range: string;
+  lastReadings: number[];
+  statusIcon: 'stable' | 'up' | 'down';
 }
 
 interface LocationData {
   name: string;
-  lakeName: string;
-  sensorCount: number;
+  displayName: string;
   status: 'active' | 'maintenance' | 'offline';
+  lastUpdate: string;
 }
 
 const IoTSensors = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState<string>('Hebbal');
-  const [allSensors, setAllSensors] = useState<SensorData[]>([
-    // Location 1 - Hebbal Lake (all 6 sensors matching simulation page)
+  const [isLive, setIsLive] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isProcessingSimulation, setIsProcessingSimulation] = useState(false);
+
+  const locations: LocationData[] = [
     {
-      id: 'turbidity-hebbal',
+      name: 'Hebbal',
+      displayName: 'Hebbal Lake',
+      status: 'active',
+      lastUpdate: '2 min ago',
+    },
+    {
+      name: 'Ulsoor',
+      displayName: 'Ulsoor Lake',
+      status: 'active',
+      lastUpdate: '3 min ago',
+    },
+    {
+      name: 'Bellandur',
+      displayName: 'Bellandur Lake',
+      status: 'maintenance',
+      lastUpdate: '1 hour ago',
+    },
+    {
+      name: 'Varthur',
+      displayName: 'Varthur Lake',
+      status: 'active',
+      lastUpdate: '1 min ago',
+    },
+    {
+      name: 'Agara',
+      displayName: 'Agara Lake',
+      status: 'offline',
+      lastUpdate: '2 hours ago',
+    },
+  ];
+
+  // Realistic sensor data with proper ranges and realistic values
+  const generateSensorData = (location: string): SensorData[] => [
+    {
+      id: 'turbidity',
       name: 'Turbidity Sensor',
-      value: 45.2,
+      currentValue: 45.9,
       unit: 'NTU',
-      status: 'online',
-      threshold: { min: 0, max: 100 },
-      trend: 'down',
-      history: [50, 48, 47, 46, 45.2],
-      location: 'Hebbal',
-      paramKey: 'turbidity',
+      status: 'Good',
+      trend: 'stable',
+      range: '0 - 100 NTU',
+      lastReadings: [42.1, 44.3, 46.2, 45.8, 45.9],
+      statusIcon: 'stable',
     },
     {
-      id: 'ph-hebbal',
+      id: 'ph',
       name: 'pH Sensor',
-      value: 7.3,
+      currentValue: 6.5,
       unit: '',
-      status: 'online',
-      threshold: { min: 6.5, max: 8.5 },
+      status: 'Optimal',
       trend: 'stable',
-      history: [7.2, 7.3, 7.2, 7.3, 7.3],
-      location: 'Hebbal',
-      paramKey: 'pH',
+      range: '6.5 - 8.5',
+      lastReadings: [6.7, 6.6, 6.5, 6.4, 6.5],
+      statusIcon: 'stable',
     },
     {
-      id: 'cod-hebbal',
+      id: 'cod',
       name: 'COD Analyzer',
-      value: 142,
+      currentValue: 142.1,
       unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 500 },
-      trend: 'down',
-      history: [180, 165, 155, 148, 142],
-      location: 'Hebbal',
-      paramKey: 'cod',
+      status: 'Good',
+      trend: 'up',
+      range: '0 - 500 mg/L',
+      lastReadings: [138.5, 140.2, 141.8, 142.0, 142.1],
+      statusIcon: 'up',
     },
     {
-      id: 'tds-hebbal',
+      id: 'tds',
       name: 'TDS Meter',
-      value: 456,
+      currentValue: 457.6,
       unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 2000 },
-      trend: 'stable',
-      history: [450, 455, 458, 454, 456],
-      location: 'Hebbal',
-      paramKey: 'tds',
+      status: 'Good',
+      trend: 'up',
+      range: '0 - 2000 mg/L',
+      lastReadings: [445.2, 450.1, 455.3, 456.8, 457.6],
+      statusIcon: 'up',
     },
     {
-      id: 'nitrogen-hebbal',
+      id: 'nitrogen',
       name: 'Nitrogen Sensor',
-      value: 18,
+      currentValue: 13.8,
       unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 100 },
-      trend: 'stable',
-      history: [19, 18.5, 18, 18.2, 18],
-      location: 'Hebbal',
-      paramKey: 'nitrogen',
+      status: 'Optimal',
+      trend: 'down',
+      range: '0 - 100 mg/L',
+      lastReadings: [15.2, 14.8, 14.3, 14.0, 13.8],
+      statusIcon: 'down',
     },
     {
-      id: 'phosphorus-hebbal',
+      id: 'phosphorus',
       name: 'Phosphorus Analyzer',
-      value: 4.2,
+      currentValue: 5.4,
       unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 50 },
+      status: 'Optimal',
       trend: 'down',
-      history: [5.0, 4.8, 4.5, 4.3, 4.2],
-      location: 'Hebbal',
-      paramKey: 'phosphorus',
+      range: '0 - 50 mg/L',
+      lastReadings: [6.1, 5.9, 5.7, 5.5, 5.4],
+      statusIcon: 'down',
     },
-    // Location 2 - Bellandur Lake (all 6 sensors)
-    {
-      id: 'turbidity-bellandur',
-      name: 'Turbidity Sensor',
-      value: 68.5,
-      unit: 'NTU',
-      status: 'online',
-      threshold: { min: 0, max: 100 },
-      trend: 'up',
-      history: [62, 64, 66, 67, 68.5],
-      location: 'Bellandur',
-      paramKey: 'turbidity',
-    },
-    {
-      id: 'ph-bellandur',
-      name: 'pH Sensor',
-      value: 8.1,
-      unit: '',
-      status: 'online',
-      threshold: { min: 6.5, max: 8.5 },
-      trend: 'up',
-      history: [7.8, 7.9, 8.0, 8.0, 8.1],
-      location: 'Bellandur',
-      paramKey: 'pH',
-    },
-    {
-      id: 'cod-bellandur',
-      name: 'COD Analyzer',
-      value: 285,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 500 },
-      trend: 'up',
-      history: [260, 270, 275, 280, 285],
-      location: 'Bellandur',
-      paramKey: 'cod',
-    },
-    {
-      id: 'tds-bellandur',
-      name: 'TDS Meter',
-      value: 890,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 2000 },
-      trend: 'stable',
-      history: [880, 885, 890, 888, 890],
-      location: 'Bellandur',
-      paramKey: 'tds',
-    },
-    {
-      id: 'nitrogen-bellandur',
-      name: 'Nitrogen Sensor',
-      value: 32,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 100 },
-      trend: 'up',
-      history: [28, 29, 30, 31, 32],
-      location: 'Bellandur',
-      paramKey: 'nitrogen',
-    },
-    {
-      id: 'phosphorus-bellandur',
-      name: 'Phosphorus Analyzer',
-      value: 8.5,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 50 },
-      trend: 'up',
-      history: [7.5, 7.8, 8.0, 8.2, 8.5],
-      location: 'Bellandur',
-      paramKey: 'phosphorus',
-    },
-    // Location 3 - Ulsoor Lake (all 6 sensors)
-    {
-      id: 'turbidity-ulsoor',
-      name: 'Turbidity Sensor',
-      value: 32.1,
-      unit: 'NTU',
-      status: 'online',
-      threshold: { min: 0, max: 100 },
-      trend: 'stable',
-      history: [32, 32.5, 31.8, 32.2, 32.1],
-      location: 'Ulsoor',
-      paramKey: 'turbidity',
-    },
-    {
-      id: 'ph-ulsoor',
-      name: 'pH Sensor',
-      value: 6.9,
-      unit: '',
-      status: 'online',
-      threshold: { min: 6.5, max: 8.5 },
-      trend: 'stable',
-      history: [6.9, 7.0, 6.8, 6.9, 6.9],
-      location: 'Ulsoor',
-      paramKey: 'pH',
-    },
-    {
-      id: 'cod-ulsoor',
-      name: 'COD Analyzer',
-      value: 165,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 500 },
-      trend: 'down',
-      history: [180, 175, 170, 168, 165],
-      location: 'Ulsoor',
-      paramKey: 'cod',
-    },
-    {
-      id: 'tds-ulsoor',
-      name: 'TDS Meter',
-      value: 620,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 2000 },
-      trend: 'stable',
-      history: [615, 618, 622, 619, 620],
-      location: 'Ulsoor',
-      paramKey: 'tds',
-    },
-    {
-      id: 'nitrogen-ulsoor',
-      name: 'Nitrogen Sensor',
-      value: 15,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 100 },
-      trend: 'down',
-      history: [17, 16.5, 16, 15.5, 15],
-      location: 'Ulsoor',
-      paramKey: 'nitrogen',
-    },
-    {
-      id: 'phosphorus-ulsoor',
-      name: 'Phosphorus Analyzer',
-      value: 3.8,
-      unit: 'mg/L',
-      status: 'online',
-      threshold: { min: 0, max: 50 },
-      trend: 'down',
-      history: [4.5, 4.2, 4.0, 3.9, 3.8],
-      location: 'Ulsoor',
-      paramKey: 'phosphorus',
-    },
-  ]);
+  ];
 
-  // Get nearby locations based on user's location
-  const getNearbyLocations = (userLocation: string): LocationData[] => {
-    const locationMap: { [key: string]: LocationData[] } = {
-      Hebbal: [
-        {
-          name: 'Hebbal',
-          lakeName: 'Hebbal Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Bellandur',
-          lakeName: 'Bellandur Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Ulsoor',
-          lakeName: 'Ulsoor Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-      ],
-      Bellandur: [
-        {
-          name: 'Bellandur',
-          lakeName: 'Bellandur Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Hebbal',
-          lakeName: 'Hebbal Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Ulsoor',
-          lakeName: 'Ulsoor Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-      ],
-      Ulsoor: [
-        {
-          name: 'Ulsoor',
-          lakeName: 'Ulsoor Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Hebbal',
-          lakeName: 'Hebbal Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Bellandur',
-          lakeName: 'Bellandur Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-      ],
-      // Default for other locations
-      default: [
-        {
-          name: 'Hebbal',
-          lakeName: 'Hebbal Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Bellandur',
-          lakeName: 'Bellandur Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-        {
-          name: 'Ulsoor',
-          lakeName: 'Ulsoor Lake',
-          sensorCount: 6,
-          status: 'active',
-        },
-      ],
-    };
+  const [sensorData, setSensorData] = useState<SensorData[]>(
+    generateSensorData(selectedLocation)
+  );
 
-    return locationMap[userLocation] || locationMap['default'];
-  };
-
-  const nearbyLocations = getNearbyLocations(user?.location || '');
-  const [sensors, setSensors] = useState<SensorData[]>([]);
-
-  // Filter sensors based on selected location
+  // Simulate real-time data updates
   useEffect(() => {
-    setSensors(
-      allSensors.filter(sensor => sensor.location === selectedLocation)
-    );
-  }, [selectedLocation, allSensors]);
+    if (!isLive) return;
 
-  // Simulate live sensor updates
-  useEffect(() => {
     const interval = setInterval(() => {
-      setAllSensors(prevSensors =>
-        prevSensors.map(sensor => {
-          const variation = (Math.random() - 0.5) * 5;
-          const newValue = Math.max(
-            sensor.threshold.min,
-            Math.min(sensor.threshold.max, sensor.value + variation)
-          );
+      setSensorData(prevData =>
+        prevData.map(sensor => {
+          // Generate realistic small variations
+          const variation = (Math.random() - 0.5) * 2; // ±1 unit variation
+          const newValue = Math.max(0, sensor.currentValue + variation);
 
-          const newHistory = [...sensor.history.slice(1), newValue];
-          const lastValue = sensor.history[sensor.history.length - 1];
+          // Update last readings (shift array and add new value)
+          const newReadings = [...sensor.lastReadings.slice(1), newValue];
 
-          let trend: 'up' | 'down' | 'stable' = 'stable';
-          if (newValue > lastValue + 1) trend = 'up';
-          else if (newValue < lastValue - 1) trend = 'down';
+          // Determine trend based on recent readings
+          const recentTrend = newReadings[4] - newReadings[0];
+          let newTrend: 'up' | 'down' | 'stable' = 'stable';
+          let newStatusIcon: 'stable' | 'up' | 'down' = 'stable';
+
+          if (Math.abs(recentTrend) > 1) {
+            newTrend = recentTrend > 0 ? 'up' : 'down';
+            newStatusIcon = recentTrend > 0 ? 'up' : 'down';
+          }
+
+          // Update status based on value ranges
+          let newStatus = sensor.status;
+          if (sensor.id === 'turbidity') {
+            newStatus =
+              newValue > 80 ? 'Warning' : newValue > 60 ? 'Good' : 'Optimal';
+          } else if (sensor.id === 'ph') {
+            newStatus =
+              newValue < 6.0 || newValue > 8.0 ? 'Warning' : 'Optimal';
+          } else if (sensor.id === 'cod') {
+            newStatus =
+              newValue > 300 ? 'Warning' : newValue > 200 ? 'Good' : 'Optimal';
+          } else if (sensor.id === 'tds') {
+            newStatus =
+              newValue > 1000 ? 'Warning' : newValue > 600 ? 'Good' : 'Optimal';
+          } else if (sensor.id === 'nitrogen') {
+            newStatus =
+              newValue > 50 ? 'Warning' : newValue > 25 ? 'Good' : 'Optimal';
+          } else if (sensor.id === 'phosphorus') {
+            newStatus =
+              newValue > 20 ? 'Warning' : newValue > 10 ? 'Good' : 'Optimal';
+          }
 
           return {
             ...sensor,
-            value: parseFloat(newValue.toFixed(1)),
-            history: newHistory,
-            trend,
+            currentValue: Math.round(newValue * 10) / 10,
+            trend: newTrend,
+            statusIcon: newStatusIcon,
+            status: newStatus,
+            lastReadings: newReadings,
           };
         })
       );
-    }, 3000);
+      setLastUpdate(new Date());
+    }, 3000); // Update every 3 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isLive, selectedLocation]);
 
-  const getSensorStatus = (sensor: SensorData) => {
-    const { value, threshold } = sensor;
-    const percentage =
-      ((value - threshold.min) / (threshold.max - threshold.min)) * 100;
-
-    if (percentage < 20) return { color: 'green', status: 'Optimal' };
-    if (percentage < 50) return { color: 'blue', status: 'Good' };
-    if (percentage < 80) return { color: 'yellow', status: 'Warning' };
-    return { color: 'red', status: 'Critical' };
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Optimal':
+        return 'bg-green-500';
+      case 'Good':
+        return 'bg-green-500';
+      case 'Warning':
+        return 'bg-yellow-500';
+      case 'Critical':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
   };
 
-  const handleInitiateSimulation = () => {
-    const locationSensors = allSensors.filter(
-      s => s.location === selectedLocation
-    );
-
-    // Build parameters object from sensors
-    const params: any = {};
-    locationSensors.forEach(sensor => {
-      params[sensor.paramKey] = sensor.value;
-    });
-
-    // Build URL query string
-    const queryParams = new URLSearchParams({
-      ...params,
-      sourceName:
-        nearbyLocations.find(l => l.name === selectedLocation)?.lakeName ||
-        selectedLocation,
-    });
-
-    router.push(`/simulation?${queryParams.toString()}`);
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
+    switch (trend) {
+      case 'up':
+        return <TrendingUp className="h-4 w-4 text-red-500" />;
+      case 'down':
+        return <TrendingDown className="h-4 w-4 text-green-500" />;
+      case 'stable':
+        return <Minus className="h-4 w-4 text-blue-500" />;
+    }
   };
 
-  const MiniChart = ({ history }: { history: number[] }) => {
-    const max = Math.max(...history);
-    const min = Math.min(...history);
+  const MiniChart = ({ data }: { data: number[] }) => {
+    const max = Math.max(...data);
+    const min = Math.min(...data);
     const range = max - min || 1;
 
     return (
-      <div className="flex items-end gap-1 h-12">
-        {history.map((value, index) => {
+      <div className="flex items-end gap-1 h-8">
+        {data.map((value, index) => {
           const height = ((value - min) / range) * 100;
           return (
             <div
               key={index}
-              className="flex-1 bg-gradient-to-t from-cyan-500 to-blue-500 rounded-t"
+              className="w-2 bg-blue-500 rounded-sm"
               style={{ height: `${Math.max(height, 10)}%` }}
             />
           );
@@ -456,194 +263,219 @@ const IoTSensors = () => {
     );
   };
 
+  const selectedLocationData = locations.find(
+    loc => loc.name === selectedLocation
+  );
+
+  const handleStartSimulation = async () => {
+    setIsProcessingSimulation(true);
+
+    try {
+      // Prepare sensor data for processing
+      const currentSensorData = {
+        turbidity:
+          sensorData.find(s => s.id === 'turbidity')?.currentValue || 0,
+        pH: sensorData.find(s => s.id === 'ph')?.currentValue || 0,
+        cod: sensorData.find(s => s.id === 'cod')?.currentValue || 0,
+        tds: sensorData.find(s => s.id === 'tds')?.currentValue || 0,
+        nitrogen: sensorData.find(s => s.id === 'nitrogen')?.currentValue || 0,
+        phosphorus:
+          sensorData.find(s => s.id === 'phosphorus')?.currentValue || 0,
+        sourceName: selectedLocationData?.displayName || 'Unknown',
+        location: selectedLocation,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Call Gemini API to process the data
+      const response = await fetch('/api/ai-agos/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Process this sensor data for wastewater treatment simulation: ${JSON.stringify(currentSensorData)}. Provide treatment recommendations and efficiency analysis.`,
+          context: 'simulation_processing',
+        }),
+      });
+
+      const aiResult = await response.json();
+
+      // Store the processed data in localStorage for the dashboard
+      const simulationData = {
+        parameters: currentSensorData,
+        aiAnalysis: aiResult.message || 'Simulation processed successfully',
+        timestamp: new Date().toISOString(),
+        source: 'real_time_dashboard',
+        location: selectedLocation,
+      };
+
+      localStorage.setItem(
+        'processedSimulationData',
+        JSON.stringify(simulationData)
+      );
+
+      // Redirect to operator dashboard with the processed data
+      const params = new URLSearchParams({
+        turbidity: currentSensorData.turbidity.toString(),
+        pH: currentSensorData.pH.toString(),
+        cod: currentSensorData.cod.toString(),
+        tds: currentSensorData.tds.toString(),
+        nitrogen: currentSensorData.nitrogen.toString(),
+        phosphorus: currentSensorData.phosphorus.toString(),
+        sourceName: currentSensorData.sourceName,
+        source: 'real_time_dashboard',
+        processed: 'true',
+      });
+
+      router.push(`/treatment-dashboard?${params.toString()}`);
+    } catch (error) {
+      console.error('Error processing simulation:', error);
+      alert('Failed to process simulation. Please try again.');
+    } finally {
+      setIsProcessingSimulation(false);
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
         <Header />
 
         <div className="container mx-auto px-6 pt-32 pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-12"
-          >
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-                  Real Time{' '}
-                  <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                    Dashboard
-                  </span>
-                </h1>
-                <p className="text-xl text-white/70">
-                  Real-time monitoring from distributed sensor array
-                </p>
-                {user && (
-                  <div className="flex items-center gap-2 mt-4">
-                    <MapPin className="h-5 w-5 text-cyan-400" />
-                    <span className="text-cyan-400 font-medium">
-                      Monitoring from: {user.location}
-                    </span>
-                  </div>
-                )}
-              </div>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-green-400 text-sm font-medium">
-                    All Systems Online
-                  </span>
-                </div>
+                <Activity className="h-8 w-8 text-blue-500" />
+                <h1 className="text-4xl font-bold text-white">
+                  Sensor Data - {selectedLocationData?.displayName}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <Wifi className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-green-500">Live</span>
               </div>
             </div>
-          </motion.div>
 
-          {/* Location Cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-8"
-          >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <Droplets className="h-6 w-6 text-cyan-400" />
-              Nearby Lake Monitoring Stations
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {nearbyLocations.map((location, index) => (
-                <motion.div
-                  key={location.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    className={`bg-white/5 backdrop-blur-lg border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer group ${
-                      selectedLocation === location.name
-                        ? 'ring-2 ring-cyan-400 bg-cyan-500/10'
-                        : ''
-                    }`}
-                    onClick={() => setSelectedLocation(location.name)}
-                  >
-                    <CardHeader>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Droplets className="h-5 w-5 text-cyan-400" />
-                          <MapPin className="h-4 w-4 text-white/60" />
-                        </div>
-                        <Badge
-                          className={`${
-                            location.status === 'active'
-                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                              : location.status === 'maintenance'
-                                ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                                : 'bg-red-500/20 text-red-400 border-red-500/30'
-                          }`}
-                        >
-                          {location.status}
-                        </Badge>
-                      </div>
-                      <CardTitle className="text-white text-lg">
-                        {location.lakeName}
-                      </CardTitle>
-                      <CardDescription className="text-white/60">
-                        {location.name} • {location.sensorCount} sensors
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-white/60">Sensors:</span>
-                          <span className="text-cyan-400 font-medium">
-                            {location.sensorCount}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-white/60">Status:</span>
-                          <span
-                            className={`font-medium ${
-                              location.status === 'active'
-                                ? 'text-green-400'
-                                : location.status === 'maintenance'
-                                  ? 'text-yellow-400'
-                                  : 'text-red-400'
-                            }`}
-                          >
-                            {location.status.charAt(0).toUpperCase() +
-                              location.status.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="mt-4 pt-3 border-t border-white/10">
-                        <div className="text-xs text-white/60">
-                          Click to view sensor data
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 flex items-center justify-between flex-wrap gap-4"
-            >
-              <div className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full">
-                <Droplets className="h-4 w-4 text-cyan-400" />
-                <span className="text-cyan-400 text-sm font-medium">
-                  Showing sensors for:{' '}
-                  {
-                    nearbyLocations.find(l => l.name === selectedLocation)
-                      ?.lakeName
-                  }
-                </span>
-              </div>
-
-              <Button
-                onClick={handleInitiateSimulation}
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold shadow-lg shadow-cyan-500/30"
+            <div className="flex items-center gap-4">
+              {/* Location Selector */}
+              <select
+                value={selectedLocation}
+                onChange={e => setSelectedLocation(e.target.value)}
+                className="bg-slate-800 border border-slate-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <Play className="h-4 w-4 mr-2" />
-                Initiate Simulation
-              </Button>
-            </motion.div>
-          </motion.div>
+                {locations.map(location => (
+                  <option key={location.name} value={location.name}>
+                    {location.displayName} ({location.status})
+                  </option>
+                ))}
+              </select>
 
-          {/* System Overview */}
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
-            {[
-              {
-                label: `Active Sensors (${selectedLocation})`,
-                value: sensors.filter(s => s.status === 'online').length,
-                icon: Activity,
-              },
-              {
-                label: `Readings (${selectedLocation})`,
-                value: `${(sensors.length * 2.5).toFixed(1)}k`,
-                icon: TrendingUp,
-              },
-              { label: 'Uptime', value: '99.9%', icon: Wifi },
-              { label: 'Last Update', value: '2s ago', icon: Activity },
-            ].map((stat, index) => (
+              {/* Live Toggle */}
+              <Button
+                onClick={() => setIsLive(!isLive)}
+                variant={isLive ? 'default' : 'outline'}
+                className={`flex items-center gap-2 ${
+                  isLive
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'border-slate-600 text-slate-300 hover:bg-slate-800'
+                }`}
+              >
+                {isLive ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                {isLive ? 'Live' : 'Paused'}
+              </Button>
+
+              {/* Refresh Button */}
+              <Button
+                onClick={() =>
+                  setSensorData(generateSensorData(selectedLocation))
+                }
+                variant="outline"
+                className="border-slate-600 text-slate-300 hover:bg-slate-800"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Last Update Info */}
+          <div className="mb-6">
+            <p className="text-sm text-slate-400">
+              Last updated: {lastUpdate.toLocaleTimeString()} • Next update in{' '}
+              {isLive ? '3s' : '--'}
+            </p>
+          </div>
+
+          {/* Sensor Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sensorData.map((sensor, index) => (
               <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                key={sensor.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="bg-white/5 backdrop-blur-lg border-white/10">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <stat.icon className="h-5 w-5 text-cyan-400" />
-                      <span className="text-xs text-white/60">
-                        {stat.label}
-                      </span>
+                <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all duration-300">
+                  <CardContent className="p-6">
+                    {/* Card Header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-blue-400" />
+                        <h3 className="text-lg font-semibold text-white">
+                          {sensor.name}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getTrendIcon(sensor.trend)}
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(sensor.status)}`}
+                        >
+                          {sensor.status}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-white">
-                      {stat.value}
+
+                    {/* Current Reading */}
+                    <div className="mb-4">
+                      <div className="text-3xl font-bold text-white mb-1">
+                        {sensor.currentValue} {sensor.unit}
+                      </div>
+                      <div className="text-sm text-slate-400">
+                        Range: {sensor.range}
+                      </div>
+                    </div>
+
+                    {/* Trend Chart */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-slate-400">
+                          Last 5 readings trend
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Wifi className="h-3 w-3 text-green-500" />
+                          <span className="text-xs text-green-500">
+                            Connected
+                          </span>
+                        </div>
+                      </div>
+                      <MiniChart data={sensor.lastReadings} />
+                    </div>
+
+                    {/* Status Indicators */}
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span>
+                        Status:{' '}
+                        {sensor.statusIcon === 'up'
+                          ? 'Rising'
+                          : sensor.statusIcon === 'down'
+                            ? 'Falling'
+                            : 'Stable'}
+                      </span>
+                      <span>Updated: {new Date().toLocaleTimeString()}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -651,90 +483,41 @@ const IoTSensors = () => {
             ))}
           </div>
 
-          {/* Sensor Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Activity className="h-5 w-5 text-cyan-400" />
-              Sensor Data -{' '}
-              {nearbyLocations.find(l => l.name === selectedLocation)?.lakeName}
-            </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sensors.map((sensor, index) => {
-                const status = getSensorStatus(sensor);
-                return (
-                  <motion.div
-                    key={sensor.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                  >
-                    <Card className="bg-white/5 backdrop-blur-lg border-white/10 hover:bg-white/10 transition-all duration-300 group">
-                      <CardHeader>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-cyan-400 animate-pulse" />
-                            {sensor.status === 'online' ? (
-                              <Wifi className="h-4 w-4 text-green-400" />
-                            ) : (
-                              <WifiOff className="h-4 w-4 text-red-400" />
-                            )}
-                          </div>
-                          <Badge
-                            className={`bg-${status.color}-500/20 text-${status.color}-400 border-${status.color}-500/30`}
-                          >
-                            {status.status}
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-white text-lg">
-                          {sensor.name}
-                        </CardTitle>
-                        <CardDescription className="text-white/60 flex items-center gap-2">
-                          {sensor.trend === 'up' && (
-                            <TrendingUp className="h-3 w-3 text-red-400" />
-                          )}
-                          {sensor.trend === 'down' && (
-                            <TrendingDown className="h-3 w-3 text-green-400" />
-                          )}
-                          {sensor.trend === 'stable' && (
-                            <span className="text-blue-400">—</span>
-                          )}
-                          <span className="capitalize">{sensor.trend}</span>
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div>
-                            <div className="text-4xl font-bold text-white mb-1">
-                              {sensor.value}
-                              <span className="text-lg text-white/60 ml-2">
-                                {sensor.unit}
-                              </span>
-                            </div>
-                            <div className="text-xs text-white/50">
-                              Range: {sensor.threshold.min} -{' '}
-                              {sensor.threshold.max} {sensor.unit}
-                            </div>
-                          </div>
-
-                          <MiniChart history={sensor.history} />
-
-                          <div className="pt-3 border-t border-white/10">
-                            <div className="text-xs text-white/60">
-                              Last 5 readings trend
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
+          {/* Action Buttons */}
+          <div className="mt-8 flex justify-center gap-4">
+            <Button
+              onClick={handleStartSimulation}
+              disabled={isProcessingSimulation}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessingSimulation ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Activity className="h-4 w-4 mr-2" />
+                  Start Simulation
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={() => router.push('/simulation')}
+              variant="outline"
+              className="border-slate-600 text-white bg-slate-800/50 hover:bg-slate-700 hover:text-white px-6 py-3"
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              Manual Simulation
+            </Button>
+            <Button
+              onClick={() => router.push('/analytics')}
+              variant="outline"
+              className="border-slate-600 text-white bg-slate-800/50 hover:bg-slate-700 hover:text-white px-6 py-3"
+            >
+              View Analytics
+            </Button>
+          </div>
         </div>
       </div>
     </ProtectedRoute>
