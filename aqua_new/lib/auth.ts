@@ -15,9 +15,13 @@ export interface TokenPayload {
 }
 
 export function generateToken(id: string, email: string): string {
-  return jwt.sign({ id, organizationEmail: email } as TokenPayload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRE,
-  });
+  return (jwt.sign as any)(
+    { id, organizationEmail: email },
+    JWT_SECRET,
+    {
+      expiresIn: JWT_EXPIRE,
+    }
+  );
 }
 
 export function verifyToken(token: string): TokenPayload | null {

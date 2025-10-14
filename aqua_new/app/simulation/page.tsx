@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Card,
@@ -45,7 +45,7 @@ interface WaterParameters {
 
 type NumericParameters = Exclude<keyof WaterParameters, "reuseType">;
 
-const Simulation = () => {
+const SimulationContent = () => {
   const searchParams = useSearchParams();
   const [sourceName, setSourceName] = useState<string | null>(null);
   const [parameters, setParameters] = useState<WaterParameters>({
@@ -371,6 +371,14 @@ const Simulation = () => {
         </div>
       </div>
     </ProtectedRoute>
+  );
+};
+
+const Simulation = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SimulationContent />
+    </Suspense>
   );
 };
 
