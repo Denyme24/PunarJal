@@ -21,6 +21,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   CheckCircle2,
   XCircle,
@@ -31,17 +32,96 @@ import {
   Beaker,
   Filter,
   Sparkles,
+  Activity,
+  Settings,
+  FileText,
+  RefreshCw,
 } from "lucide-react";
 
 export default function TreatmentDashboard() {
   const searchParams = useSearchParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [simulationResult, setSimulationResult] =
     useState<TreatmentSimulationResult | null>(null);
   const [parameters, setParameters] = useState<WaterQualityParameters | null>(
     null
   );
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Real-time monitoring state
+  const [currentTurbidity, setCurrentTurbidity] = useState(12.5); // Example: starts above threshold
+  const [alerts, setAlerts] = useState<Array<{id: string, message: string, type: 'warning' | 'critical', timestamp: Date}>>([]);
+  const [isRealTimeMode, setIsRealTimeMode] = useState(true);
+  const [maintenanceLogs, setMaintenanceLogs] = useState<Array<{id: string, activity: string, timestamp: Date, operator: string}>>([]);
+
+  // Check for turbidity alerts
+  useEffect(() => {
+    if (currentTurbidity > 10) {
+      const newAlert = {
+        id: `turbidity-${Date.now()}`,
+        message: `Turbidity Alert: ${currentTurbidity.toFixed(1)} NTU exceeds threshold of 10 NTU`,
+        type: 'critical' as const,
+        timestamp: new Date()
+      };
+      setAlerts(prev => {
+        // Avoid duplicate alerts
+        if (!prev.some(alert => alert.message.includes('Turbidity Alert'))) {
+          return [...prev, newAlert];
+        }
+        return prev;
+      });
+    }
+  }, [currentTurbidity]);
+
+  // Simulate real-time data updates
+  useEffect(() => {
+    if (!isRealTimeMode) return;
+    
+    const interval = setInterval(() => {
+      // Simulate turbidity fluctuations
+      setCurrentTurbidity(prev => {
+        const change = (Math.random() - 0.5) * 2; // -1 to 1
+        const newValue = Math.max(0, prev + change);
+        return Math.round(newValue * 10) / 10; // Round to 1 decimal
+      });
+    }, 3000); // Update every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isRealTimeMode]);
+
+  // Handle filter flush action
+  const handleFilterFlush = () => {
+    // Reset turbidity to safe levels
+    setCurrentTurbidity(8.5);
+    
+    // Log maintenance activity
+    const logEntry = {
+      id: `maintenance-${Date.now()}`,
+      activity: 'Primary Treatment Filter Flush',
+      timestamp: new Date(),
+      operator: user?.organizationName || 'Unknown Operator'
+    };
+    setMaintenanceLogs(prev => [logEntry, ...prev]);
+    
+    // Clear turbidity alerts
+    setAlerts(prev => prev.filter(alert => !alert.message.includes('Turbidity Alert')));
+  };
+
+  // Generate daily report
+  const generateDailyReport = () => {
+    const report = {
+      date: new Date().toISOString().split('T')[0],
+      operator: user?.organizationName || 'Unknown',
+      alerts: alerts.length,
+      maintenanceActivities: maintenanceLogs.length,
+      avgTurbidity: currentTurbidity,
+      status: currentTurbidity > 10 ? 'Action Required' : 'Normal Operation'
+    };
+    
+    // In a real app, this would save to database or generate PDF
+    console.log('Daily Report Generated:', report);
+    alert('Daily report generated and saved to system logs');
+  };
 
   // Function to save simulation log to database
   const saveSimulationLog = async (
@@ -198,16 +278,239 @@ export default function TreatmentDashboard() {
             className="text-center mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Treatment{" "}
+              Plant Operator{" "}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Simulation
+                Dashboard
               </span>
             </h1>
             <p className="text-xl text-white/70 max-w-3xl mx-auto mb-6">
-              AI-powered analysis determining optimal treatment stages
+              Real-time monitoring and treatment control system
             </p>
-            {getStatusBadge(simulationResult.overallStatus)}
+            <div className="flex items-center justify-center gap-4">
+              {getStatusBadge(simulationResult.overallStatus)}
+              <Badge className={`${isRealTimeMode ? 'bg-green-500' : 'bg-gray-500'} flex items-center gap-1`}>
+                <Activity className="h-3 w-3" />
+                {isRealTimeMode ? 'Live' : 'Paused'}
+              </Badge>
+            </div>
           </motion.div>
+
+          {/* Real-time Sensor Dashboard */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Turbidity Monitor */}
+              <Card className={`${currentTurbidity > 10 ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'} backdrop-blur-lg`}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-white flex items-center gap-2 text-sm">
+                    <Droplets className="h-4 w-4" />
+                    Turbidity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {currentTurbidity.toFixed(1)}
+                    <span className="text-lg text-white/60"> NTU</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {currentTurbidity > 10 ? (
+                      <Badge className="bg-red-500 text-white">Critical</Badge>
+                    ) : (
+                      <Badge className="bg-green-500 text-white">Normal</Badge>
+                    )}
+                    <span className="text-xs text-white/60">Threshold: 10 NTU</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Other Sensors */}
+              <Card className="bg-blue-500/10 border-blue-500/30 backdrop-blur-lg">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-white flex items-center gap-2 text-sm">
+                    <Beaker className="h-4 w-4" />
+                    pH Level
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    7.2<span className="text-lg text-white/60"> pH</span>
+                  </div>
+                  <Badge className="bg-green-500 text-white">Normal</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-purple-500/10 border-purple-500/30 backdrop-blur-lg">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-white flex items-center gap-2 text-sm">
+                    <TrendingUp className="h-4 w-4" />
+                    COD
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    185<span className="text-lg text-white/60"> mg/L</span>
+                  </div>
+                  <Badge className="bg-yellow-500 text-white">Attention</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-teal-500/10 border-teal-500/30 backdrop-blur-lg">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-white flex items-center gap-2 text-sm">
+                    <Filter className="h-4 w-4" />
+                    TDS
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    650<span className="text-lg text-white/60"> mg/L</span>
+                  </div>
+                  <Badge className="bg-green-500 text-white">Normal</Badge>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+
+          {/* Alerts Panel */}
+          {alerts.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mb-8"
+            >
+              <Card className="bg-red-500/10 border-red-500/30 backdrop-blur-lg">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                    Active Alerts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {alerts.map((alert) => (
+                      <Alert key={alert.id} className="bg-red-500/20 border-red-500/40">
+                        <AlertTriangle className="h-4 w-4 text-red-400" />
+                        <AlertDescription className="text-white">
+                          <div className="flex justify-between items-center">
+                            <span>{alert.message}</span>
+                            <span className="text-xs text-white/60">
+                              {alert.timestamp.toLocaleTimeString()}
+                            </span>
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Control Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mb-8"
+          >
+            <Card className="bg-slate-900/70 backdrop-blur-lg border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-cyan-400" />
+                  Treatment Controls
+                </CardTitle>
+                <CardDescription className="text-white/60">
+                  Adjust treatment parameters and perform maintenance actions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold">Primary Treatment</h4>
+                    <Button
+                      onClick={handleFilterFlush}
+                      disabled={currentTurbidity <= 10}
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                    >
+                      <Filter className="h-4 w-4 mr-2" />
+                      Flush Filter
+                    </Button>
+                    <p className="text-xs text-white/60">
+                      {currentTurbidity <= 10 ? 'Filter operating normally' : 'Filter flush recommended'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold">Monitoring</h4>
+                    <Button
+                      onClick={() => setIsRealTimeMode(!isRealTimeMode)}
+                      variant="outline"
+                      className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      {isRealTimeMode ? 'Pause Updates' : 'Resume Updates'}
+                    </Button>
+                    <p className="text-xs text-white/60">
+                      {isRealTimeMode ? 'Real-time data enabled' : 'Data updates paused'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold">Reporting</h4>
+                    <Button
+                      onClick={generateDailyReport}
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Generate Report
+                    </Button>
+                    <p className="text-xs text-white/60">
+                      Create daily operations summary
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Maintenance Log */}
+          {maintenanceLogs.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mb-8"
+            >
+              <Card className="bg-slate-900/70 backdrop-blur-lg border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-green-400" />
+                    Recent Maintenance Activities
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {maintenanceLogs.slice(0, 5).map((log) => (
+                      <div key={log.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div>
+                          <p className="text-white font-medium">{log.activity}</p>
+                          <p className="text-white/60 text-sm">Operator: {log.operator}</p>
+                        </div>
+                        <span className="text-white/60 text-sm">
+                          {log.timestamp.toLocaleTimeString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
           {/* Summary Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
