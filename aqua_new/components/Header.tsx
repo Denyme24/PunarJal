@@ -45,6 +45,11 @@ const Header = () => {
           label: 'OPERATOR DASHBOARD',
           icon: Settings,
         },
+        {
+          href: '/reports',
+          label: 'REPORTS',
+          icon: TrendingUp,
+        },
       ];
     } else if (user.role === 'Environmental Officer') {
       return [{ href: '/analytics', label: 'ANALYTICS', icon: TrendingUp }];

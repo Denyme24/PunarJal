@@ -11,895 +11,885 @@ import {
   WaterQualityParameters,
   TreatmentSimulationResult,
 } from '@/lib/treatmentLogic';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 import {
   CheckCircle2,
-  XCircle,
   AlertTriangle,
-  Droplets,
-  Clock,
   TrendingUp,
-  Beaker,
-  Filter,
-  Sparkles,
   Activity,
   Settings,
   FileText,
-  RefreshCw,
+  MessageSquare,
+  Bell,
+  TrendingDown,
+  Play,
+  Pause,
+  Wifi,
+  Minus,
 } from 'lucide-react';
+
+interface RealTimeSensor {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  status: 'optimal' | 'good' | 'warning' | 'critical';
+  trend: 'up' | 'down' | 'stable';
+  lastReadings: number[];
+  threshold: { min: number; max: number };
+}
+
+interface Alert {
+  id: string;
+  type: 'critical' | 'warning' | 'info';
+  title: string;
+  message: string;
+  timestamp: Date;
+  resolved: boolean;
+}
+
+interface MaintenanceLog {
+  id: string;
+  title: string;
+  description: string;
+  equipment: string;
+  type: 'routine' | 'repair' | 'inspection' | 'replacement';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'overdue';
+  assignedTo: string;
+  scheduledDate: Date;
+  completedDate?: Date;
+  notes: string;
+  photos: string[];
+  partsUsed: string[];
+  downtime: number; // in hours
+}
 
 function TreatmentDashboardContent() {
   const searchParams = useSearchParams();
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [simulationResult, setSimulationResult] =
     useState<TreatmentSimulationResult | null>(null);
   const [parameters, setParameters] = useState<WaterQualityParameters | null>(
     null
   );
-  const [isSaving, setIsSaving] = useState(false);
+  const [isLive, setIsLive] = useState(true);
 
-  // Real-time monitoring state
-  const [currentTurbidity, setCurrentTurbidity] = useState(12.5); // Example: starts above threshold
-  const [alerts, setAlerts] = useState<
-    Array<{
-      id: string;
-      message: string;
-      type: 'warning' | 'critical';
-      timestamp: Date;
-    }>
-  >([]);
-  const [isRealTimeMode, setIsRealTimeMode] = useState(true);
-  const [maintenanceLogs, setMaintenanceLogs] = useState<
-    Array<{ id: string; activity: string; timestamp: Date; operator: string }>
-  >([]);
+  // Real-time sensor data simulation
+  const [sensorData, setSensorData] = useState<RealTimeSensor[]>([
+    {
+      id: 'flow',
+      name: 'Influent Flow Rate',
+      value: 2.4,
+      unit: 'MLD',
+      status: 'good',
+      trend: 'stable',
+      lastReadings: [2.38, 2.39, 2.4, 2.41, 2.4],
+      threshold: { min: 1.5, max: 3.0 },
+    },
+    {
+      id: 'efficiency',
+      name: 'BOD Removal Efficiency',
+      value: 94.2,
+      unit: '%',
+      status: 'optimal',
+      trend: 'stable',
+      lastReadings: [94.1, 94.2, 94.2, 94.1, 94.2],
+      threshold: { min: 85, max: 100 },
+    },
+    {
+      id: 'turbidity',
+      name: 'Effluent Turbidity',
+      value: 1.8,
+      unit: 'NTU',
+      status: 'optimal',
+      trend: 'stable',
+      lastReadings: [1.79, 1.8, 1.81, 1.8, 1.8],
+      threshold: { min: 0, max: 5 },
+    },
+    {
+      id: 'ph',
+      name: 'Final pH',
+      value: 7.4,
+      unit: '',
+      status: 'optimal',
+      trend: 'stable',
+      lastReadings: [7.39, 7.4, 7.41, 7.4, 7.4],
+      threshold: { min: 6.5, max: 8.5 },
+    },
+  ]);
 
-  // Check for turbidity alerts
+  // Alerts and recommendations
+  const [alerts] = useState<Alert[]>([
+    {
+      id: '1',
+      type: 'critical',
+      title: 'Primary Clarifier Overflow',
+      message:
+        'Clarifier #2 overflow detected. Immediate bypass activation required to prevent environmental discharge.',
+      timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+      resolved: false,
+    },
+    {
+      id: '2',
+      type: 'warning',
+      title: 'Dissolved Oxygen Low',
+      message:
+        'DO levels in aeration tank #3 below 2.0 mg/L. Check blower operation and diffuser maintenance.',
+      timestamp: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
+      resolved: false,
+    },
+    {
+      id: '3',
+      type: 'warning',
+      title: 'Sludge Return Pump Vibration',
+      message:
+        'Excessive vibration detected on SRP-04. Schedule maintenance within 24 hours to prevent failure.',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      resolved: false,
+    },
+    {
+      id: '4',
+      type: 'info',
+      title: 'Weekly Calibration Due',
+      message:
+        'pH sensors in secondary treatment require calibration. Scheduled for tomorrow 8:00 AM.',
+      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+      resolved: false,
+    },
+    {
+      id: '5',
+      type: 'critical',
+      title: 'Power Supply Failure',
+      message:
+        'UPS backup activated for control room. Generator startup initiated. Monitor system stability.',
+      timestamp: new Date(Date.now() - 8 * 60 * 1000), // 8 minutes ago
+      resolved: false,
+    },
+  ]);
+
+  // Maintenance logs
+  const [maintenanceLogs] = useState<MaintenanceLog[]>([
+    {
+      id: '1',
+      title: 'Primary Clarifier Maintenance',
+      description: 'Routine cleaning and inspection of primary clarifier #2',
+      equipment: 'Primary Clarifier #2',
+      type: 'routine',
+      priority: 'medium',
+      status: 'completed',
+      assignedTo: 'John Smith',
+      scheduledDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      completedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      notes:
+        'Completed successfully. No issues found. Scum removal system working properly.',
+      photos: ['maintenance_001.jpg'],
+      partsUsed: ['Scraper Blade', 'Seal Kit'],
+      downtime: 2.5,
+    },
+    {
+      id: '2',
+      title: 'Blower Motor Replacement',
+      description: 'Replace failed blower motor in aeration tank #3',
+      equipment: 'Blower Motor - Aeration Tank #3',
+      type: 'repair',
+      priority: 'urgent',
+      status: 'in_progress',
+      assignedTo: 'Sarah Johnson',
+      scheduledDate: new Date(Date.now() + 1 * 60 * 60 * 1000),
+      notes:
+        'Motor failure detected during routine inspection. Replacement scheduled.',
+      photos: [],
+      partsUsed: ['Blower Motor 5HP', 'Mounting Brackets'],
+      downtime: 0,
+    },
+    {
+      id: '3',
+      title: 'Filter Media Inspection',
+      description: 'Quarterly inspection of sand filter media',
+      equipment: 'Sand Filter #1',
+      type: 'inspection',
+      priority: 'low',
+      status: 'scheduled',
+      assignedTo: 'Mike Wilson',
+      scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      notes:
+        'Regular quarterly inspection. Check for media loss and contamination.',
+      photos: [],
+      partsUsed: [],
+      downtime: 0,
+    },
+  ]);
+
+  // Treatment parameters
+  const [treatmentParams, setTreatmentParams] = useState({
+    aerationRate: 2.8,
+    sludgeReturn: 35,
+    chemicalDosage: 8.5,
+    filtrationSpeed: 92,
+  });
+
+  // Simulate real-time updates - Very realistic, slow changes
   useEffect(() => {
-    if (currentTurbidity > 10) {
-      const newAlert = {
-        id: `turbidity-${Date.now()}`,
-        message: `Turbidity Alert: ${currentTurbidity.toFixed(1)} NTU exceeds threshold of 10 NTU`,
-        type: 'critical' as const,
-        timestamp: new Date(),
-      };
-      setAlerts(prev => {
-        // Avoid duplicate alerts
-        if (!prev.some(alert => alert.message.includes('Turbidity Alert'))) {
-          return [...prev, newAlert];
-        }
-        return prev;
-      });
-    }
-  }, [currentTurbidity]);
-
-  // Simulate real-time data updates
-  useEffect(() => {
-    if (!isRealTimeMode) return;
+    if (!isLive) return;
 
     const interval = setInterval(() => {
-      // Simulate turbidity fluctuations
-      setCurrentTurbidity(prev => {
-        const change = (Math.random() - 0.5) * 2; // -1 to 1
-        const newValue = Math.max(0, prev + change);
-        return Math.round(newValue * 10) / 10; // Round to 1 decimal
-      });
-    }, 3000); // Update every 3 seconds
+      setSensorData(prevData =>
+        prevData.map(sensor => {
+          // Extremely small, realistic variations - industrial sensors are very stable
+          const variation = (Math.random() - 0.5) * 0.02; // Very small changes
+          const newValue = Math.max(0, sensor.value + variation);
+          const newReadings = [...sensor.lastReadings.slice(1), newValue];
+
+          const recentTrend = newReadings[4] - newReadings[0];
+          let newTrend: 'up' | 'down' | 'stable' = 'stable';
+
+          // Only detect trends for significant changes
+          if (Math.abs(recentTrend) > 0.02) {
+            newTrend = recentTrend > 0 ? 'up' : 'down';
+          }
+
+          // Update status based on thresholds - very conservative
+          let newStatus = sensor.status;
+          if (
+            newValue < sensor.threshold.min ||
+            newValue > sensor.threshold.max
+          ) {
+            newStatus = 'critical';
+          } else if (
+            newValue > sensor.threshold.max * 0.95 ||
+            newValue < sensor.threshold.min * 1.05
+          ) {
+            newStatus = 'warning';
+          } else if (newValue > sensor.threshold.max * 0.85) {
+            newStatus = 'good';
+          } else {
+            newStatus = 'optimal';
+          }
+
+          return {
+            ...sensor,
+            value: Math.round(newValue * 100) / 100,
+            trend: newTrend,
+            status: newStatus,
+            lastReadings: newReadings,
+          };
+        })
+      );
+    }, 30000); // Update every 30 seconds - very realistic for industrial sensors
 
     return () => clearInterval(interval);
-  }, [isRealTimeMode]);
+  }, [isLive]);
 
-  // Handle filter flush action
-  const handleFilterFlush = () => {
-    // Reset turbidity to safe levels
-    setCurrentTurbidity(8.5);
-
-    // Log maintenance activity
-    const logEntry = {
-      id: `maintenance-${Date.now()}`,
-      activity: 'Primary Treatment Filter Flush',
-      timestamp: new Date(),
-      operator: user?.organizationName || 'Unknown Operator',
-    };
-    setMaintenanceLogs(prev => [logEntry, ...prev]);
-
-    // Clear turbidity alerts
-    setAlerts(prev =>
-      prev.filter(alert => !alert.message.includes('Turbidity Alert'))
-    );
-  };
-
-  // Generate daily report
-  const generateDailyReport = () => {
-    const report = {
-      date: new Date().toISOString().split('T')[0],
-      operator: user?.organizationName || 'Unknown',
-      alerts: alerts.length,
-      maintenanceActivities: maintenanceLogs.length,
-      avgTurbidity: currentTurbidity,
-      status: currentTurbidity > 10 ? 'Action Required' : 'Normal Operation',
-    };
-
-    // In a real app, this would save to database or generate PDF
-    console.log('Daily Report Generated:', report);
-    alert('Daily report generated and saved to system logs');
-  };
-
-  // Function to save simulation log to database
-  const saveSimulationLog = async (
-    params: WaterQualityParameters,
-    result: TreatmentSimulationResult,
-    source: 'simulation_page' | 'iot_sensors' | 'map_view',
-    sourceName?: string
-  ) => {
-    if (!token) {
-      console.warn('No token available, skipping log save');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      const response = await fetch('/api/simulation-logs/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          source,
-          sourceName,
-          inputParameters: params,
-          simulationResult: result,
-          sessionId: `session_${Date.now()}`,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error('Failed to save simulation log:', data.error);
-      } else {
-        console.log('Simulation log saved successfully:', data.logId);
-      }
-    } catch (error) {
-      console.error('Error saving simulation log:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
+  // Load simulation data from URL params
   useEffect(() => {
-    // Get parameters from URL
     const turbidity = parseFloat(searchParams.get('turbidity') || '0');
-    const pH = parseFloat(searchParams.get('pH') || '7');
+    const pH = parseFloat(searchParams.get('pH') || '0');
     const cod = parseFloat(searchParams.get('cod') || '0');
     const tds = parseFloat(searchParams.get('tds') || '0');
     const nitrogen = parseFloat(searchParams.get('nitrogen') || '0');
     const phosphorus = parseFloat(searchParams.get('phosphorus') || '0');
-    const reuseType = searchParams.get('reuseType') || undefined;
-    const sourceName = searchParams.get('sourceName') || undefined;
+    if (turbidity || pH || cod || tds || nitrogen || phosphorus) {
+      const params: WaterQualityParameters = {
+        turbidity,
+        pH,
+        cod,
+        tds,
+        nitrogen,
+        phosphorus,
+      };
 
-    const params: WaterQualityParameters = {
-      turbidity,
-      pH,
-      cod,
-      nitrogen,
-      phosphorus,
-      tds,
-    };
-
-    setParameters(params);
-
-    // Run simulation
-    const result = simulateTreatment(params);
-    setSimulationResult(result);
-
-    // Persist latest simulation context for Analytics page AI generation
-    try {
-      const payload = { parameters: params, simulationResult: result };
-      localStorage.setItem('lastSimulationContext', JSON.stringify(payload));
-    } catch {}
-
-    // Determine the source of the simulation
-    // If sourceName is present, it's either from map or real-time monitoring
-    let source: 'simulation_page' | 'real_time_dashboard' | 'map_view' =
-      'simulation_page';
-    if (sourceName) {
-      // Check if it contains "Lake" - likely from map or real-time monitoring
-      if (sourceName.includes('Lake')) {
-        // Check if there's sensor data patterns to differentiate
-        // For now, we'll use map_view as default when sourceName is present
-        source = 'map_view';
-      }
+      setParameters(params);
+      const result = simulateTreatment(params);
+      setSimulationResult(result);
     }
-
-    // Save simulation log to database
-    saveSimulationLog(params, result, source, sourceName);
-  }, [searchParams, token]);
-
-  if (!simulationResult || !parameters) {
-    return (
-      <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950 flex items-center justify-center">
-          <div className="text-white text-xl">Loading simulation...</div>
-        </div>
-      </ProtectedRoute>
-    );
-  }
+  }, [searchParams]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'safe':
-        return 'text-green-500';
-      case 'needs-treatment':
-        return 'text-yellow-500';
+      case 'optimal':
+        return 'text-green-500 bg-green-500/20';
+      case 'good':
+        return 'text-green-500 bg-green-500/20';
+      case 'warning':
+        return 'text-yellow-500 bg-yellow-500/20';
       case 'critical':
-        return 'text-red-500';
+        return 'text-red-500 bg-red-500/20';
       default:
-        return 'text-gray-500';
+        return 'text-gray-500 bg-gray-500/20';
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
+    switch (trend) {
+      case 'up':
+        return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case 'down':
+        return <TrendingDown className="h-4 w-4 text-red-500" />;
+      case 'stable':
+        return <Minus className="h-4 w-4 text-blue-500" />;
+    }
+  };
+
+  const MiniChart = ({ data }: { data: number[] }) => {
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+
+    return (
+      <div className="flex items-end gap-1 h-8">
+        {data.map((value, index) => {
+          const height = ((value - min) / range) * 100;
+          return (
+            <div
+              key={index}
+              className="w-2 bg-blue-500 rounded-sm"
+              style={{ height: `${Math.max(height, 10)}%` }}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
+  const getMaintenanceStatusColor = (status: string) => {
     switch (status) {
-      case 'safe':
-        return <Badge className="bg-green-500">Safe</Badge>;
-      case 'needs-treatment':
-        return <Badge className="bg-yellow-500">Needs Treatment</Badge>;
-      case 'critical':
-        return <Badge className="bg-red-500">Critical</Badge>;
+      case 'completed':
+        return 'bg-green-500/20 text-green-500 border-green-500/30';
+      case 'in_progress':
+        return 'bg-blue-500/20 text-blue-500 border-blue-500/30';
+      case 'scheduled':
+        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+      case 'overdue':
+        return 'bg-red-500/20 text-red-500 border-red-500/30';
       default:
-        return <Badge>Unknown</Badge>;
+        return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
     }
   };
 
-  const getTreatmentIcon = (stageName: string) => {
-    switch (stageName) {
-      case 'Primary Treatment':
-        return <Filter className="h-6 w-6" />;
-      case 'Secondary Treatment':
-        return <Beaker className="h-6 w-6" />;
-      case 'Tertiary Treatment':
-        return <Sparkles className="h-6 w-6" />;
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent':
+        return 'bg-red-500/20 text-red-500';
+      case 'high':
+        return 'bg-orange-500/20 text-orange-500';
+      case 'medium':
+        return 'bg-yellow-500/20 text-yellow-500';
+      case 'low':
+        return 'bg-green-500/20 text-green-500';
       default:
-        return <Droplets className="h-6 w-6" />;
+        return 'bg-gray-500/20 text-gray-500';
     }
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
-        <Header />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
+      <Header />
 
-        <div className="container mx-auto px-6 pt-32 pb-20">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Plant Operator{' '}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Dashboard
-              </span>
+      <div className="container mx-auto px-6 pt-32 pb-20">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Plant Operator Dashboard
             </h1>
-            <p className="text-xl text-white/70 max-w-3xl mx-auto mb-6">
-              Real-time monitoring and treatment control system
+            <p className="text-slate-400">
+              Real-time monitoring and control for {user?.organizationName}
             </p>
-            <div className="flex items-center justify-center gap-4">
-              {getStatusBadge(simulationResult.overallStatus)}
-              <Badge
-                className={`${isRealTimeMode ? 'bg-green-500' : 'bg-gray-500'} flex items-center gap-1`}
-              >
-                <Activity className="h-3 w-3" />
-                {isRealTimeMode ? 'Live' : 'Paused'}
-              </Badge>
-            </div>
-          </motion.div>
-
-          {/* Real-time Sensor Dashboard */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8"
-          >
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Turbidity Monitor */}
-              <Card
-                className={`${currentTurbidity > 10 ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'} backdrop-blur-lg`}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-white flex items-center gap-2 text-sm">
-                    <Droplets className="h-4 w-4" />
-                    Turbidity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white mb-1">
-                    {currentTurbidity.toFixed(1)}
-                    <span className="text-lg text-white/60"> NTU</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {currentTurbidity > 10 ? (
-                      <Badge className="bg-red-500 text-white">Critical</Badge>
-                    ) : (
-                      <Badge className="bg-green-500 text-white">Normal</Badge>
-                    )}
-                    <span className="text-xs text-white/60">
-                      Threshold: 10 NTU
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Other Sensors */}
-              <Card className="bg-blue-500/10 border-blue-500/30 backdrop-blur-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-white flex items-center gap-2 text-sm">
-                    <Beaker className="h-4 w-4" />
-                    pH Level
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white mb-1">
-                    7.2<span className="text-lg text-white/60"> pH</span>
-                  </div>
-                  <Badge className="bg-green-500 text-white">Normal</Badge>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-purple-500/10 border-purple-500/30 backdrop-blur-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-white flex items-center gap-2 text-sm">
-                    <TrendingUp className="h-4 w-4" />
-                    COD
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white mb-1">
-                    185<span className="text-lg text-white/60"> mg/L</span>
-                  </div>
-                  <Badge className="bg-yellow-500 text-white">Attention</Badge>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-teal-500/10 border-teal-500/30 backdrop-blur-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-white flex items-center gap-2 text-sm">
-                    <Filter className="h-4 w-4" />
-                    TDS
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white mb-1">
-                    650<span className="text-lg text-white/60"> mg/L</span>
-                  </div>
-                  <Badge className="bg-green-500 text-white">Normal</Badge>
-                </CardContent>
-              </Card>
-            </div>
-          </motion.div>
-
-          {/* Alerts Panel */}
-          {alerts.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mb-8"
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => setIsLive(!isLive)}
+              variant={isLive ? 'default' : 'outline'}
+              className={`flex items-center gap-2 ${
+                isLive
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'border-slate-600 text-slate-300 hover:bg-slate-800'
+              }`}
             >
-              <Card className="bg-red-500/10 border-red-500/30 backdrop-blur-lg">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-red-400" />
-                    Active Alerts
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {alerts.map(alert => (
-                      <Alert
-                        key={alert.id}
-                        className="bg-red-500/20 border-red-500/40"
-                      >
-                        <AlertTriangle className="h-4 w-4 text-red-400" />
-                        <AlertDescription className="text-white">
-                          <div className="flex justify-between items-center">
-                            <span>{alert.message}</span>
-                            <span className="text-xs text-white/60">
-                              {alert.timestamp.toLocaleTimeString()}
-                            </span>
-                          </div>
-                        </AlertDescription>
-                      </Alert>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
+              {isLive ? (
+                <Pause className="h-4 w-4" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+              {isLive ? 'Live' : 'Paused'}
+            </Button>
+            <Button
+              onClick={() => window.open('/reports', '_blank')}
+              variant="outline"
+              className="border-slate-600 text-slate-300 hover:bg-slate-800"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              View Reports
+            </Button>
+          </div>
+        </div>
 
-          {/* Control Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mb-8"
-          >
-            <Card className="bg-slate-900/70 backdrop-blur-lg border-slate-700">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Real-time Sensors */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {sensorData.map((sensor, index) => (
+                <motion.div
+                  key={sensor.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="bg-slate-800/50 border-slate-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-slate-400">
+                          {sensor.name}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {getTrendIcon(sensor.trend)}
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(sensor.status)}`}
+                          >
+                            {sensor.status}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-2xl font-bold text-white">
+                        {sensor.value} {sensor.unit}
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Wifi className="h-3 w-3 text-green-500" />
+                        <span className="text-xs text-slate-500">Live</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Detailed Sensor Charts */}
+            <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-cyan-400" />
-                  Treatment Controls
+                  <Activity className="h-5 w-5 text-blue-500" />
+                  Real-time Sensor Data
                 </CardTitle>
-                <CardDescription className="text-white/60">
-                  Adjust treatment parameters and perform maintenance actions
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold">
-                      Primary Treatment
-                    </h4>
-                    <Button
-                      onClick={handleFilterFlush}
-                      disabled={currentTurbidity <= 10}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
-                    >
-                      <Filter className="h-4 w-4 mr-2" />
-                      Flush Filter
-                    </Button>
-                    <p className="text-xs text-white/60">
-                      {currentTurbidity <= 10
-                        ? 'Filter operating normally'
-                        : 'Filter flush recommended'}
-                    </p>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {sensorData.slice(0, 2).map(sensor => (
+                    <div key={sensor.id}>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-white">
+                          {sensor.name}
+                        </h3>
+                        <span className="text-sm text-slate-400">
+                          Last 24h{' '}
+                          {sensor.trend === 'up'
+                            ? '+0.3%'
+                            : sensor.trend === 'down'
+                              ? '-0.2%'
+                              : '±0.1%'}
+                        </span>
+                      </div>
+                      <div className="text-3xl font-bold text-white mb-2">
+                        {sensor.value} {sensor.unit}
+                      </div>
+                      <MiniChart data={sensor.lastReadings} />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold">Monitoring</h4>
-                    <Button
-                      onClick={() => setIsRealTimeMode(!isRealTimeMode)}
-                      variant="outline"
-                      className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      {isRealTimeMode ? 'Pause Updates' : 'Resume Updates'}
-                    </Button>
-                    <p className="text-xs text-white/60">
-                      {isRealTimeMode
-                        ? 'Real-time data enabled'
-                        : 'Data updates paused'}
-                    </p>
+            {/* Treatment Stages */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Treatment Stages</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div>
+                      <h4 className="text-white font-medium">
+                        Primary Treatment
+                      </h4>
+                      <p className="text-sm text-slate-400">
+                        Sedimentation: 98% complete
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        Grit Removal: Active
+                      </p>
+                    </div>
                   </div>
+                  <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
+                    Normal
+                  </Badge>
+                </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold">Reporting</h4>
-                    <Button
-                      onClick={generateDailyReport}
-                      className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Generate Report
-                    </Button>
-                    <p className="text-xs text-white/60">
-                      Create daily operations summary
-                    </p>
+                <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div>
+                      <h4 className="text-white font-medium">
+                        Secondary Treatment
+                      </h4>
+                      <p className="text-sm text-slate-400">
+                        Aeration: {treatmentParams.aerationRate} mg/L O₂
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        Sludge Return: {treatmentParams.sludgeReturn} m³/h
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
+                    Normal
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div>
+                      <h4 className="text-white font-medium">
+                        Tertiary Treatment
+                      </h4>
+                      <p className="text-sm text-slate-400">
+                        Filtration: Clogged filter detected
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        Disinfection: UV lamp at 80%
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
+                    Warning
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Treatment Parameter Controls */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-blue-500" />
+                  Treatment Parameters
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-slate-400 mb-2 block">
+                      DO Level (mg/L)
+                    </label>
+                    <Input
+                      type="number"
+                      value={treatmentParams.aerationRate}
+                      onChange={e =>
+                        setTreatmentParams(prev => ({
+                          ...prev,
+                          aerationRate: parseFloat(e.target.value),
+                        }))
+                      }
+                      className="bg-slate-700 border-slate-600 text-white"
+                      step="0.1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-slate-400 mb-2 block">
+                      RAS Rate (%)
+                    </label>
+                    <Input
+                      type="number"
+                      value={treatmentParams.sludgeReturn}
+                      onChange={e =>
+                        setTreatmentParams(prev => ({
+                          ...prev,
+                          sludgeReturn: parseFloat(e.target.value),
+                        }))
+                      }
+                      className="bg-slate-700 border-slate-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-slate-400 mb-2 block">
+                      Polymer Dose (mg/L)
+                    </label>
+                    <Input
+                      type="number"
+                      value={treatmentParams.chemicalDosage}
+                      onChange={e =>
+                        setTreatmentParams(prev => ({
+                          ...prev,
+                          chemicalDosage: parseFloat(e.target.value),
+                        }))
+                      }
+                      className="bg-slate-700 border-slate-600 text-white"
+                      step="0.1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-slate-400 mb-2 block">
+                      Filter Backwash (%)
+                    </label>
+                    <Input
+                      type="number"
+                      value={treatmentParams.filtrationSpeed}
+                      onChange={e =>
+                        setTreatmentParams(prev => ({
+                          ...prev,
+                          filtrationSpeed: parseFloat(e.target.value),
+                        }))
+                      }
+                      className="bg-slate-700 border-slate-600 text-white"
+                    />
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
 
-          {/* Maintenance Log */}
-          {maintenanceLogs.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="mb-8"
-            >
-              <Card className="bg-slate-900/70 backdrop-blur-lg border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-green-400" />
-                    Recent Maintenance Activities
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {maintenanceLogs.slice(0, 5).map(log => (
-                      <div
-                        key={log.id}
-                        className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg"
-                      >
+            {/* Maintenance Logging */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-blue-500" />
+                  Maintenance Logs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {maintenanceLogs.slice(0, 3).map(log => (
+                    <div
+                      key={log.id}
+                      className="p-4 bg-slate-700/50 rounded-lg border border-slate-600"
+                    >
+                      <div className="flex items-start justify-between mb-2">
                         <div>
-                          <p className="text-white font-medium">
-                            {log.activity}
-                          </p>
-                          <p className="text-white/60 text-sm">
-                            Operator: {log.operator}
+                          <h4 className="text-white font-medium">
+                            {log.title}
+                          </h4>
+                          <p className="text-sm text-slate-400">
+                            {log.equipment}
                           </p>
                         </div>
-                        <span className="text-white/60 text-sm">
-                          {log.timestamp.toLocaleTimeString()}
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            className={getMaintenanceStatusColor(log.status)}
+                          >
+                            {log.status}
+                          </Badge>
+                          <Badge className={getPriorityColor(log.priority)}>
+                            {log.priority}
+                          </Badge>
+                        </div>
+                      </div>
+                      <p className="text-sm text-slate-400 mb-2">
+                        {log.description}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <span>Assigned: {log.assignedTo}</span>
+                        <span>
+                          Scheduled: {log.scheduledDate.toLocaleDateString()}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Summary Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card className="bg-white/5 backdrop-blur-lg border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-yellow-400" />
-                    Treatment Stages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold text-white mb-2">
-                    {simulationResult.totalStagesRequired}
-                    <span className="text-xl text-white/60">/3</span>
-                  </div>
-                  <p className="text-white/60 text-sm">Stages required</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Card className="bg-white/5 backdrop-blur-lg border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-blue-400" />
-                    Treatment Time
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold text-white mb-2">
-                    {simulationResult.estimatedTreatmentTime}
-                    <span className="text-xl text-white/60">hrs</span>
-                  </div>
-                  <p className="text-white/60 text-sm">Estimated duration</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <Card className="bg-white/5 backdrop-blur-lg border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-400" />
-                    Efficiency
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold text-white mb-2">
-                    {simulationResult.estimatedEfficiency}
-                    <span className="text-xl text-white/60">%</span>
-                  </div>
-                  <Progress
-                    value={simulationResult.estimatedEfficiency}
-                    className="h-2"
-                  />
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-
-          {/* Action Buttons - Prominent Position */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mb-12"
-          >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/90 via-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
-              {/* Animated background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 animate-pulse"></div>
-
-              <div className="relative p-8">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 rounded-full mb-4">
-                    <Sparkles className="h-5 w-5 text-cyan-400 animate-pulse" />
-                    <span className="text-cyan-400 font-semibold text-sm uppercase tracking-wider">
-                      What&apos;s Next?
-                    </span>
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                    Explore Detailed Insights
-                  </h3>
-                  <p className="text-white/70 text-base">
-                    Get AI-powered recommendations and comprehensive analytics
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                  <Button
-                    onClick={() => (window.location.href = '/reuse')}
-                    className="group relative h-20 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 hover:from-emerald-600 hover:via-green-600 hover:to-teal-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 border-2 border-emerald-400/50"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                    <div className="relative flex items-center justify-center gap-3">
-                      <Droplets className="h-6 w-6 group-hover:animate-bounce" />
-                      <div className="text-left">
-                        <div className="text-lg font-bold">Reuse Options</div>
-                        <div className="text-xs text-white/90 font-normal">
-                          Water reuse recommendations
+                      {log.downtime > 0 && (
+                        <div className="mt-2">
+                          <span className="text-xs text-yellow-500">
+                            Downtime: {log.downtime}h
+                          </span>
                         </div>
-                      </div>
-                    </div>
-                  </Button>
-
-                  <Button
-                    onClick={() => (window.location.href = '/analytics')}
-                    className="group relative h-20 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 border-2 border-cyan-400/50"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                    <div className="relative flex items-center justify-center gap-3">
-                      <TrendingUp className="h-6 w-6 group-hover:animate-bounce" />
-                      <div className="text-left">
-                        <div className="text-lg font-bold">Analytics</div>
-                        <div className="text-xs text-white/90 font-normal">
-                          Detailed performance insights
-                        </div>
-                      </div>
-                    </div>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Treatment Stages */}
-          <div className="space-y-6">
-            {[
-              simulationResult.primaryTreatment,
-              simulationResult.secondaryTreatment,
-              simulationResult.tertiaryTreatment,
-            ].map((stage, index) => (
-              <motion.div
-                key={stage.name}
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-              >
-                <Card
-                  className={`${
-                    stage.required
-                      ? 'bg-red-500/10 border-red-500/30'
-                      : 'bg-green-500/10 border-green-500/30'
-                  } backdrop-blur-lg`}
-                >
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-white flex items-center gap-3">
-                        <div
-                          className={`p-3 rounded-lg ${
-                            stage.required ? 'bg-red-500/20' : 'bg-green-500/20'
-                          }`}
-                        >
-                          {getTreatmentIcon(stage.name)}
-                        </div>
-                        {stage.name}
-                      </CardTitle>
-                      {stage.required ? (
-                        <XCircle className="h-8 w-8 text-red-400" />
-                      ) : (
-                        <CheckCircle2 className="h-8 w-8 text-green-400" />
                       )}
                     </div>
-                    <CardDescription className="text-white/70 text-base mt-2">
-                      {stage.required
-                        ? '⚠️ Treatment Required'
-                        : '✓ Within Safe Limits'}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Reasons */}
-                    <div className="mb-6">
-                      <h4 className="text-white font-semibold mb-2">
-                        Analysis:
-                      </h4>
-                      <ul className="space-y-1">
-                        {stage.reason.map((reason, idx) => (
-                          <li
-                            key={idx}
-                            className="text-white/80 text-sm flex items-start gap-2"
-                          >
-                            <span className="text-cyan-400 mt-1">•</span>
-                            {reason}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  ))}
+                </div>
+                <Button
+                  onClick={() =>
+                    alert(
+                      'Maintenance log functionality would open a modal here'
+                    )
+                  }
+                  className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Add Maintenance Log
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
 
-                    {/* Parameters */}
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {stage.parameters.map((param, idx) => (
-                        <div
-                          key={idx}
-                          className={`p-4 rounded-lg ${
-                            param.exceedsThreshold
-                              ? 'bg-red-500/10 border border-red-500/30'
-                              : 'bg-green-500/10 border border-green-500/30'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-white/80 text-sm font-medium">
-                              {param.name}
-                            </span>
-                            {param.exceedsThreshold ? (
-                              <AlertTriangle className="h-4 w-4 text-red-400" />
-                            ) : (
-                              <CheckCircle2 className="h-4 w-4 text-green-400" />
-                            )}
-                          </div>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-white">
-                              {param.value.toFixed(1)}
-                            </span>
-                            <span className="text-white/60 text-sm">
-                              {param.unit}
-                            </span>
-                          </div>
-                          <div className="text-white/60 text-xs mt-1">
-                            Threshold: {param.threshold} {param.unit}
-                          </div>
-                          {param.exceedsThreshold && (
-                            <div className="mt-2 text-xs text-red-400 font-medium">
-                              Exceeds limit by{' '}
-                              {(
-                                (param.value / param.threshold - 1) *
-                                100
-                              ).toFixed(1)}
-                              %
-                            </div>
-                          )}
+          {/* Right Column - Alerts, AI Assistant, Maintenance */}
+          <div className="space-y-6">
+            {/* Alerts Feed */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-red-500" />
+                  Alert Feed
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {alerts.map(alert => (
+                  <div
+                    key={alert.id}
+                    className={`p-3 rounded-lg border ${
+                      alert.type === 'critical'
+                        ? 'bg-red-500/10 border-red-500/30'
+                        : alert.type === 'warning'
+                          ? 'bg-yellow-500/10 border-yellow-500/30'
+                          : 'bg-blue-500/10 border-blue-500/30'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2">
+                      <div
+                        className={`p-1 rounded ${
+                          alert.type === 'critical'
+                            ? 'bg-red-500'
+                            : alert.type === 'warning'
+                              ? 'bg-yellow-500'
+                              : 'bg-blue-500'
+                        }`}
+                      >
+                        <AlertTriangle className="h-3 w-3 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-white text-sm font-medium">
+                          {alert.title}
+                        </h4>
+                        <p className="text-slate-400 text-xs">
+                          {alert.message}
+                        </p>
+                        <p className="text-slate-500 text-xs mt-1">
+                          {alert.timestamp.toLocaleTimeString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  onClick={() => window.open('/reports', '_blank')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Generate Reports
+                </Button>
+                <Button
+                  onClick={() => window.open('/ai-agos', '_blank')}
+                  variant="outline"
+                  className="w-full border-slate-600 text-white bg-slate-800/50 hover:bg-slate-700"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Full AI Assistant
+                </Button>
+                <Button
+                  onClick={() => window.open('/simulation', '_blank')}
+                  variant="outline"
+                  className="w-full border-slate-600 text-white bg-slate-800/50 hover:bg-slate-700"
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Run Simulation
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Simulation Results (if available) */}
+        {simulationResult && parameters && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8"
+          >
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Treatment Simulation Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <h4 className="text-white font-medium mb-2">
+                      Input Parameters
+                    </h4>
+                    <div className="space-y-1 text-sm text-slate-400">
+                      <p>Turbidity: {parameters.turbidity} NTU</p>
+                      <p>pH: {parameters.pH}</p>
+                      <p>COD: {parameters.cod} mg/L</p>
+                      <p>TDS: {parameters.tds} mg/L</p>
+                      <p>Nitrogen: {parameters.nitrogen} mg/L</p>
+                      <p>Phosphorus: {parameters.phosphorus} mg/L</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-2">
+                      Treatment Stages
+                    </h4>
+                    <div className="space-y-2">
+                      {[
+                        simulationResult.primaryTreatment,
+                        simulationResult.secondaryTreatment,
+                        simulationResult.tertiaryTreatment,
+                      ].map((stage, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <span className="text-sm text-slate-400">
+                            {stage.name}
+                          </span>
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Action Recommendations */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="mt-12"
-          >
-            <Card className="bg-slate-900/70 backdrop-blur-lg border-slate-700 shadow-2xl">
-              <CardHeader className="border-b border-slate-700">
-                <CardTitle className="text-white text-2xl flex items-center gap-2">
-                  <span className="text-3xl">💡</span>
-                  Recommended Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {simulationResult.totalStagesRequired === 0 ? (
-                    <div className="bg-emerald-900/40 border border-emerald-400/40 rounded-lg p-4">
-                      <p className="text-lg text-white font-medium">
-                        ✅ Water quality is within acceptable limits. No
-                        treatment required at this time.
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-2">
+                      Output Quality
+                    </h4>
+                    <div className="space-y-1 text-sm text-slate-400">
+                      <p>Efficiency: {simulationResult.estimatedEfficiency}%</p>
+                      <p>
+                        Treatment Time:{' '}
+                        {simulationResult.estimatedTreatmentTime} hours
                       </p>
+                      <p>
+                        Stages Required: {simulationResult.totalStagesRequired}
+                      </p>
+                      <p>Status: {simulationResult.overallStatus}</p>
                     </div>
-                  ) : (
-                    <>
-                      <p className="text-xl font-bold text-white">
-                        Initiate {simulationResult.totalStagesRequired}{' '}
-                        treatment stage
-                        {simulationResult.totalStagesRequired > 1 ? 's' : ''}:
-                      </p>
-                      <ul className="space-y-3">
-                        {simulationResult.primaryTreatment.required && (
-                          <li className="flex items-start gap-3 bg-slate-800/70 p-4 rounded-lg border border-slate-700">
-                            <span className="text-cyan-400 text-xl font-bold mt-0.5">
-                              →
-                            </span>
-                            <span className="text-white text-base">
-                              Start with{' '}
-                              <strong className="text-cyan-300">
-                                primary treatment
-                              </strong>{' '}
-                              for physical removal of suspended solids
-                            </span>
-                          </li>
-                        )}
-                        {simulationResult.secondaryTreatment.required && (
-                          <li className="flex items-start gap-3 bg-slate-800/70 p-4 rounded-lg border border-slate-700">
-                            <span className="text-cyan-400 text-xl font-bold mt-0.5">
-                              →
-                            </span>
-                            <span className="text-white text-base">
-                              Proceed to{' '}
-                              <strong className="text-cyan-300">
-                                secondary treatment
-                              </strong>{' '}
-                              for biological removal of organic matter
-                            </span>
-                          </li>
-                        )}
-                        {simulationResult.tertiaryTreatment.required && (
-                          <li className="flex items-start gap-3 bg-slate-800/70 p-4 rounded-lg border border-slate-700">
-                            <span className="text-cyan-400 text-xl font-bold mt-0.5">
-                              →
-                            </span>
-                            <span className="text-white text-base">
-                              Complete with{' '}
-                              <strong className="text-cyan-300">
-                                tertiary treatment
-                              </strong>{' '}
-                              for nutrient removal and pH adjustment
-                            </span>
-                          </li>
-                        )}
-                      </ul>
-                      <div className="mt-6 p-4 bg-slate-800/70 border border-slate-700 rounded-lg">
-                        <p className="text-white text-base leading-relaxed">
-                          <strong className="text-cyan-300">📋 Note:</strong>{' '}
-                          Treatment stages should be executed sequentially for
-                          optimal results. Total estimated time:{' '}
-                          <span className="font-bold text-cyan-300">
-                            {simulationResult.estimatedTreatmentTime} hours
-                          </span>{' '}
-                          with{' '}
-                          <span className="font-bold text-cyan-300">
-                            {simulationResult.estimatedEfficiency}% efficiency
-                          </span>
-                          .
-                        </p>
-                      </div>
-                    </>
-                  )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
-        </div>
+        )}
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }
 
 export default function TreatmentDashboard() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <TreatmentDashboardContent />
-    </Suspense>
+    <ProtectedRoute>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+            <div className="text-white">Loading...</div>
+          </div>
+        }
+      >
+        <TreatmentDashboardContent />
+      </Suspense>
+    </ProtectedRoute>
   );
 }

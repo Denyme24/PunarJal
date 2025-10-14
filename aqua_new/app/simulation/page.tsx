@@ -4,13 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { MapPin } from 'lucide-react';
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -73,31 +66,6 @@ const SimulationContent = () => {
     const params = new URLSearchParams(parameters as any).toString();
     window.location.href = `/treatment-dashboard?${params}`;
   };
-
-  const [validationStatus, setValidationStatus] = useState(
-    'All parameters valid'
-  );
-
-  // Validate parameters
-  useEffect(() => {
-    const isValid =
-      parameters.turbidity >= 0 &&
-      parameters.turbidity <= 1000 &&
-      parameters.pH >= 0 &&
-      parameters.pH <= 14 &&
-      parameters.cod >= 0 &&
-      parameters.cod <= 1000 &&
-      parameters.tds >= 0 &&
-      parameters.tds <= 2000 &&
-      parameters.nitrogen >= 0 &&
-      parameters.nitrogen <= 100 &&
-      parameters.phosphorus >= 0 &&
-      parameters.phosphorus <= 50;
-
-    setValidationStatus(
-      isValid ? 'All parameters valid' : 'Some parameters need adjustment'
-    );
-  }, [parameters]);
 
   return (
     <ProtectedRoute>
@@ -232,41 +200,6 @@ const SimulationContent = () => {
                 max="50"
                 step="0.5"
               />
-            </div>
-          </div>
-
-          {/* Additional Fields */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center">
-              <span className="text-gray-300">Reuse Type</span>
-              <Select
-                value={parameters.reuseType}
-                onValueChange={value =>
-                  setParameters({ ...parameters, reuseType: value })
-                }
-              >
-                <SelectTrigger className="w-32 bg-transparent border-none text-white font-bold p-0 h-auto">
-                  <SelectValue placeholder="Irrigation" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="irrigation">Irrigation</SelectItem>
-                  <SelectItem value="industrial">Industrial</SelectItem>
-                  <SelectItem value="potable">Potable</SelectItem>
-                  <SelectItem value="landscape">Landscape</SelectItem>
-                  <SelectItem value="cooling">Cooling</SelectItem>
-                  <SelectItem value="toilet">Toilet</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center">
-              <span className="text-gray-300">Validation</span>
-              <span className="text-gray-400">{validationStatus}</span>
-            </div>
-            <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center">
-              <span className="text-gray-300">Helpful Tip</span>
-              <span className="text-gray-400">
-                <span className="font-bold">Hover labels</span> for guidelines
-              </span>
             </div>
           </div>
 

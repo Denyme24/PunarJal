@@ -52,6 +52,12 @@ export default function AIAgosPage() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Fix hydration issue by ensuring client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
@@ -229,8 +235,8 @@ export default function AIAgosPage() {
               </h1>
             </div>
             <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto">
-              Your intelligent assistant for wastewater treatment, real-time monitoring,
-              and water quality management
+              Your intelligent assistant for wastewater treatment, real-time
+              monitoring, and water quality management
             </p>
 
             {/* Language Selector */}
@@ -302,7 +308,9 @@ export default function AIAgosPage() {
                             : 'text-white/50'
                         }`}
                       >
-                        {message.timestamp.toLocaleTimeString()}
+                        {isClient
+                          ? message.timestamp.toLocaleTimeString()
+                          : '--:--:-- --'}
                       </div>
                     </div>
 
@@ -426,8 +434,8 @@ export default function AIAgosPage() {
               </div>
 
               <p className="text-xs text-white/40 mt-2 text-center">
-                AI Assistant is trained on PunarJal data. Press Shift+Enter for new
-                line
+                AI Assistant is trained on PunarJal data. Press Shift+Enter for
+                new line
               </p>
             </div>
           </Card>

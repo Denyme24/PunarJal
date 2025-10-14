@@ -9,6 +9,7 @@ export interface WaterQualityParameters {
   phosphorus: number; // mg/L
   pH: number;
   tds?: number; // mg/L
+  reuseType?: string; // Type of water reuse application
 }
 
 export interface TreatmentStage {
