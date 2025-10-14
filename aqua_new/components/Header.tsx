@@ -27,12 +27,9 @@ const Header = () => {
   };
 
   const navLinks = [
-    { href: "/", label: "HOME" },
     { href: "/map", label: "MAP VIEW" },
     { href: "/simulation", label: "SIMULATION" },
     { href: "/iot-sensors", label: "IOT SENSORS" },
-    { href: "/reuse", label: "REUSE OPTIONS" },
-    { href: "/analytics", label: "ANALYTICS" },
   ];
 
   return (
