@@ -25,7 +25,7 @@ const HeroSection = () => {
     if (isAuthenticated) {
       router.push("/simulation");
     } else {
-      setIsAuthModalOpen(true);
+      router.push("/onboarding");
     }
   };
 
