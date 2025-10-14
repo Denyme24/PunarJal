@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Eye, EyeOff, MessageCircle, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const BANGALORE_LOCATIONS = [
   "Whitefield",
@@ -160,110 +161,185 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center p-6">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <motion.div 
+      className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+    >
+      <motion.div 
+        className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+      >
         
         {/* Left Side - Role Selection */}
-        <div className="space-y-6">
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+        >
           {/* Back Button */}
-          <Button
-            onClick={handleBackToHome}
-            variant="ghost"
-            className="text-white hover:bg-white/10 p-2"
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Button>
+            <Button
+              onClick={handleBackToHome}
+              variant="ghost"
+              className="text-white hover:bg-white/10 p-2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+          </motion.div>
 
-          <div className="text-center lg:text-left">
-            <h1 className="text-4xl font-bold text-white mb-2">Welcome to PunarJal</h1>
+          <motion.div 
+            className="text-center lg:text-left"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+          >
+            <div className="flex items-center justify-center lg:justify-start space-x-4 mb-4">
+              <img 
+                src="/assets/logo.png" 
+                alt="PunarJal Logo" 
+                className="h-24 w-24"
+              />
+              <h1 className="text-4xl font-bold text-white">Welcome to PunarJal</h1>
+            </div>
             <p className="text-lg text-gray-300">Smart Water Recovery & Reuse System</p>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+          >
             <h2 className="text-2xl font-semibold text-white mb-6">Choose your role</h2>
             
             <div className="space-y-4">
               {/* Plant Operator Card */}
-              <Card 
-                className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
-                  selectedRole === "Plant Operator" 
-                    ? "bg-blue-600 border-blue-500" 
-                    : "bg-gray-800/60 border-gray-700 hover:bg-gray-700/60"
-                }`}
-                onClick={() => handleRoleSelect("Plant Operator")}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.7, ease: "easeOut" }}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedRole === "Plant Operator" ? "bg-white/20" : "bg-blue-600"
-                    }`}>
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-                        <path d="M6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
-                      </svg>
+                <Card 
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 ${
+                    selectedRole === "Plant Operator" 
+                      ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/30" 
+                      : "bg-gray-800/60 border-gray-700 hover:bg-gray-700/60"
+                  }`}
+                  onClick={() => handleRoleSelect("Plant Operator")}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className={`p-3 rounded-lg transition-all duration-300 ${
+                        selectedRole === "Plant Operator" ? "bg-white/20 scale-110" : "bg-blue-600"
+                      }`}>
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                          <path d="M6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-white">Plant Operator</h3>
+                        <p className="text-gray-300">Monitor and control plant operations</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white">Plant Operator</h3>
-                      <p className="text-gray-300">Monitor and control plant operations</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Environmental Officer Card */}
-              <Card 
-                className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
-                  selectedRole === "Environmental Officer" 
-                    ? "bg-blue-600 border-blue-500" 
-                    : "bg-gray-800/60 border-gray-700 hover:bg-gray-700/60"
-                }`}
-                onClick={() => handleRoleSelect("Environmental Officer")}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedRole === "Environmental Officer" ? "bg-white/20" : "bg-blue-600"
-                    }`}>
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
-                      </svg>
+                <Card 
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 ${
+                    selectedRole === "Environmental Officer" 
+                      ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/30" 
+                      : "bg-gray-800/60 border-gray-700 hover:bg-gray-700/60"
+                  }`}
+                  onClick={() => handleRoleSelect("Environmental Officer")}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className={`p-3 rounded-lg transition-all duration-300 ${
+                        selectedRole === "Environmental Officer" ? "bg-white/20 scale-110" : "bg-blue-600"
+                      }`}>
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-white">Environmental Officer</h3>
+                        <p className="text-gray-300">Review compliance and environmental data</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white">Environmental Officer</h3>
-                      <p className="text-gray-300">Review compliance and environmental data</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Right Side - Login/Signup Form */}
-        <div className="space-y-6">
-          <div>
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+          >
             <h2 className="text-2xl font-semibold text-white mb-6">Get Started</h2>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-gray-800/60">
-                <TabsTrigger 
-                  value="login" 
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-300 hover:text-white"
-                >
-                  Login
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="signup" 
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-300 hover:text-white"
-                >
-                  Sign Up
-                </TabsTrigger>
-              </TabsList>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
+                <TabsList className="grid w-full grid-cols-2 bg-gray-800/60">
+                  <TabsTrigger 
+                    value="login" 
+                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-all duration-300"
+                  >
+                    Login
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="signup" 
+                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-all duration-300"
+                  >
+                    Sign Up
+                  </TabsTrigger>
+                </TabsList>
+              </motion.div>
 
               {/* Login Tab */}
               <TabsContent value="login" className="mt-6">
-                <form onSubmit={handleLogin} className="space-y-4">
+                <AnimatePresence mode="wait">
+                  {activeTab === "login" && (
+                    <motion.form 
+                      key="login-form"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      onSubmit={handleLogin} 
+                      className="space-y-4"
+                    >
                   {/* Email Field */}
                   <div className="space-y-2">
                     <Label htmlFor="login-email" className="text-white">Email</Label>
@@ -345,12 +421,24 @@ export default function OnboardingPage() {
                       <span>Google</span>
                     </div>
                   </Button>
-                </form>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
               </TabsContent>
 
               {/* Signup Tab */}
               <TabsContent value="signup" className="mt-6">
-                <form onSubmit={handleSignup} className="space-y-4">
+                <AnimatePresence mode="wait">
+                  {activeTab === "signup" && (
+                    <motion.form 
+                      key="signup-form"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      onSubmit={handleSignup} 
+                      className="space-y-4"
+                    >
                   {/* Organization Name */}
                   <div className="space-y-2">
                     <Label htmlFor="org-name" className="text-white">Organization Name</Label>
@@ -474,23 +562,31 @@ export default function OnboardingPage() {
                   >
                     {isLoading ? "Creating Account..." : "Sign Up"}
                   </Button>
-                </form>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
               </TabsContent>
             </Tabs>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
       {/* Help Button - Bottom Right */}
-      <Button
-        onClick={handleHelpClick}
-        className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white rounded-full p-4 shadow-lg"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 1, ease: "easeOut" }}
       >
-        <div className="flex items-center space-x-2">
-          <MessageCircle className="w-5 h-5" />
-          <span className="hidden sm:inline">Need Help? Ask Aqua AI</span>
-        </div>
-      </Button>
-    </div>
+        <Button
+          onClick={handleHelpClick}
+          className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <div className="flex items-center space-x-2">
+            <MessageCircle className="w-5 h-5" />
+            <span className="hidden sm:inline">Need Help? Ask Aqua AI</span>
+          </div>
+        </Button>
+      </motion.div>
+    </motion.div>
   );
 }

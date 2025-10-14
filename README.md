@@ -1,6 +1,6 @@
-# Smart Wastewater Treatment System - Next.js
+# PunarJal - Smart Wastewater Treatment System
 
-A full-stack Next.js application for wastewater treatment simulation and monitoring with integrated backend API and JWT authentication.
+A full-stack Next.js application for wastewater treatment simulation and monitoring with integrated backend API and JWT authentication. PunarJal transforms wastewater treatment from a costly necessity into a sustainable resource recovery system.
 
 ## 🌟 Features
 
