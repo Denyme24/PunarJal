@@ -25,7 +25,10 @@ const HeroSection = () => {
     if (isAuthenticated) {
       router.push("/simulation");
     } else {
-      router.push("/onboarding");
+      // Add a small delay for smooth transition
+      setTimeout(() => {
+        router.push("/onboarding");
+      }, 100);
     }
   };
 

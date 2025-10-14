@@ -46,7 +46,7 @@ export default function AIAgosPage() {
     {
       role: "assistant",
       content:
-        "Hello! I'm AI AGOS, your intelligent assistant for AquaRenew's wastewater treatment system. I can help you understand water treatment processes, simulation results, IoT sensor data, and more. How can I assist you today?",
+        "Hello! I'm AI AGOS, your intelligent assistant for PunarJal's wastewater treatment system. I can help you understand water treatment processes, simulation results, IoT sensor data, and more. How can I assist you today?",
       timestamp: new Date(),
     },
   ]);
@@ -362,7 +362,7 @@ export default function AIAgosPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={`Ask me anything about AquaRenew... ${
+                    placeholder={`Ask me anything about PunarJal... ${
                       isRecording ? "(Recording...)" : ""
                     }`}
                     className="bg-white/5 border-white/10 text-white placeholder:text-white/40 resize-none focus-visible:ring-cyan-500 min-h-[60px]"
@@ -426,7 +426,7 @@ export default function AIAgosPage() {
               </div>
 
               <p className="text-xs text-white/40 mt-2 text-center">
-                AI AGOS is trained on AquaRenew data. Press Shift+Enter for new
+                AI AGOS is trained on PunarJal data. Press Shift+Enter for new
                 line
               </p>
             </div>

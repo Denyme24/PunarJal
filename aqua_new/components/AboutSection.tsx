@@ -67,7 +67,7 @@ const AboutSection = () => {
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
             About{" "}
-            <span className="font-serif italic text-cyan-400">AquaRenew</span>
+            <span className="font-serif italic text-cyan-400">PunarJal</span>
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
             Revolutionizing wastewater treatment through intelligent technology
@@ -90,7 +90,7 @@ const AboutSection = () => {
                 Our Mission
               </h3>
               <p className="text-lg text-white/80 leading-relaxed">
-                At AquaRenew, we believe that every drop of water has value. Our
+                At PunarJal, we believe that every drop of water has value. Our
                 mission is to transform wastewater treatment from a costly
                 necessity into a sustainable resource recovery system that
                 benefits both industry and environment.
@@ -158,7 +158,7 @@ const AboutSection = () => {
           className="mb-20"
         >
           <h3 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
-            Why Choose AquaRenew?
+            Why Choose PunarJal?
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -198,7 +198,7 @@ const AboutSection = () => {
             Ready to Transform Your Water Management?
           </h3>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Discover how AquaRenew can revolutionize your wastewater treatment
+            Discover how PunarJal can revolutionize your wastewater treatment
             and unlock the potential of water reuse for your organization.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
