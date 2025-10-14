@@ -8,6 +8,7 @@ interface User {
   organizationEmail: string;
   organizationType: string;
   location: string;
+  role: "Plant Operator" | "Environmental Officer";
 }
 
 interface AuthContextType {
@@ -25,6 +26,7 @@ interface SignupData {
   organizationEmail: string;
   organizationType: string;
   location: string;
+  role: "Plant Operator" | "Environmental Officer";
   password: string;
 }
 

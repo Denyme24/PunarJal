@@ -6,6 +6,7 @@ export interface IUser extends Document {
   organizationEmail: string;
   organizationType: string;
   location: string;
+  role: "Plant Operator" | "Environmental Officer";
   password: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
   createdAt: Date;
@@ -79,6 +80,12 @@ const userSchema = new Schema<IUser>(
         "Bellandur",
         "MG Road",
       ],
+    },
+    role: {
+      type: String,
+      required: [true, "Role is required"],
+      enum: ["Plant Operator", "Environmental Officer"],
+      default: "Plant Operator",
     },
     password: {
       type: String,

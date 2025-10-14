@@ -15,10 +15,11 @@ import {
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiredRole?: "Plant Operator" | "Environmental Officer";
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
@@ -73,6 +74,14 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         </AlertDialog>
       </>
     );
+  }
+
+  // Role-based check
+  if (requiredRole && user && user.role !== requiredRole) {
+    // Redirect based on role to the right home
+    const redirect = user.role === "Plant Operator" ? "/simulation" : "/analytics";
+    router.push(redirect);
+    return null;
   }
 
   // User is authenticated, render the protected content

@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
       organizationEmail,
       organizationType,
       location,
+      role,
       password,
     } = body;
 
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
       !organizationEmail ||
       !organizationType ||
       !location ||
+      !role ||
       !password
     ) {
       return NextResponse.json(
@@ -46,6 +48,7 @@ export async function POST(request: NextRequest) {
       organizationEmail,
       organizationType,
       location,
+      role,
       password,
     });
 
@@ -62,6 +65,7 @@ export async function POST(request: NextRequest) {
           organizationEmail: user.organizationEmail,
           organizationType: user.organizationType,
           location: user.location,
+          role: user.role,
           token,
         },
         { status: 201 }

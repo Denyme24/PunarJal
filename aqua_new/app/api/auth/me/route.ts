@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
       organizationEmail: user.organizationEmail,
       organizationType: user.organizationType,
       location: user.location,
+    role: user.role,
     });
   } catch (error: any) {
     console.error("Get me error:", error);
