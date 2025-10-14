@@ -210,11 +210,11 @@ function TreatmentDashboardContent() {
     } catch {}
 
     // Determine the source of the simulation
-    // If sourceName is present, it's either from map or IoT sensors
-    let source: 'simulation_page' | 'iot_sensors' | 'map_view' =
+    // If sourceName is present, it's either from map or real-time monitoring
+    let source: 'simulation_page' | 'real_time_dashboard' | 'map_view' =
       'simulation_page';
     if (sourceName) {
-      // Check if it contains "Lake" - likely from map or IoT
+      // Check if it contains "Lake" - likely from map or real-time monitoring
       if (sourceName.includes('Lake')) {
         // Check if there's sensor data patterns to differentiate
         // For now, we'll use map_view as default when sourceName is present

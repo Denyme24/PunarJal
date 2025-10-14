@@ -96,7 +96,7 @@ const AboutSection = () => {
                 benefits both industry and environment.
               </p>
               <p className="text-lg text-white/80 leading-relaxed">
-                Through cutting-edge IoT sensors, AI-driven analytics, and
+                Through cutting-edge real-time monitoring, AI-driven analytics, and
                 automated treatment processes, we&apos;re making water reuse not
                 just possible, but profitable and environmentally responsible.
               </p>
@@ -229,7 +229,7 @@ const AboutSection = () => {
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              View IoT Sensors
+              View Real Time Dashboard
             </motion.a>
           </div>
         </motion.div>

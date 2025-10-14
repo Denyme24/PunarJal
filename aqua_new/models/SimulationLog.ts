@@ -6,8 +6,8 @@ export interface ISimulationLog extends mongoose.Document {
   userLocation?: string;
 
   // Source of simulation
-  source: 'simulation_page' | 'iot_sensors' | 'map_view';
-  sourceName?: string; // e.g., "Hebbal Lake" for map/IoT sources
+  source: 'simulation_page' | 'real_time_dashboard' | 'map_view';
+  sourceName?: string; // e.g., "Hebbal Lake" for map/real-time monitoring sources
 
   // Input parameters
   inputParameters: {
