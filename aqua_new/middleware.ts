@@ -13,7 +13,6 @@ export const config = {
   matcher: [
     "/map/:path*",
     "/simulation/:path*",
-    "/dashboard/:path*",
     "/treatment-dashboard/:path*",
     "/iot-sensors/:path*",
     "/reuse/:path*",

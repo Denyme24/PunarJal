@@ -30,7 +30,6 @@ const Header = () => {
     { href: "/", label: "HOME" },
     { href: "/map", label: "MAP VIEW" },
     { href: "/simulation", label: "SIMULATION" },
-    { href: "/dashboard", label: "DASHBOARD" },
     { href: "/iot-sensors", label: "IOT SENSORS" },
     { href: "/reuse", label: "REUSE OPTIONS" },
     { href: "/analytics", label: "ANALYTICS" },
