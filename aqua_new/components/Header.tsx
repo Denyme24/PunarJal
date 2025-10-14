@@ -30,8 +30,8 @@ const Header = () => {
   const baseNavLinks = [
     { href: '/map', label: 'MAP VIEW' },
     { href: '/simulation', label: 'SIMULATION' },
-    { href: '/iot-sensors', label: 'IOT SENSORS' },
-    { href: '/ai-agos', label: 'AI AGOS', icon: Bot },
+    { href: '/iot-sensors', label: 'REAL TIME DASHBOARD' },
+    { href: '/ai-agos', label: 'AI ASSISTANT', icon: Bot },
   ];
 
   // Role-specific navigation links

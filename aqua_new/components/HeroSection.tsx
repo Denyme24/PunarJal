@@ -133,7 +133,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 1.1 }}
           className="text-sm md:text-base text-sky-100/70 mb-10 max-w-3xl mx-auto leading-relaxed"
         >
-          Automated 3-stage treatment • IoT sensor integration • Smart reuse
+          Automated 3-stage treatment • Real-time monitoring • Smart reuse
           recommendations • Water conservation analytics
         </motion.p>
 
