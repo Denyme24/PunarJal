@@ -10,6 +10,7 @@ import {
   simulateTreatment,
   WaterQualityParameters,
   TreatmentSimulationResult,
+  THRESHOLDS,
 } from '@/lib/treatmentLogic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -122,54 +123,115 @@ function TreatmentDashboardContent() {
     },
   ]);
 
-  // Alerts and recommendations
-  const [alerts] = useState<Alert[]>([
-    {
-      id: '1',
-      type: 'critical',
-      title: 'Primary Clarifier Overflow',
-      message:
-        'Clarifier #2 overflow detected. Immediate bypass activation required to prevent environmental discharge.',
-      timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
-      resolved: false,
-    },
-    {
-      id: '2',
-      type: 'warning',
-      title: 'Dissolved Oxygen Low',
-      message:
-        'DO levels in aeration tank #3 below 2.0 mg/L. Check blower operation and diffuser maintenance.',
-      timestamp: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
-      resolved: false,
-    },
-    {
-      id: '3',
-      type: 'warning',
-      title: 'Sludge Return Pump Vibration',
-      message:
-        'Excessive vibration detected on SRP-04. Schedule maintenance within 24 hours to prevent failure.',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      resolved: false,
-    },
-    {
-      id: '4',
-      type: 'info',
-      title: 'Weekly Calibration Due',
-      message:
-        'pH sensors in secondary treatment require calibration. Scheduled for tomorrow 8:00 AM.',
-      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-      resolved: false,
-    },
-    {
-      id: '5',
-      type: 'critical',
-      title: 'Power Supply Failure',
-      message:
-        'UPS backup activated for control room. Generator startup initiated. Monitor system stability.',
-      timestamp: new Date(Date.now() - 8 * 60 * 1000), // 8 minutes ago
-      resolved: false,
-    },
-  ]);
+  // Alerts and recommendations (generated from thresholds)
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  function generateDynamicAlerts(
+    params: WaterQualityParameters | null,
+    sensors: RealTimeSensor[]
+  ): Alert[] {
+    const out: Alert[] = [];
+    const now = Date.now();
+    const add = (
+      type: Alert['type'],
+      title: string,
+      message: string,
+      minutesAgo: number
+    ) => {
+      out.push({
+        id: `${type}-${title}-${minutesAgo}`,
+        type,
+        title,
+        message,
+        timestamp: new Date(now - minutesAgo * 60 * 1000),
+        resolved: false,
+      });
+    };
+
+    const flow = sensors.find(s => s.id === 'flow');
+    if (flow && (flow.value < flow.threshold.min || flow.value > flow.threshold.max)) {
+      add(
+        'critical',
+        'Primary Clarifier Overflow',
+        `Influent flow ${flow.value.toFixed(2)} ${flow.unit} outside operational band (${flow.threshold.min}-${flow.threshold.max}). Consider bypass and equalization.`,
+        12
+      );
+    }
+
+    const turb = sensors.find(s => s.id === 'turbidity');
+    if (turb && turb.value > 5) {
+      add(
+        'warning',
+        'Effluent Turbidity High',
+        `Current ${turb.value.toFixed(2)} NTU exceeds good range (0-5). Check filters and coagulant dose.`,
+        28
+      );
+    }
+
+    const ph = sensors.find(s => s.id === 'ph');
+    if (ph && (ph.value < THRESHOLDS.TERTIARY.PH_MIN || ph.value > THRESHOLDS.TERTIARY.PH_MAX)) {
+      add(
+        'warning',
+        'pH Out of Range',
+        `Final pH ${ph.value.toFixed(2)} outside ${THRESHOLDS.TERTIARY.PH_MIN}-${THRESHOLDS.TERTIARY.PH_MAX}. Dose alkali/acid and verify probes.`,
+        45
+      );
+    }
+
+    if (params) {
+      if (params.cod > THRESHOLDS.SECONDARY.COD) {
+        add(
+          'warning',
+          'High COD Load',
+          `Influent COD ${params.cod} mg/L exceeds ${THRESHOLDS.SECONDARY.COD}. Increase aeration or return activated sludge.`,
+          6
+        );
+      }
+
+      if (params.nitrogen > THRESHOLDS.TERTIARY.NITROGEN) {
+        add(
+          'info',
+          'Nitrogen Removal Required',
+          `Total nitrogen ${params.nitrogen} mg/L > ${THRESHOLDS.TERTIARY.NITROGEN}. Enable nitrification/denitrification.`,
+          67
+        );
+      }
+
+      if (params.phosphorus > THRESHOLDS.TERTIARY.PHOSPHORUS) {
+        add(
+          'info',
+          'Phosphorus Above Limit',
+          `Phosphorus ${params.phosphorus} mg/L > ${THRESHOLDS.TERTIARY.PHOSPHORUS}. Start alum/FeCl3 precipitation.`,
+          31
+        );
+      }
+
+      if (params.tds && params.tds > 500) {
+        add(
+          'warning',
+          'TDS/Conductivity High',
+          `TDS ${params.tds} mg/L exceeds 500. Check RO/ion exchange and recycle ratio.`,
+          18
+        );
+      }
+    }
+
+    // Routine calibration reminder mock
+    add(
+      'info',
+      'Weekly Calibration Due',
+      'pH and DO sensors require weekly calibration. Scheduled for tomorrow 8:00 AM.',
+      240
+    );
+
+    return out
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, 8);
+  }
+
+  useEffect(() => {
+    setAlerts(generateDynamicAlerts(parameters, sensorData));
+  }, [parameters, sensorData]);
 
   // Maintenance logs
   const [maintenanceLogs] = useState<MaintenanceLog[]>([

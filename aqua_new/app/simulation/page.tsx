@@ -4,6 +4,13 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from '@/components/ui/select';
 import { MapPin } from 'lucide-react';
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -61,7 +68,80 @@ const SimulationContent = () => {
     }
   }, [searchParams]);
 
-  const handleStartSimulation = () => {
+  const handleStartSimulation = async () => {
+    // Build parameter specs for AI based on provided tables
+    const primarySpecs = [
+      {
+        name: 'Turbidity',
+        unit: 'NTU',
+        good: '0 - 5',
+        outbreak: '> 50',
+        value: parameters.turbidity,
+      },
+      {
+        name: 'Flow Rate',
+        unit: 'L/min',
+        good: 'As per plant capacity',
+        outbreak: 'Sudden drop/increase beyond ±20%',
+        value: 'not provided',
+      },
+      {
+        name: 'Pressure',
+        unit: 'kPa',
+        good: '100 - 300 (operational)',
+        outbreak: '< 80 or > 350',
+        value: 'not provided',
+      },
+      {
+        name: 'Sludge Level',
+        unit: 'cm',
+        good: '20 - 60',
+        outbreak: '> 80',
+        value: 'not provided',
+      },
+    ];
+
+    const secondarySpecs = [
+      { name: 'Dissolved Oxygen', unit: 'mg/L', good: '4 - 8', outbreak: '< 2 or > 12', value: 'not provided' },
+      { name: 'pH', unit: 'pH Units', good: '6.5 - 8.5', outbreak: '< 5.5 or > 9', value: parameters.pH },
+      { name: 'ORP', unit: 'mV', good: '200 - 450', outbreak: '< 100 or > 600', value: 'not provided' },
+      { name: 'Temperature', unit: '°C', good: '20 - 35', outbreak: '< 10 or > 45', value: 'not provided' },
+      { name: 'Ammonia-Nitrate', unit: 'mg/L', good: '0 - 1', outbreak: '> 5', value: 'not provided' },
+    ];
+
+    const tertiarySpecs = [
+      { name: 'Conductivity', unit: 'µS/cm', good: '0 - 500', outbreak: '> 2000', value: 'not provided' },
+      { name: 'Total Dissolved Solids (TDS)', unit: 'mg/L', good: '0 - 500', outbreak: '> 2000', value: parameters.tds },
+      { name: 'UV Intensity', unit: 'mW/cm²', good: '25 - 40', outbreak: '< 15', value: 'not provided' },
+      { name: 'Chlorine Residual', unit: 'mg/L', good: '0.2 - 1.0', outbreak: '> 4', value: 'not provided' },
+      { name: 'Phosphate-Nitrite', unit: 'mg/L', good: '0 - 0.1', outbreak: '> 1', value: 'not provided' },
+    ];
+
+    // Compose AI prompt
+    const aiMessage = `You are a wastewater treatment expert. Given these input values and reuse type, analyze whether primary, secondary, and tertiary processes are sufficient. Use the provided sensor parameter tables to reason about risks and recommendations.\n\nInput values:\n- Turbidity: ${parameters.turbidity} NTU\n- pH: ${parameters.pH}\n- COD: ${parameters.cod} mg/L\n- TDS: ${parameters.tds} mg/L\n- Nitrogen: ${parameters.nitrogen} mg/L\n- Phosphorus: ${parameters.phosphorus} mg/L\n- Reuse Type: ${parameters.reuseType || 'not specified'}\n\nPrimary Treatment Sensors (with good vs outbreak ranges):\n${JSON.stringify(primarySpecs, null, 2)}\n\nSecondary Treatment Sensors:\n${JSON.stringify(secondarySpecs, null, 2)}\n\nTertiary Treatment Sensors:\n${JSON.stringify(tertiarySpecs, null, 2)}\n\nReturn a concise analysis with: 1) risks detected per stage, 2) which parameters are out of range, 3) recommended adjustments and control actions, 4) expected treatment efficiency and time estimate.`;
+
+    try {
+      const response = await fetch('/api/ai-agos/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: aiMessage, context: 'simulation_processing' }),
+      });
+      const aiResult = await response.json();
+
+      // Store for dashboard consumption
+      const simulationData = {
+        parameters,
+        aiAnalysis: aiResult.message || 'Simulation processed successfully',
+        timestamp: new Date().toISOString(),
+        source: 'simulation_page',
+      };
+      try {
+        localStorage.setItem('processedSimulationData', JSON.stringify(simulationData));
+      } catch {}
+    } catch (e) {
+      console.error('Gemini call failed', e);
+    }
+
     // Navigate to treatment dashboard with parameters
     const params = new URLSearchParams(parameters as any).toString();
     window.location.href = `/treatment-dashboard?${params}`;
@@ -200,6 +280,41 @@ const SimulationContent = () => {
                 max="50"
                 step="0.5"
               />
+            </div>
+          </div>
+
+          {/* Reuse Type Selector */}
+          <div className="mb-6">
+            <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
+              <span className="text-gray-300">Reuse Type</span>
+              <div className="w-72">
+                <Select
+                  value={parameters.reuseType}
+                  onValueChange={value =>
+                    setParameters({ ...parameters, reuseType: value })
+                  }
+                >
+                  <SelectTrigger className="bg-transparent border-white/10 text-white">
+                    <SelectValue placeholder="Select reuse application" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 text-white border-white/10">
+                    <SelectItem value="Agricultural Irrigation">
+                      Agricultural Irrigation
+                    </SelectItem>
+                    <SelectItem value="Industrial Process Water">
+                      Industrial Process Water
+                    </SelectItem>
+                    <SelectItem value="Landscape Irrigation">
+                      Landscape Irrigation
+                    </SelectItem>
+                    <SelectItem value="Toilet Flushing">Toilet Flushing</SelectItem>
+                    <SelectItem value="Cooling Tower Systems">
+                      Cooling Tower Systems
+                    </SelectItem>
+                    <SelectItem value="Potable Water">Potable Water</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
