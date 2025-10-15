@@ -11,7 +11,7 @@ import {
   SelectItem,
   SelectValue,
 } from '@/components/ui/select';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -33,6 +33,7 @@ const SimulationContent = () => {
   const searchParams = useSearchParams();
   const { t } = useI18n();
   const [sourceName, setSourceName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [parameters, setParameters] = useState<WaterParameters>({
     turbidity: 50,
     pH: 7.0,
@@ -71,8 +72,11 @@ const SimulationContent = () => {
   }, [searchParams]);
 
   const handleStartSimulation = async () => {
-    // Build parameter specs for AI based on provided tables
-    const primarySpecs = [
+    setIsLoading(true);
+    
+    try {
+      // Build parameter specs for AI based on provided tables
+      const primarySpecs = [
       {
         name: 'Turbidity',
         unit: 'NTU',
@@ -182,7 +186,6 @@ const SimulationContent = () => {
     // Compose AI prompt
     const aiMessage = `You are a wastewater treatment expert. Given these input values and reuse type, analyze whether primary, secondary, and tertiary processes are sufficient. Use the provided sensor parameter tables to reason about risks and recommendations.\n\nInput values:\n- Turbidity: ${parameters.turbidity} NTU\n- pH: ${parameters.pH}\n- COD: ${parameters.cod} mg/L\n- TDS: ${parameters.tds} mg/L\n- Nitrogen: ${parameters.nitrogen} mg/L\n- Phosphorus: ${parameters.phosphorus} mg/L\n- Reuse Type: ${parameters.reuseType || 'not specified'}\n\nPrimary Treatment Sensors (with good vs outbreak ranges):\n${JSON.stringify(primarySpecs, null, 2)}\n\nSecondary Treatment Sensors:\n${JSON.stringify(secondarySpecs, null, 2)}\n\nTertiary Treatment Sensors:\n${JSON.stringify(tertiarySpecs, null, 2)}\n\nReturn a concise analysis with: 1) risks detected per stage, 2) which parameters are out of range, 3) recommended adjustments and control actions, 4) expected treatment efficiency and time estimate.`;
 
-    try {
       const response = await fetch('/api/ai-agos/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -206,19 +209,37 @@ const SimulationContent = () => {
           JSON.stringify(simulationData)
         );
       } catch {}
+      
+      // Navigate to treatment dashboard with parameters
+      const params = new URLSearchParams(parameters as any).toString();
+      window.location.href = `/treatment-dashboard?${params}`;
     } catch (e) {
       console.error('Gemini call failed', e);
+      setIsLoading(false); // Reset loading state on error
     }
-
-    // Navigate to treatment dashboard with parameters
-    const params = new URLSearchParams(parameters as any).toString();
-    window.location.href = `/treatment-dashboard?${params}`;
   };
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950 relative">
         <Header />
+        
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-slate-900 rounded-lg p-8 flex flex-col items-center space-y-4 border border-white/10">
+              <Loader2 className="h-8 w-8 animate-spin text-teal-400" />
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  {t('simulation.processing', 'Processing Simulation')}
+                </h3>
+                <p className="text-sm text-gray-300">
+                  {t('simulation.pleaseWait', 'Please wait while we analyze your water parameters...')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="container mx-auto px-6 pt-32 pb-20">
           {/* Header */}
@@ -265,6 +286,7 @@ const SimulationContent = () => {
                 className="w-20 bg-transparent border-none text-white font-bold text-right p-0 h-auto"
                 min="0"
                 max="1000"
+                disabled={isLoading}
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
@@ -282,6 +304,7 @@ const SimulationContent = () => {
                 min="0"
                 max="14"
                 step="0.1"
+                disabled={isLoading}
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
@@ -300,6 +323,7 @@ const SimulationContent = () => {
                 className="w-20 bg-transparent border-none text-white font-bold text-right p-0 h-auto"
                 min="0"
                 max="1000"
+                disabled={isLoading}
               />
             </div>
 
@@ -320,6 +344,7 @@ const SimulationContent = () => {
                 className="w-20 bg-transparent border-none text-white font-bold text-right p-0 h-auto"
                 min="0"
                 max="2000"
+                disabled={isLoading}
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
@@ -338,6 +363,7 @@ const SimulationContent = () => {
                 className="w-20 bg-transparent border-none text-white font-bold text-right p-0 h-auto"
                 min="0"
                 max="100"
+                disabled={isLoading}
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
@@ -357,6 +383,7 @@ const SimulationContent = () => {
                 min="0"
                 max="50"
                 step="0.5"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -373,6 +400,7 @@ const SimulationContent = () => {
                   onValueChange={value =>
                     setParameters({ ...parameters, reuseType: value })
                   }
+                  disabled={isLoading}
                 >
                   <SelectTrigger className="bg-transparent border-white/10 text-white">
                     <SelectValue
@@ -421,16 +449,24 @@ const SimulationContent = () => {
                   reuseType: '',
                 })
               }
-              className="px-6 py-3 bg-blue-100 text-gray-700 hover:bg-blue-200 rounded-lg font-medium"
+              disabled={isLoading}
+              className="px-6 py-3 bg-blue-100 text-gray-700 hover:bg-blue-200 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('common.reset', 'Reset')}
             </Button>
             <Button
               onClick={handleStartSimulation}
-              disabled={!parameters.reuseType}
+              disabled={!parameters.reuseType || isLoading}
               className="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t('simulation.run', 'Run Simulation')}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('simulation.running', 'Running Simulation...')}
+                </>
+              ) : (
+                t('simulation.run', 'Run Simulation')
+              )}
             </Button>
           </div>
         </div>
