@@ -77,14 +77,14 @@ const Header = () => {
       transition={{ duration: 0.6 }}
       className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-2xl border-b border-white/5"
     >
-      <div className="container mx-auto px-8 py-3">
+      <div className="container mx-auto px-8 py-2">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="group flex items-center space-x-3">
             <img
               src="/assets/logo.png"
               alt="PunarJal Logo"
-              className="h-16 w-16 transition-transform duration-300 group-hover:scale-110"
+              className="h-12 w-12 transition-transform duration-300 group-hover:scale-110"
             />
             <span className="text-2xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent tracking-tight hover:from-cyan-200 hover:via-blue-200 hover:to-white transition-all duration-300">
               {t('app.title', 'PunarJal')}
