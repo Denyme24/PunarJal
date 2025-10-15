@@ -70,19 +70,19 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 210 30% 8%;
 
-    /* Deep water blue - primary brand */
-    --primary: 200 80% 25%;
+    /* Brand palette updated to Glacial Flow (#4CD6DB) and Crystal Lagoon (#30C9D0) */
+    /* Approximate HSL conversions */
+    --primary: 183 64% 50%; /* Crystal Lagoon */
     --primary-foreground: 0 0% 100%;
 
-    /* Teal/Cyan for clean water */
-    --secondary: 180 65% 45%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 182 60% 58%; /* Glacial Flow */
+    --secondary-foreground: 210 30% 8%;
 
     --muted: 210 30% 90%;
     --muted-foreground: 210 15% 45%;
 
-    /* Bright accent for highlights */
-    --accent: 185 85% 55%;
+    /* Accent aligns within the same aqua family */
+    --accent: 182 60% 58%;
     --accent-foreground: 210 30% 8%;
 
     --destructive: 0 84.2% 60.2%;
@@ -90,7 +90,7 @@ All colors MUST be HSL.
 
     --border: 210 25% 85%;
     --input: 210 25% 85%;
-    --ring: 200 80% 25%;
+    --ring: 183 64% 50%;
 
     --radius: 0.75rem;
 
@@ -136,16 +136,16 @@ All colors MUST be HSL.
     --popover: 200 30% 12%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 185 85% 55%;
+    --primary: 183 64% 50%;
     --primary-foreground: 200 35% 8%;
 
-    --secondary: 200 60% 35%;
+    --secondary: 182 60% 58%;
     --secondary-foreground: 210 20% 98%;
 
     --muted: 200 25% 18%;
     --muted-foreground: 210 20% 65%;
 
-    --accent: 180 65% 45%;
+    --accent: 182 60% 58%;
     --accent-foreground: 210 20% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -153,7 +153,7 @@ All colors MUST be HSL.
 
     --border: 200 25% 20%;
     --input: 200 25% 20%;
-    --ring: 185 85% 55%;
+    --ring: 183 64% 50%;
 
     --gradient-murky: linear-gradient(
       180deg,
@@ -162,13 +162,13 @@ All colors MUST be HSL.
     );
     --gradient-water: linear-gradient(
       180deg,
-      hsl(200 60% 20%) 0%,
-      hsl(185 70% 35%) 100%
+      hsl(183 64% 40%) 0%,
+      hsl(182 60% 58%) 100%
     );
     --gradient-clean: linear-gradient(
       180deg,
-      hsl(185 70% 35%) 0%,
-      hsl(195 80% 55%) 100%
+      hsl(182 60% 58%) 0%,
+      hsl(183 64% 72%) 100%
     );
 
     --sidebar-background: 240 5.9% 10%;
@@ -218,5 +218,37 @@ All colors MUST be HSL.
 
   .gradient-overlay {
     background: var(--gradient-overlay);
+  }
+
+  /* Brand color overrides to apply theme without refactoring all classes */
+  .bg-blue-600 {
+    background-color: hsl(var(--primary)) !important;
+  }
+  .hover\:bg-blue-700:hover {
+    background-color: hsl(var(--primary) / 0.9) !important;
+  }
+  .bg-cyan-500 {
+    background-color: hsl(var(--secondary)) !important;
+  }
+  .hover\:bg-cyan-600:hover {
+    background-color: hsl(var(--secondary) / 0.9) !important;
+  }
+  .bg-teal-600 {
+    background-color: hsl(var(--primary)) !important;
+  }
+  .hover\:bg-teal-700:hover {
+    background-color: hsl(var(--primary) / 0.9) !important;
+  }
+  .text-cyan-400 {
+    color: hsl(var(--secondary)) !important;
+  }
+  .from-cyan-500 {
+    --tw-gradient-from: hsl(var(--secondary)) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: hsl(var(--secondary) / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops:
+      var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+  .to-blue-600 {
+    --tw-gradient-to: hsl(var(--primary)) var(--tw-gradient-to-position) !important;
   }
 }

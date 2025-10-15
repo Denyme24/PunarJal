@@ -15,6 +15,7 @@ import { MapPin } from 'lucide-react';
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface WaterParameters {
   turbidity: number;
@@ -30,6 +31,7 @@ type NumericParameters = Exclude<keyof WaterParameters, 'reuseType'>;
 
 const SimulationContent = () => {
   const searchParams = useSearchParams();
+  const { t } = useI18n();
   const [sourceName, setSourceName] = useState<string | null>(null);
   const [parameters, setParameters] = useState<WaterParameters>({
     turbidity: 50,
@@ -102,19 +104,79 @@ const SimulationContent = () => {
     ];
 
     const secondarySpecs = [
-      { name: 'Dissolved Oxygen', unit: 'mg/L', good: '4 - 8', outbreak: '< 2 or > 12', value: 'not provided' },
-      { name: 'pH', unit: 'pH Units', good: '6.5 - 8.5', outbreak: '< 5.5 or > 9', value: parameters.pH },
-      { name: 'ORP', unit: 'mV', good: '200 - 450', outbreak: '< 100 or > 600', value: 'not provided' },
-      { name: 'Temperature', unit: '°C', good: '20 - 35', outbreak: '< 10 or > 45', value: 'not provided' },
-      { name: 'Ammonia-Nitrate', unit: 'mg/L', good: '0 - 1', outbreak: '> 5', value: 'not provided' },
+      {
+        name: 'Dissolved Oxygen',
+        unit: 'mg/L',
+        good: '4 - 8',
+        outbreak: '< 2 or > 12',
+        value: 'not provided',
+      },
+      {
+        name: 'pH',
+        unit: 'pH Units',
+        good: '6.5 - 8.5',
+        outbreak: '< 5.5 or > 9',
+        value: parameters.pH,
+      },
+      {
+        name: 'ORP',
+        unit: 'mV',
+        good: '200 - 450',
+        outbreak: '< 100 or > 600',
+        value: 'not provided',
+      },
+      {
+        name: 'Temperature',
+        unit: '°C',
+        good: '20 - 35',
+        outbreak: '< 10 or > 45',
+        value: 'not provided',
+      },
+      {
+        name: 'Ammonia-Nitrate',
+        unit: 'mg/L',
+        good: '0 - 1',
+        outbreak: '> 5',
+        value: 'not provided',
+      },
     ];
 
     const tertiarySpecs = [
-      { name: 'Conductivity', unit: 'µS/cm', good: '0 - 500', outbreak: '> 2000', value: 'not provided' },
-      { name: 'Total Dissolved Solids (TDS)', unit: 'mg/L', good: '0 - 500', outbreak: '> 2000', value: parameters.tds },
-      { name: 'UV Intensity', unit: 'mW/cm²', good: '25 - 40', outbreak: '< 15', value: 'not provided' },
-      { name: 'Chlorine Residual', unit: 'mg/L', good: '0.2 - 1.0', outbreak: '> 4', value: 'not provided' },
-      { name: 'Phosphate-Nitrite', unit: 'mg/L', good: '0 - 0.1', outbreak: '> 1', value: 'not provided' },
+      {
+        name: 'Conductivity',
+        unit: 'µS/cm',
+        good: '0 - 500',
+        outbreak: '> 2000',
+        value: 'not provided',
+      },
+      {
+        name: 'Total Dissolved Solids (TDS)',
+        unit: 'mg/L',
+        good: '0 - 500',
+        outbreak: '> 2000',
+        value: parameters.tds,
+      },
+      {
+        name: 'UV Intensity',
+        unit: 'mW/cm²',
+        good: '25 - 40',
+        outbreak: '< 15',
+        value: 'not provided',
+      },
+      {
+        name: 'Chlorine Residual',
+        unit: 'mg/L',
+        good: '0.2 - 1.0',
+        outbreak: '> 4',
+        value: 'not provided',
+      },
+      {
+        name: 'Phosphate-Nitrite',
+        unit: 'mg/L',
+        good: '0 - 0.1',
+        outbreak: '> 1',
+        value: 'not provided',
+      },
     ];
 
     // Compose AI prompt
@@ -124,7 +186,10 @@ const SimulationContent = () => {
       const response = await fetch('/api/ai-agos/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: aiMessage, context: 'simulation_processing' }),
+        body: JSON.stringify({
+          message: aiMessage,
+          context: 'simulation_processing',
+        }),
       });
       const aiResult = await response.json();
 
@@ -136,7 +201,10 @@ const SimulationContent = () => {
         source: 'simulation_page',
       };
       try {
-        localStorage.setItem('processedSimulationData', JSON.stringify(simulationData));
+        localStorage.setItem(
+          'processedSimulationData',
+          JSON.stringify(simulationData)
+        );
       } catch {}
     } catch (e) {
       console.error('Gemini call failed', e);
@@ -156,10 +224,10 @@ const SimulationContent = () => {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
-              Simulation Inputs
+              {t('simulation.inputs', 'Simulation Inputs')}
             </h1>
             <p className="text-lg text-white/70">
-              Use map values or enter manually
+              {t('simulation.subtitle', 'Use map values or enter manually')}
             </p>
 
             {/* Show alert if data is loaded from map */}
@@ -182,7 +250,9 @@ const SimulationContent = () => {
           <div className="grid grid-cols-3 gap-4 mb-6">
             {/* Row 1 */}
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">Turbidity (NTU)</span>
+              <span className="text-gray-300">
+                {t('param.turbidity', 'Turbidity (NTU)')}
+              </span>
               <Input
                 type="number"
                 value={parameters.turbidity}
@@ -198,7 +268,7 @@ const SimulationContent = () => {
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">pH</span>
+              <span className="text-gray-300">{t('param.ph', 'pH')}</span>
               <Input
                 type="number"
                 value={parameters.pH}
@@ -215,7 +285,9 @@ const SimulationContent = () => {
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">COD (mg/L)</span>
+              <span className="text-gray-300">
+                {t('param.cod', 'COD (mg/L)')}
+              </span>
               <Input
                 type="number"
                 value={parameters.cod}
@@ -233,7 +305,9 @@ const SimulationContent = () => {
 
             {/* Row 2 */}
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">TDS (mg/L)</span>
+              <span className="text-gray-300">
+                {t('param.tds', 'TDS (mg/L)')}
+              </span>
               <Input
                 type="number"
                 value={parameters.tds}
@@ -249,7 +323,9 @@ const SimulationContent = () => {
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">Nitrogen (mg/L)</span>
+              <span className="text-gray-300">
+                {t('param.nitrogen', 'Nitrogen (mg/L)')}
+              </span>
               <Input
                 type="number"
                 value={parameters.nitrogen}
@@ -265,7 +341,9 @@ const SimulationContent = () => {
               />
             </div>
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">Phosphorus (mg/L)</span>
+              <span className="text-gray-300">
+                {t('param.phosphorus', 'Phosphorus (mg/L)')}
+              </span>
               <Input
                 type="number"
                 value={parameters.phosphorus}
@@ -286,7 +364,9 @@ const SimulationContent = () => {
           {/* Reuse Type Selector */}
           <div className="mb-6">
             <div className="bg-teal-100/10 rounded-lg p-4 flex justify-between items-center hover:bg-teal-100/20 transition-colors">
-              <span className="text-gray-300">Reuse Type</span>
+              <span className="text-gray-300">
+                {t('param.reuseType', 'Reuse Type')}
+              </span>
               <div className="w-72">
                 <Select
                   value={parameters.reuseType}
@@ -295,23 +375,32 @@ const SimulationContent = () => {
                   }
                 >
                   <SelectTrigger className="bg-transparent border-white/10 text-white">
-                    <SelectValue placeholder="Select reuse application" />
+                    <SelectValue
+                      placeholder={t(
+                        'param.reusePlaceholder',
+                        'Select reuse application'
+                      )}
+                    />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 text-white border-white/10">
                     <SelectItem value="Agricultural Irrigation">
-                      Agricultural Irrigation
+                      {t('reuse.agri', 'Agricultural Irrigation')}
                     </SelectItem>
                     <SelectItem value="Industrial Process Water">
-                      Industrial Process Water
+                      {t('reuse.industrial', 'Industrial Process Water')}
                     </SelectItem>
                     <SelectItem value="Landscape Irrigation">
-                      Landscape Irrigation
+                      {t('reuse.landscape', 'Landscape Irrigation')}
                     </SelectItem>
-                    <SelectItem value="Toilet Flushing">Toilet Flushing</SelectItem>
+                    <SelectItem value="Toilet Flushing">
+                      {t('reuse.toilet', 'Toilet Flushing')}
+                    </SelectItem>
                     <SelectItem value="Cooling Tower Systems">
-                      Cooling Tower Systems
+                      {t('reuse.cooling', 'Cooling Tower Systems')}
                     </SelectItem>
-                    <SelectItem value="Potable Water">Potable Water</SelectItem>
+                    <SelectItem value="Potable Water">
+                      {t('reuse.potable', 'Potable Water')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -334,14 +423,14 @@ const SimulationContent = () => {
               }
               className="px-6 py-3 bg-blue-100 text-gray-700 hover:bg-blue-200 rounded-lg font-medium"
             >
-              Reset
+              {t('common.reset', 'Reset')}
             </Button>
             <Button
               onClick={handleStartSimulation}
               disabled={!parameters.reuseType}
               className="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Run Simulation
+              {t('simulation.run', 'Run Simulation')}
             </Button>
           </div>
         </div>

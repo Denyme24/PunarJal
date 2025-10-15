@@ -149,7 +149,10 @@ function TreatmentDashboardContent() {
     };
 
     const flow = sensors.find(s => s.id === 'flow');
-    if (flow && (flow.value < flow.threshold.min || flow.value > flow.threshold.max)) {
+    if (
+      flow &&
+      (flow.value < flow.threshold.min || flow.value > flow.threshold.max)
+    ) {
       add(
         'critical',
         'Primary Clarifier Overflow',
@@ -169,7 +172,11 @@ function TreatmentDashboardContent() {
     }
 
     const ph = sensors.find(s => s.id === 'ph');
-    if (ph && (ph.value < THRESHOLDS.TERTIARY.PH_MIN || ph.value > THRESHOLDS.TERTIARY.PH_MAX)) {
+    if (
+      ph &&
+      (ph.value < THRESHOLDS.TERTIARY.PH_MIN ||
+        ph.value > THRESHOLDS.TERTIARY.PH_MAX)
+    ) {
       add(
         'warning',
         'pH Out of Range',

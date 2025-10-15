@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { I18nProvider } from '@/contexts/I18nContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
@@ -49,15 +50,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryProvider>
-          <AuthProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              {children}
-            </TooltipProvider>
-          </AuthProvider>
-        </QueryProvider>
+        <I18nProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                {children}
+              </TooltipProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );

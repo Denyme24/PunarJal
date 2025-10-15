@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "env": {
+    "MONGODB_URI": "@mongodb-uri",
+    "JWT_SECRET": "@jwt-secret",
+    "JWT_EXPIRE": "7d"
+  }
+}

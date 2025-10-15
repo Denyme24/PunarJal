@@ -41,6 +41,7 @@ import {
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 type AnalyticsData = {
   simulationHistory: Array<{
@@ -143,6 +144,7 @@ type ComplianceReport = {
 
 const Analytics = () => {
   const { token, user } = useAuth();
+  const { t } = useI18n();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
@@ -158,6 +160,10 @@ const Analytics = () => {
   const [complianceReports, setComplianceReports] = useState<
     ComplianceReport[]
   >([]);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [aiComplianceSummary, setAiComplianceSummary] = useState<string | null>(
+    null
+  );
 
   // Sample plant data for Environmental Officer dashboard
   const initializePlantData = () => {
@@ -471,6 +477,41 @@ const Analytics = () => {
     );
   };
 
+  // AI-powered compliance summary (per selected plant or all plants)
+  const generateAIComplianceSummary = async () => {
+    try {
+      setIsSummarizing(true);
+      const plantContext = selectedPlant ? [selectedPlant] : plants;
+      const prompt = `You are a regulatory compliance expert. Create a concise, bullet-point compliance summary for the following wastewater treatment plants. Include: (1) current compliance status (monthly/quarterly/annual), (2) key violations or alerts in last 30 days, (3) risks for next month, (4) recommended corrective actions, (5) approval recommendation for water reuse levels with justification. Keep it actionable and under 200 words per plant.\n\nPlants:\n${JSON.stringify(
+        plantContext.map(p => ({
+          name: p.name,
+          location: p.location,
+          metrics: p.currentMetrics,
+          alerts: p.alerts,
+          compliance: p.compliance,
+        })),
+        null,
+        2
+      )}`;
+
+      const res = await fetch('/api/ai-agos/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: prompt,
+          context: 'compliance_summary',
+        }),
+      });
+      const data = await res.json();
+      setAiComplianceSummary(data?.message || 'No summary generated.');
+    } catch (e) {
+      console.error(e);
+      setAiComplianceSummary('Failed to generate summary.');
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
   // Original analytics functions
   const exportAsPdf = () => {
     window.print();
@@ -579,13 +620,16 @@ const Analytics = () => {
               className="mb-12"
             >
               <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-                Environmental{' '}
+                {t('eo.titlePrefix', 'Environmental')}{' '}
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  Oversight
+                  {t('eo.oversight', 'Oversight')}
                 </span>
               </h1>
               <p className="text-xl text-white/70">
-                Multi-plant monitoring and compliance management
+                {t(
+                  'eo.subtitle',
+                  'Multi-plant monitoring and compliance management'
+                )}
               </p>
             </motion.div>
 
@@ -600,19 +644,19 @@ const Analytics = () => {
                   value="overview"
                   className="data-[state=active]:bg-cyan-500/20"
                 >
-                  Plant Overview
+                  {t('eo.tab.overview', 'Plant Overview')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="trends"
                   className="data-[state=active]:bg-cyan-500/20"
                 >
-                  Trend Analysis
+                  {t('eo.tab.trends', 'Trend Analysis')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="compliance"
                   className="data-[state=active]:bg-cyan-500/20"
                 >
-                  Compliance Reports
+                  {t('eo.tab.compliance', 'Compliance Reports')}
                 </TabsTrigger>
               </TabsList>
 
@@ -625,7 +669,7 @@ const Analytics = () => {
                       <div className="flex items-center justify-between mb-2">
                         <Building2 className="h-5 w-5 text-blue-400" />
                         <span className="text-xs text-white/60">
-                          Total Plants
+                          {t('eo.cards.totalPlants', 'Total Plants')}
                         </span>
                       </div>
                       <div className="text-2xl font-bold text-white">
@@ -639,7 +683,7 @@ const Analytics = () => {
                       <div className="flex items-center justify-between mb-2">
                         <CheckCircle className="h-5 w-5 text-green-400" />
                         <span className="text-xs text-white/60">
-                          Operational
+                          {t('eo.cards.operational', 'Operational')}
                         </span>
                       </div>
                       <div className="text-2xl font-bold text-white">
@@ -652,7 +696,9 @@ const Analytics = () => {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <AlertTriangle className="h-5 w-5 text-red-400" />
-                        <span className="text-xs text-white/60">Alerts</span>
+                        <span className="text-xs text-white/60">
+                          {t('eo.cards.alerts', 'Alerts')}
+                        </span>
                       </div>
                       <div className="text-2xl font-bold text-white">
                         {plants.reduce(
@@ -668,7 +714,7 @@ const Analytics = () => {
                       <div className="flex items-center justify-between mb-2">
                         <Activity className="h-5 w-5 text-yellow-400" />
                         <span className="text-xs text-white/60">
-                          Maintenance
+                          {t('eo.cards.maintenance', 'Maintenance')}
                         </span>
                       </div>
                       <div className="text-2xl font-bold text-white">
@@ -779,14 +825,17 @@ const Analytics = () => {
                           {selectedPlant.name} - Trend Analysis
                         </CardTitle>
                         <CardDescription className="text-white/60">
-                          Historical data and performance trends
+                          {t(
+                            'eo.trends.desc',
+                            'Historical data and performance trends'
+                          )}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <div className="grid md:grid-cols-3 gap-6">
                           <div>
                             <h4 className="text-white font-semibold mb-3">
-                              TDS Trend
+                              {t('eo.trends.tds', 'TDS Trend')}
                             </h4>
                             <div className="space-y-2">
                               {selectedPlant.trends.tds.map((point, index) => (
@@ -812,7 +861,7 @@ const Analytics = () => {
                           </div>
                           <div>
                             <h4 className="text-white font-semibold mb-3">
-                              Turbidity Trend
+                              {t('eo.trends.turbidity', 'Turbidity Trend')}
                             </h4>
                             <div className="space-y-2">
                               {selectedPlant.trends.turbidity.map(
@@ -840,7 +889,7 @@ const Analytics = () => {
                           </div>
                           <div>
                             <h4 className="text-white font-semibold mb-3">
-                              Efficiency Trend
+                              {t('eo.trends.efficiency', 'Efficiency Trend')}
                             </h4>
                             <div className="space-y-2">
                               {selectedPlant.trends.efficiency.map(
@@ -869,14 +918,54 @@ const Analytics = () => {
                       <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
                           <MessageSquare className="h-5 w-5 text-cyan-400" />
-                          Send Corrective Feedback
+                          {t('eo.feedback.title', 'Send Corrective Feedback')}
                         </CardTitle>
                         <CardDescription className="text-white/60">
-                          Communicate with plant operator about performance
-                          issues
+                          {t(
+                            'eo.feedback.desc',
+                            'Communicate with plant operator about performance issues'
+                          )}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
+                        <div className="flex flex-col md:flex-row gap-3 mb-4">
+                          <Button
+                            onClick={generateAIComplianceSummary}
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+                            disabled={isSummarizing}
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            {isSummarizing
+                              ? t('eo.ai.summarizing', 'Generating summary...')
+                              : t('eo.ai.generate', 'AI Compliance Summary')}
+                          </Button>
+                          {aiComplianceSummary && (
+                            <Button
+                              onClick={() => {
+                                const blob = new Blob([aiComplianceSummary!], {
+                                  type: 'text/plain',
+                                });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `ai-compliance-summary-${Date.now()}.txt`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }}
+                              variant="outline"
+                              className="border-white/20 text-white"
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              {t('eo.ai.download', 'Download Summary')}
+                            </Button>
+                          )}
+                        </div>
+
+                        {aiComplianceSummary && (
+                          <div className="p-4 bg-black/30 border border-white/10 rounded-lg text-white whitespace-pre-wrap text-sm">
+                            {aiComplianceSummary}
+                          </div>
+                        )}
                         <Dialog
                           open={showFeedbackDialog}
                           onOpenChange={setShowFeedbackDialog}
@@ -889,16 +978,23 @@ const Analytics = () => {
                           <DialogContent className="bg-gray-900 border-gray-700">
                             <DialogHeader>
                               <DialogTitle className="text-white">
-                                Send Feedback
+                                {t('eo.feedback.modalTitle', 'Send Feedback')}
                               </DialogTitle>
                               <DialogDescription className="text-gray-300">
-                                Send corrective feedback to{' '}
-                                {selectedPlant.operator} at {selectedPlant.name}
+                                {t(
+                                  'eo.feedback.modalDesc',
+                                  'Send corrective feedback to'
+                                )}{' '}
+                                {selectedPlant.operator} {t('common.at', 'at')}{' '}
+                                {selectedPlant.name}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
                               <Textarea
-                                placeholder="Enter your feedback message..."
+                                placeholder={t(
+                                  'eo.feedback.placeholder',
+                                  'Enter your feedback message...'
+                                )}
                                 value={feedbackMessage}
                                 onChange={e =>
                                   setFeedbackMessage(e.target.value)
@@ -911,7 +1007,7 @@ const Analytics = () => {
                                 }
                                 className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
                               >
-                                Send Feedback
+                                {t('eo.feedback.send', 'Send Feedback')}
                               </Button>
                             </div>
                           </DialogContent>
@@ -921,7 +1017,7 @@ const Analytics = () => {
                         {selectedPlant.feedback.length > 0 && (
                           <div className="mt-6 space-y-3">
                             <h4 className="text-white font-semibold">
-                              Previous Feedback
+                              {t('eo.feedback.previous', 'Previous Feedback')}
                             </h4>
                             {selectedPlant.feedback.map(feedback => (
                               <div
@@ -953,10 +1049,13 @@ const Analytics = () => {
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <FileText className="h-5 w-5 text-cyan-400" />
-                      Monthly Compliance Reports
+                      {t('eo.compliance.title', 'Monthly Compliance Reports')}
                     </CardTitle>
                     <CardDescription className="text-white/60">
-                      Generate and download compliance reports for all plants
+                      {t(
+                        'eo.compliance.desc',
+                        'Generate and download compliance reports for all plants'
+                      )}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -965,13 +1064,13 @@ const Analytics = () => {
                       className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white mb-6"
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Generate Monthly Report
+                      {t('eo.compliance.generate', 'Generate Monthly Report')}
                     </Button>
 
                     {complianceReports.length > 0 && (
                       <div className="space-y-4">
                         <h4 className="text-white font-semibold">
-                          Generated Reports
+                          {t('eo.compliance.generated', 'Generated Reports')}
                         </h4>
                         {complianceReports.map(report => (
                           <div

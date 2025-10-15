@@ -14,6 +14,7 @@ import {
 } from '@/lib/waterSourcesData';
 import { MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/contexts/I18nContext';
 
 // Dynamically import map component to avoid SSR issues
 const WaterSourcesMap = dynamic(() => import('@/components/WaterSourcesMap'), {
@@ -22,6 +23,7 @@ const WaterSourcesMap = dynamic(() => import('@/components/WaterSourcesMap'), {
 
 export default function MapPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [waterSources, setWaterSources] = useState<WaterSource[]>([]);
   const [selectedSource, setSelectedSource] = useState<WaterSource | null>(
     null
@@ -81,13 +83,16 @@ export default function MapPage() {
             className="mb-8"
           >
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Explore Water{' '}
+              {t('map.explore', 'Explore Water')}{' '}
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Bodies
+                {t('map.bodies', 'Bodies')}
               </span>
             </h1>
             <p className="text-xl text-white/70 mb-6">
-              Click pins to view details and start a simulation
+              {t(
+                'map.subtitle',
+                'Click pins to view details and start a simulation'
+              )}
             </p>
 
             {/* Legend & Stats */}
@@ -104,7 +109,7 @@ export default function MapPage() {
                       : 'text-white hover:bg-white/10'
                   }
                 >
-                  All ({stats.total})
+                  {t('map.all', 'All')} ({stats.total})
                 </Button>
                 <Button
                   variant={filter === 'safe' ? 'default' : 'ghost'}
@@ -117,7 +122,7 @@ export default function MapPage() {
                   }
                 >
                   <MapPin className="h-4 w-4 mr-1" />
-                  Safe ({stats.safe})
+                  {t('map.safe', 'Safe')} ({stats.safe})
                 </Button>
                 <Button
                   variant={filter === 'attention' ? 'default' : 'ghost'}
@@ -130,7 +135,7 @@ export default function MapPage() {
                   }
                 >
                   <MapPin className="h-4 w-4 mr-1" />
-                  Attention ({stats.attention})
+                  {t('map.attention', 'Attention')} ({stats.attention})
                 </Button>
               </div>
 
@@ -139,13 +144,19 @@ export default function MapPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 flex-shrink-0 rounded-full bg-green-500"></div>
                   <span className="text-xs sm:text-sm text-white">
-                    Green pins indicate suitable quality
+                    {t(
+                      'map.legend.green',
+                      'Green pins indicate suitable quality'
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 flex-shrink-0 rounded-full bg-amber-500"></div>
                   <span className="text-xs sm:text-sm text-white">
-                    Amber pins indicate thresholds near limits
+                    {t(
+                      'map.legend.amber',
+                      'Amber pins indicate thresholds near limits'
+                    )}
                   </span>
                 </div>
               </div>
@@ -212,7 +223,7 @@ export default function MapPage() {
               className="mt-8 text-center"
             >
               <p className="text-white/60 text-sm">
-                Showing water sources near{' '}
+                {t('map.near', 'Showing water sources near')}{' '}
                 <span className="font-semibold text-cyan-400">
                   {user.location}
                 </span>

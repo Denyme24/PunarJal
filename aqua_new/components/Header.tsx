@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useI18n } from '@/contexts/I18nContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +22,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleLogout = () => {
     logout();
@@ -28,10 +31,10 @@ const Header = () => {
 
   // Base navigation links
   const baseNavLinks = [
-    { href: '/map', label: 'MAP VIEW' },
-    { href: '/simulation', label: 'SIMULATION' },
-    { href: '/iot-sensors', label: 'REAL TIME DASHBOARD' },
-    { href: '/ai-agos', label: 'AI ASSISTANT', icon: Bot },
+    { href: '/map', label: t('nav.map', 'MAP VIEW') },
+    { href: '/simulation', label: t('nav.simulation', 'SIMULATION') },
+    { href: '/iot-sensors', label: t('nav.realtime', 'REAL TIME DASHBOARD') },
+    { href: '/ai-agos', label: t('nav.ai', 'AI ASSISTANT'), icon: Bot },
   ];
 
   // Role-specific navigation links
@@ -42,17 +45,23 @@ const Header = () => {
       return [
         {
           href: '/treatment-dashboard',
-          label: 'OPERATOR DASHBOARD',
+          label: t('nav.operatorDashboard', 'OPERATOR DASHBOARD'),
           icon: Settings,
         },
         {
           href: '/reports',
-          label: 'REPORTS',
+          label: t('nav.reports', 'REPORTS'),
           icon: TrendingUp,
         },
       ];
     } else if (user.role === 'Environmental Officer') {
-      return [{ href: '/analytics', label: 'ANALYTICS', icon: TrendingUp }];
+      return [
+        {
+          href: '/analytics',
+          label: t('nav.analytics', 'ANALYTICS'),
+          icon: TrendingUp,
+        },
+      ];
     }
 
     return [];
@@ -78,7 +87,7 @@ const Header = () => {
               className="h-16 w-16 transition-transform duration-300 group-hover:scale-110"
             />
             <span className="text-2xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent tracking-tight hover:from-cyan-200 hover:via-blue-200 hover:to-white transition-all duration-300">
-              PunarJal
+              {t('app.title', 'PunarJal')}
             </span>
           </a>
 
@@ -103,6 +112,9 @@ const Header = () => {
                 );
               })}
             </nav>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
 
             {/* Authentication */}
             {isAuthenticated && user ? (
@@ -132,7 +144,7 @@ const Header = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>{t('auth.logout', 'Log out')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -143,13 +155,13 @@ const Header = () => {
                   variant="outline"
                   className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  Login
+                  {t('auth.login', 'Login')}
                 </Button>
                 <Button
                   onClick={() => router.push('/onboarding')}
                   className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
                 >
-                  Sign Up
+                  {t('auth.signup', 'Sign Up')}
                 </Button>
               </div>
             )}
@@ -190,6 +202,11 @@ const Header = () => {
                 </Link>
               );
             })}
+            {/* Language Switcher (mobile) */}
+            <div className="px-4 py-3">
+              <LanguageSwitcher />
+            </div>
+
             {isAuthenticated && user ? (
               <>
                 <div className="px-4 py-3 border-t border-white/10 mt-2">

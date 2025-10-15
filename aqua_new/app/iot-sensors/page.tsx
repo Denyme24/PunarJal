@@ -19,6 +19,7 @@ import {
 import Header from '@/components/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface SensorData {
   id: string;
@@ -42,6 +43,7 @@ interface LocationData {
 const IoTSensors = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
   const [selectedLocation, setSelectedLocation] = useState<string>('Hebbal');
   const [isLive, setIsLive] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
@@ -348,12 +350,15 @@ const IoTSensors = () => {
               <div className="flex items-center gap-3">
                 <Activity className="h-8 w-8 text-blue-500" />
                 <h1 className="text-4xl font-bold text-white">
-                  Sensor Data - {selectedLocationData?.displayName}
+                  {t('iot.title', 'Sensor Data')} -{' '}
+                  {selectedLocationData?.displayName}
                 </h1>
               </div>
               <div className="flex items-center gap-2">
                 <Wifi className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-500">Live</span>
+                <span className="text-sm text-green-500">
+                  {t('common.live', 'Live')}
+                </span>
               </div>
             </div>
 
@@ -386,7 +391,9 @@ const IoTSensors = () => {
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-                {isLive ? 'Live' : 'Paused'}
+                {isLive
+                  ? t('common.live', 'Live')
+                  : t('common.paused', 'Paused')}
               </Button>
 
               {/* Refresh Button */}
@@ -405,8 +412,9 @@ const IoTSensors = () => {
           {/* Last Update Info */}
           <div className="mb-6">
             <p className="text-sm text-slate-400">
-              Last updated: {lastUpdate.toLocaleTimeString()} • Next update in{' '}
-              {isLive ? '3s' : '--'}
+              {t('iot.lastUpdated', 'Last updated:')}{' '}
+              {lastUpdate.toLocaleTimeString()} •{' '}
+              {t('iot.nextUpdate', 'Next update in')} {isLive ? '3s' : '--'}
             </p>
           </div>
 
@@ -426,7 +434,7 @@ const IoTSensors = () => {
                       <div className="flex items-center gap-2">
                         <Activity className="h-4 w-4 text-blue-400" />
                         <h3 className="text-lg font-semibold text-white">
-                          {sensor.name}
+                          {t(`sensor.${sensor.id}.name`, sensor.name)}
                         </h3>
                       </div>
                       <div className="flex items-center gap-2">
@@ -434,7 +442,10 @@ const IoTSensors = () => {
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(sensor.status)}`}
                         >
-                          {sensor.status}
+                          {t(
+                            `sensor.status.${sensor.status.toLowerCase()}`,
+                            sensor.status
+                          )}
                         </span>
                       </div>
                     </div>
@@ -445,7 +456,7 @@ const IoTSensors = () => {
                         {sensor.currentValue} {sensor.unit}
                       </div>
                       <div className="text-sm text-slate-400">
-                        Range: {sensor.range}
+                        {t('sensor.range', 'Range:')} {sensor.range}
                       </div>
                     </div>
 
@@ -453,12 +464,12 @@ const IoTSensors = () => {
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-slate-400">
-                          Last 5 readings trend
+                          {t('sensor.last5', 'Last 5 readings trend')}
                         </span>
                         <div className="flex items-center gap-1">
                           <Wifi className="h-3 w-3 text-green-500" />
                           <span className="text-xs text-green-500">
-                            Connected
+                            {t('sensor.connected', 'Connected')}
                           </span>
                         </div>
                       </div>
@@ -468,14 +479,17 @@ const IoTSensors = () => {
                     {/* Status Indicators */}
                     <div className="flex items-center justify-between text-xs text-slate-500">
                       <span>
-                        Status:{' '}
+                        {t('sensor.statusLabel', 'Status:')}{' '}
                         {sensor.statusIcon === 'up'
-                          ? 'Rising'
+                          ? t('sensor.rising', 'Rising')
                           : sensor.statusIcon === 'down'
-                            ? 'Falling'
-                            : 'Stable'}
+                            ? t('sensor.falling', 'Falling')
+                            : t('sensor.stable', 'Stable')}
                       </span>
-                      <span>Updated: {new Date().toLocaleTimeString()}</span>
+                      <span>
+                        {t('sensor.updated', 'Updated:')}{' '}
+                        {new Date().toLocaleTimeString()}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -493,12 +507,12 @@ const IoTSensors = () => {
               {isProcessingSimulation ? (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Processing...
+                  {t('common.processing', 'Processing...')}
                 </>
               ) : (
                 <>
                   <Activity className="h-4 w-4 mr-2" />
-                  Start Simulation
+                  {t('simulation.start', 'Start Simulation')}
                 </>
               )}
             </Button>
@@ -508,14 +522,14 @@ const IoTSensors = () => {
               className="border-slate-600 text-white bg-slate-800/50 hover:bg-slate-700 hover:text-white px-6 py-3"
             >
               <MapPin className="h-4 w-4 mr-2" />
-              Manual Simulation
+              {t('simulation.manual', 'Manual Simulation')}
             </Button>
             <Button
               onClick={() => router.push('/analytics')}
               variant="outline"
               className="border-slate-600 text-white bg-slate-800/50 hover:bg-slate-700 hover:text-white px-6 py-3"
             >
-              View Analytics
+              {t('analytics.view', 'View Analytics')}
             </Button>
           </div>
         </div>

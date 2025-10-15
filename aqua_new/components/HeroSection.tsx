@@ -5,12 +5,14 @@ import { useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import AuthModal from './AuthModal';
+import { useI18n } from '@/contexts/I18nContext';
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -94,7 +96,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            Smart
+            {t('hero.smart', 'Smart')}
           </motion.span>
           <motion.span
             className="block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-2xl"
@@ -105,7 +107,7 @@ const HeroSection = () => {
               textShadow: '0 0 30px rgba(52, 211, 153, 0.3)',
             }}
           >
-            Wastewater Treatment
+            {t('hero.wastewater', 'Wastewater Treatment')}
           </motion.span>
           <motion.span
             className="block text-white/95 drop-shadow-lg"
@@ -113,7 +115,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
           >
-            System
+            {t('hero.system', 'System')}
           </motion.span>
         </motion.h1>
 
@@ -123,8 +125,10 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.9 }}
           className="text-base md:text-xl text-cyan-50/90 mb-4 max-w-4xl mx-auto font-normal"
         >
-          Intelligent Simulation & Real-Time Monitoring for Sustainable Water
-          Reuse
+          {t(
+            'hero.subtitle',
+            'Intelligent Simulation & Real-Time Monitoring for Sustainable Water Reuse'
+          )}
         </motion.p>
 
         <motion.p
@@ -133,8 +137,10 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 1.1 }}
           className="text-sm md:text-base text-sky-100/70 mb-10 max-w-3xl mx-auto leading-relaxed"
         >
-          Automated 3-stage treatment • Real-time monitoring • Smart reuse
-          recommendations • Water conservation analytics
+          {t(
+            'hero.points',
+            'Automated 3-stage treatment • Real-time monitoring • Smart reuse recommendations • Water conservation analytics'
+          )}
         </motion.p>
 
         <motion.div
@@ -155,7 +161,7 @@ const HeroSection = () => {
               animate={{ opacity: [1, 0.8, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              START SIMULATION
+              {t('hero.start', 'START SIMULATION')}
             </motion.span>
             <svg
               className="relative w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
@@ -177,7 +183,7 @@ const HeroSection = () => {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            LEARN MORE
+            {t('hero.learn', 'LEARN MORE')}
           </motion.a>
         </motion.div>
       </motion.div>

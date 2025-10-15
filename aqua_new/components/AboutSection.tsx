@@ -2,52 +2,67 @@
 
 import { motion } from 'framer-motion';
 import { Droplet, Cpu, BarChart3, Leaf, Shield, Zap } from 'lucide-react';
+import { useI18n } from '@/contexts/I18nContext';
 
 const AboutSection = () => {
+  const { t } = useI18n();
+
   const features = [
     {
       icon: Cpu,
-      title: 'AI-Powered Intelligence',
-      description:
-        'Advanced machine learning algorithms optimize treatment processes in real-time',
+      title: t('about.ai', 'AI-Powered Intelligence'),
+      description: t(
+        'about.aiDesc',
+        'Advanced machine learning algorithms optimize treatment processes in real-time'
+      ),
     },
     {
       icon: BarChart3,
-      title: 'Data-Driven Insights',
-      description:
-        'Comprehensive analytics provide actionable insights for water management',
+      title: t('about.insights', 'Data-Driven Insights'),
+      description: t(
+        'about.insightsDesc',
+        'Comprehensive analytics provide actionable insights for water management'
+      ),
     },
     {
       icon: Shield,
-      title: 'Quality Assurance',
-      description:
-        'Multi-stage filtration ensures water meets the highest safety standards',
+      title: t('about.qa', 'Quality Assurance'),
+      description: t(
+        'about.qaDesc',
+        'Multi-stage filtration ensures water meets the highest safety standards'
+      ),
     },
     {
       icon: Leaf,
-      title: 'Environmental Impact',
-      description:
-        'Sustainable processes reduce carbon footprint and promote circular economy',
+      title: t('about.impact', 'Environmental Impact'),
+      description: t(
+        'about.impactDesc',
+        'Sustainable processes reduce carbon footprint and promote circular economy'
+      ),
     },
     {
       icon: Zap,
-      title: 'Automated Operations',
-      description:
-        'Smart automation reduces manual intervention and operational costs',
+      title: t('about.automation', 'Automated Operations'),
+      description: t(
+        'about.automationDesc',
+        'Smart automation reduces manual intervention and operational costs'
+      ),
     },
     {
       icon: Droplet,
-      title: 'Water Conservation',
-      description:
-        'Maximizes water reuse potential, reducing dependency on freshwater sources',
+      title: t('about.conservation', 'Water Conservation'),
+      description: t(
+        'about.conservationDesc',
+        'Maximizes water reuse potential, reducing dependency on freshwater sources'
+      ),
     },
   ];
 
   const stats = [
-    { value: '95%', label: 'Water Recovery Rate' },
-    { value: '60%', label: 'Energy Savings' },
-    { value: '24/7', label: 'Monitoring' },
-    { value: '99.9%', label: 'System Uptime' },
+    { value: '95%', label: t('about.statRecovery', 'Water Recovery Rate') },
+    { value: '60%', label: t('about.statEnergy', 'Energy Savings') },
+    { value: '24/7', label: t('about.statMonitoring', 'Monitoring') },
+    { value: '99.9%', label: t('about.statUptime', 'System Uptime') },
   ];
 
   return (
@@ -66,12 +81,14 @@ const AboutSection = () => {
           className="text-center mb-20"
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            About{' '}
+            {t('about.title', 'About ')}
             <span className="font-serif italic text-cyan-400">PunarJal</span>
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Revolutionizing wastewater treatment through intelligent technology
-            and sustainable practices
+            {t(
+              'about.subtitle',
+              'Revolutionizing wastewater treatment through intelligent technology and sustainable practices'
+            )}
           </p>
         </motion.div>
 
@@ -87,19 +104,19 @@ const AboutSection = () => {
           >
             <div className="space-y-6">
               <h3 className="text-3xl md:text-4xl font-bold text-white">
-                Our Mission
+                {t('about.mission', 'Our Mission')}
               </h3>
               <p className="text-lg text-white/80 leading-relaxed">
-                At PunarJal, we believe that every drop of water has value. Our
-                mission is to transform wastewater treatment from a costly
-                necessity into a sustainable resource recovery system that
-                benefits both industry and environment.
+                {t(
+                  'about.mission1',
+                  'At PunarJal, we believe that every drop of water has value. Our mission is to transform wastewater treatment from a costly necessity into a sustainable resource recovery system that benefits both industry and environment.'
+                )}
               </p>
               <p className="text-lg text-white/80 leading-relaxed">
-                Through cutting-edge real-time monitoring, AI-driven analytics,
-                and automated treatment processes, we&apos;re making water reuse
-                not just possible, but profitable and environmentally
-                responsible.
+                {t(
+                  'about.mission2',
+                  "Through cutting-edge real-time monitoring, AI-driven analytics, and automated treatment processes, we're making water reuse not just possible, but profitable and environmentally responsible."
+                )}
               </p>
             </div>
 
@@ -139,11 +156,13 @@ const AboutSection = () => {
                   <Droplet className="h-10 w-10 text-white" />
                 </div>
                 <h4 className="text-2xl font-bold text-white">
-                  Smart Water Future
+                  {t('about.future', 'Smart Water Future')}
                 </h4>
                 <p className="text-white/70">
-                  Join us in creating a world where wastewater becomes a
-                  valuable resource, not a waste product.
+                  {t(
+                    'about.futureDesc',
+                    'Join us in creating a world where wastewater becomes a valuable resource, not a waste product.'
+                  )}
                 </p>
               </div>
             </div>
@@ -159,7 +178,7 @@ const AboutSection = () => {
           className="mb-20"
         >
           <h3 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
-            Why Choose PunarJal?
+            {t('about.why', 'Why Choose PunarJal?')}
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -196,11 +215,13 @@ const AboutSection = () => {
           className="text-center bg-gradient-to-r from-gray-800/30 to-gray-700/30 rounded-3xl p-12 border border-gray-600/50"
         >
           <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Water Management?
+            {t('about.ctaTitle', 'Ready to Transform Your Water Management?')}
           </h3>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Discover how PunarJal can revolutionize your wastewater treatment
-            and unlock the potential of water reuse for your organization.
+            {t(
+              'about.ctaDesc',
+              'Discover how PunarJal can revolutionize your wastewater treatment and unlock the potential of water reuse for your organization.'
+            )}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.a
@@ -209,7 +230,7 @@ const AboutSection = () => {
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              Start Your Simulation
+              {t('about.startSim', 'Start Your Simulation')}
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -230,7 +251,7 @@ const AboutSection = () => {
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              View Real Time Dashboard
+              {t('about.viewDashboard', 'View Real Time Dashboard')}
             </motion.a>
           </div>
         </motion.div>
