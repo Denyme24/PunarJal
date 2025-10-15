@@ -103,7 +103,7 @@ const IoTSensors = () => {
       status: 'Optimal',
       trend: 'stable',
       range: '6.5 - 8.5',
-      lastReadings: [6.7, 6.6, 6.5, 6.4, 6.5],
+      lastReadings: [6.7, 6.8, 6.5, 6.4, 6.5],
       statusIcon: 'stable',
     },
     {
