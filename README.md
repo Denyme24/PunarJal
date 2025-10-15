@@ -1,374 +1,119 @@
-# PunarJal - Smart Wastewater Treatment System
 
-A full-stack Next.js application for wastewater treatment simulation and monitoring with integrated backend API and JWT authentication. PunarJal transforms wastewater treatment from a costly necessity into a sustainable resource recovery system.
+# 🌊 PunarJal - Giving Water a Second Life 
 
-## 🌟 Features
+## 🌟 Overview
 
-- ✅ **Full-Stack Next.js** - Frontend and backend in one application
-- ✅ **JWT Authentication** - Secure user authentication with HTTP-only cookies
-- ✅ **MongoDB Integration** - Persistent data storage
-- ✅ **Protected Routes** - Server-side route protection with middleware
-- ✅ **Modern UI** - Built with Tailwind CSS and Shadcn UI
-- ✅ **TypeScript** - Full type safety
-- ✅ **One-Click Deploy** - Deploy to Vercel with one click
+The Smart Water Reuse Platform is an innovative web and app-based multilingual system designed to optimize industrial wastewater treatment and promote water reuse. By leveraging IoT sensors, 🤖 AI assistance, and real-time data visualization 📊, this platform enables more efficient, sustainable, and cost-effective management of water resources in industries, supporting environmental compliance and circular economy goals. ♻️
 
-## 🚀 Quick Start
+***
 
-### Prerequisites
+## 📊 Features
 
-- Node.js 16+ installed
-- MongoDB running locally or MongoDB Atlas account
-- npm or yarn package manager
+- **⚡ Real-time Monitoring:** IoT sensors track key water quality parameters such as pH, turbidity, TDS, nitrogen, COD, and more.
+- **🛁 Treatment Simulation:** Simulates wastewater treatment across primary (solid removal), secondary (organic removal), and tertiary (nutrient and contaminant removal) stages with manual simulation options.
+- **🤖 AI Assistant:** Provides operational guidance, anomaly detection, and generates treatment summaries.
+- **🌐 Multilingual User Interface:** Supports multiple languages through user-friendly web and mobile app interfaces.
+- **🗺️ Interactive Map Visualization:** Displays real-time water body quality on an interactive map with simulation overlays.
+- **👥 User Roles:** Supports Plant Operators and Environmental Officers with role-based access and dashboards.
+- **🔔 Alerts & Notifications:** Real-time alerts on water quality deviations and treatment process issues.
+- **📄 Automated Reporting:** Generates compliance reports to meet environmental regulations.
 
-### 1. Clone and Setup
+***
 
-```bash
-# Navigate to the Next.js app directory
-cd nextjs-app
+## ⚠️ Problem Statement
 
-# Install dependencies
-npm install
-```
+Freshwater resources are increasingly scarce, yet industrial processes rely heavily on them, generating significant wastewater streams. Addressing water scarcity, minimizing waste and pollution, and ensuring regulatory compliance are critical to sustainable industrial operations and ecosystem preservation.
 
-### 2. Environment Variables
+***
 
-Create a `.env.local` file in the `nextjs-app` directory:
+## 💡 Solution
 
-```bash
-cp .env.example .env.local
-```
+This platform presents a smart process system for wastewater treatment incorporating IoT-based real-time monitoring, AI-guided operational support, and comprehensive visualization tools to optimize primary, secondary, and tertiary treatment processes, enabling effective water reuse aligned with circular economy principles. 🌍
 
-Edit `.env.local` with your values:
+***
 
-```env
-MONGODB_URI=mongodb://localhost:27017/wastewater-treatment
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-JWT_EXPIRE=7d
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
+## 🛠️ Technologies Used
 
-**Important:** Change `JWT_SECRET` to a strong random string in production!
-
-### 3. Start Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📁 Project Structure
-
-```
-nextjs-app/
-├── app/
-│   ├── api/                    # Backend API routes
-│   │   ├── auth/              # Authentication endpoints
-│   │   │   ├── signup/
-│   │   │   ├── login/
-│   │   │   ├── logout/
-│   │   │   ├── me/
-│   │   │   └── verify/
-│   │   └── health/            # Health check endpoint
-│   ├── (pages)/               # Frontend pages
-│   │   ├── simulation/
-│   │   ├── dashboard/
-│   │   ├── iot-sensors/
-│   │   ├── reuse/
-│   │   └── analytics/
-│   ├── layout.tsx             # Root layout
-│   ├── page.tsx               # Home page
-│   └── globals.css            # Global styles
-├── components/                 # React components
-│   ├── ui/                    # Shadcn UI components
-│   ├── providers/             # Context providers
-│   ├── Header.tsx
-│   ├── HeroSection.tsx
-│   ├── AuthModal.tsx
-│   └── ...
-├── contexts/                   # React contexts
-│   └── AuthContext.tsx        # Authentication context
-├── lib/                        # Utilities
-│   ├── mongodb.ts             # MongoDB connection
-│   ├── auth.ts                # Authentication helpers
-│   └── utils.ts               # General utilities
-├── models/                     # MongoDB models
-│   └── User.ts                # User model
-├── hooks/                      # Custom React hooks
-├── public/                     # Static assets
-│   ├── assets/                # Images, icons
-│   └── ...
-├── middleware.ts               # Next.js middleware (route protection)
-├── next.config.mjs            # Next.js configuration
-├── tailwind.config.ts         # Tailwind CSS configuration
-└── package.json               # Dependencies
-```
-
-## 🔐 Authentication
-
-### Sign Up
-
-1. Click "START SIMULATION" on home page
-2. Fill in organization details:
-   - Organization Name
-   - Organization Type (dropdown)
-   - Location (Bangalore areas dropdown)
-   - Email
-   - Password
-3. Automatic login after signup
-
-### Sign In
-
-1. Click "START SIMULATION"
-2. Switch to "Sign In" mode
-3. Enter email and password
-
-### Protected Routes
-
-These routes require authentication:
-
-- `/simulation`
-- `/dashboard`
-- `/iot-sensors`
-- `/reuse`
-- `/analytics`
-
-Unauthenticated users are automatically redirected to the home page.
-
-## 📡 API Endpoints
-
-### Authentication
-
-#### POST `/api/auth/signup`
-
-Register new organization
-
-**Request:**
-
-```json
-{
-  "organizationName": "ABC Hospital",
-  "organizationEmail": "admin@abchospital.com",
-  "organizationType": "Hospital",
-  "location": "Whitefield",
-  "password": "securepass123"
-}
-```
-
-**Response:**
-
-```json
-{
-  "_id": "...",
-  "organizationName": "ABC Hospital",
-  "organizationEmail": "admin@abchospital.com",
-  "organizationType": "Hospital",
-  "location": "Whitefield",
-  "token": "jwt_token..."
-}
-```
-
-#### POST `/api/auth/login`
-
-Login with credentials
-
-#### POST `/api/auth/logout`
-
-Logout and clear cookies
-
-#### GET `/api/auth/me`
-
-Get current user (requires auth)
-
-#### GET `/api/auth/verify`
-
-Verify token validity (requires auth)
-
-### Health Check
-
-#### GET `/api/health`
-
-Server health check
-
-## 🎨 Available Organization Types
-
-- Hospital
-- Hotel
-- Restaurant
-- Manufacturing Industry
-- IT/Tech Company
-- Educational Institution
-- Shopping Mall
-- Residential Complex
-- Commercial Complex
-- Food Processing Unit
-- Pharmaceutical Company
-- Textile Industry
-- Other
-
-## 📍 Available Locations (Bangalore)
-
-Whitefield, Electronic City, Koramangala, Indiranagar, JP Nagar, Jayanagar, BTM Layout, HSR Layout, Marathahalli, Sarjapur Road, Hebbal, Yelahanka, Banashankari, Rajajinagar, Malleshwaram, Yeshwanthpur, Peenya, Bommanahalli, Mahadevapura, Dasarahalli, RR Nagar, Kengeri, Hennur, Bellandur, MG Road
-
-## 🚀 Deployment
-
-### Deploy to Vercel (Recommended)
-
-1. Push your code to GitHub
-
-2. Import project on [Vercel](https://vercel.com):
-
-   - Click "Import Project"
-   - Select your repository
-   - Vercel auto-detects Next.js
-
-3. Add Environment Variables:
-
-   - `MONGODB_URI` - Your MongoDB connection string
-   - `JWT_SECRET` - Your JWT secret key
-   - `JWT_EXPIRE` - Token expiration (7d)
-   - `NEXT_PUBLIC_APP_URL` - Your deployment URL
-
-4. Click "Deploy"
-
-That's it! Your app is live! 🎉
-
-### MongoDB Atlas (Production Database)
-
-For production, use MongoDB Atlas instead of local MongoDB:
-
-1. Create account at [mongodb.com](https://www.mongodb.com/)
-2. Create a cluster (free tier available)
-3. Get connection string
-4. Add to Vercel environment variables:
-   ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/wastewater?retryWrites=true&w=majority
-   ```
-
-### Alternative Deployment Options
-
-- **Netlify**: Supports Next.js with serverless functions
-- **Railway**: Easy deployment with MongoDB included
-- **DigitalOcean App Platform**: Full-stack deployment
-- **AWS Amplify**: Scalable cloud deployment
-
-## 📝 Scripts
-
-```bash
-# Development server
-npm run dev
-
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Lint code
-npm run lint
-```
-
-## 🛠️ Tech Stack
+- IoT Sensor Integration (pH, Turbidity, TDS, Nitrogen, COD sensors, etc.)
 
 ### Frontend
 
-- **Next.js 14** - React framework with App Router
+- **Next.js 14** - React framework with App Router 
 - **React 18** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
+- **TypeScript** - Type safety 
+- **Tailwind CSS** - Styling 
 - **Shadcn UI** - UI components
-- **Framer Motion** - Animations
-- **React Query** - Data fetching
+- **Framer Motion** - Animations 
+- **React Query** - Data fetching 
 
 ### Backend
 
-- **Next.js API Routes** - Serverless API
+- **Next.js API Routes** - Serverless API 
 - **MongoDB & Mongoose** - Database
-- **JWT** - Authentication
-- **bcryptjs** - Password hashing
+- **JWT** - Authentication 
+- **bcryptjs** - Password hashing 
 
-## 🔧 Development
+***
 
-### Adding a New Page
+## 🚀 Installation and Setup
 
-1. Create file in `app/your-page/page.tsx`:
+1. Clone the repository:  
+   ```
+   git clone https://github.com/Denyme24/PunarJal.git
+   ```
 
-```tsx
-export default function YourPage() {
-  return <div>Your Page</div>;
-}
-```
+2. Install dependencies:  
+   ```
+   cd frontend
+   npm install
+   ```
 
-2. Access at `/your-page`
+3. Configure environment variables for IoT data sources, API keys, and database connections:  
+   - `MONGODB_URI` - MongoDB connection string  
+   - `JWT_SECRET` - JWT secret key  
+   - `JWT_EXPIRE` - Token expiration (e.g., 7d)  
+   - `NEXT_PUBLIC_APP_URL` - Deployment URL  
 
-### Adding a New API Route
+4. Run the platform locally:  
+   ```
+   npm run dev
+   ```
 
-1. Create file in `app/api/your-route/route.ts`:
+5. Access via your web browser at `http://localhost:3000`
 
-```ts
-import { NextResponse } from "next/server";
+***
 
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
+## ⚙️ Usage
 
-2. Access at `/api/your-route`
+- Register and login as Plant Operator or Environmental Officer. 
+- Connect IoT sensors for streaming real-time water quality data. 
+- Use Treatment Simulation module to model wastewater processes.   
+- Monitor water quality live on the interactive map interface.   
+- Receive AI-generated operational insights and alerts.   
+- Generate and download compliance reports for regulatory bodies.   
 
-### Adding Authentication to a Route
+***
 
-1. Add path to `middleware.ts`:
+## 🌱 Field Survey Insight
 
-```ts
-const protectedPaths = ["/simulation", "/your-new-protected-page"];
-```
+A survey at a medium-scale industrial facility confirmed strong demand for advanced water reuse solutions. Operators highlighted rising water costs, significant wastage, and regulatory pressures. Real-time monitoring, treatment simulation, and AI guidance were highly appreciated for enhancing water conservation and operational efficiency. ✔️
 
-2. Update matcher in `middleware.ts`
+***
 
-## 🐛 Troubleshooting
+## 🌟 Benefits
 
-### MongoDB Connection Issues
+- 💧 Preserves freshwater and promotes sustainable water management.  
+- 💸 Reduces operational costs through optimized water reuse.  
+- ✅ Enhances compliance with environmental regulations.  
+- 🌿 Mitigates pollution and protects ecosystems.  
+- 🔄 Supports circular economy and resource efficiency.  
+- 🌍 Provides accessible, multilingual interfaces for diverse users.  
+- 📊 Empowers data-driven decision-making via real-time visualization and AI support.
 
-- Ensure MongoDB is running locally
-- Check connection string in `.env.local`
-- For Atlas, whitelist your IP address
 
-### Build Errors
 
-- Clear `.next` folder: `rm -rf .next`
-- Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
 
-### Authentication Not Working
 
-- Clear cookies and localStorage
-- Check JWT_SECRET is set
-- Verify token hasn't expired
 
-## 📚 Learn More
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Next.js Learn Tutorial](https://nextjs.org/learn)
-- [Shadcn UI](https://ui.shadcn.com)
-- [MongoDB with Next.js](https://www.mongodb.com/developer/languages/javascript/nextjs-with-mongodb/)
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🙏 Acknowledgments
-
-- Next.js team for the amazing framework
-- Shadcn for the beautiful UI components
-- MongoDB for the database solution
-
----
-
-**Made with ❤️ for sustainable water treatment**
